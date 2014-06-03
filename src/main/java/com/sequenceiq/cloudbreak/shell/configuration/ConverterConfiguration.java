@@ -43,83 +43,83 @@ import org.springframework.shell.core.Converter;
 @Configuration
 public class ConverterConfiguration {
 
-  @Bean
-  Converter simpleFileConverter() {
-    return new SimpleFileConverter();
-  }
+    @Bean
+    Converter simpleFileConverter() {
+        return new SimpleFileConverter();
+    }
 
-  @Bean
-  Converter stringConverter() {
-    return new StringConverter();
-  }
+    @Bean
+    Converter stringConverter() {
+        return new StringConverter();
+    }
 
-  @Bean
-  Converter availableCommandsConverter() {
-    return new AvailableCommandsConverter();
-  }
+    @Bean
+    Converter availableCommandsConverter() {
+        return new AvailableCommandsConverter();
+    }
 
-  @Bean
-  Converter bigDecimalConverter() {
-    return new BigDecimalConverter();
-  }
+    @Bean
+    Converter bigDecimalConverter() {
+        return new BigDecimalConverter();
+    }
 
-  @Bean
-  Converter bigIntegerConverter() {
-    return new BigIntegerConverter();
-  }
+    @Bean
+    Converter bigIntegerConverter() {
+        return new BigIntegerConverter();
+    }
 
-  @Bean
-  Converter booleanConverter() {
-    return new BooleanConverter();
-  }
+    @Bean
+    Converter booleanConverter() {
+        return new BooleanConverter();
+    }
 
-  @Bean
-  Converter characterConverter() {
-    return new CharacterConverter();
-  }
+    @Bean
+    Converter characterConverter() {
+        return new CharacterConverter();
+    }
 
-  @Bean
-  Converter dateConverter() {
-    return new DateConverter();
-  }
+    @Bean
+    Converter dateConverter() {
+        return new DateConverter();
+    }
 
-  @Bean
-  Converter doubleConverter() {
-    return new DoubleConverter();
-  }
+    @Bean
+    Converter doubleConverter() {
+        return new DoubleConverter();
+    }
 
-  @Bean
-  Converter enumConverter() {
-    return new EnumConverter();
-  }
+    @Bean
+    Converter enumConverter() {
+        return new EnumConverter();
+    }
 
-  @Bean
-  Converter floatConverter() {
-    return new FloatConverter();
-  }
+    @Bean
+    Converter floatConverter() {
+        return new FloatConverter();
+    }
 
-  @Bean
-  Converter integerConverter() {
-    return new IntegerConverter();
-  }
+    @Bean
+    Converter integerConverter() {
+        return new IntegerConverter();
+    }
 
-  @Bean
-  Converter localeConverter() {
-    return new LocaleConverter();
-  }
+    @Bean
+    Converter localeConverter() {
+        return new LocaleConverter();
+    }
 
-  @Bean
-  Converter longConverter() {
-    return new LongConverter();
-  }
+    @Bean
+    Converter longConverter() {
+        return new LongConverter();
+    }
 
-  @Bean
-  Converter shortConverter() {
-    return new ShortConverter();
-  }
+    @Bean
+    Converter shortConverter() {
+        return new ShortConverter();
+    }
 
-  @Bean
-  Converter staticFieldConverterImpl() {
-    return new StaticFieldConverterImpl();
-  }
+    @Bean
+    Converter staticFieldConverterImpl() {
+        return new StaticFieldConverterImpl();
+    }
 }

@@ -15,19 +15,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.sequenceiq.cloudbreak.shell.model.model;
+package com.sequenceiq.cloudbreak.shell.customization;
 
-public enum FocusType {
+import org.springframework.shell.plugin.HistoryFileNameProvider;
+import org.springframework.stereotype.Component;
 
-  ROOT("");
+/**
+ * Specifies the name of the CloudBreak command log. Later this log can be used
+ * to re-execute the commands with either the --cmdfile option at startup
+ * or with the script --file command.
+ */
+@Component
+public class CloudbreakHistory implements HistoryFileNameProvider {
 
-  private final String prefix;
+    @Override
+    public String getHistoryFileName() {
+        return "cloud-break.cbh";
+    }
 
-  private FocusType(String prefix) {
-    this.prefix = prefix;
-  }
-
-  public String prefix() {
-    return prefix;
-  }
+    @Override
+    public String getProviderName() {
+        return "CloudbreakShell";
+    }
 }

@@ -15,30 +15,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.sequenceiq.cloudbreak.shell.customization;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.shell.plugin.PromptProvider;
-import org.springframework.stereotype.Component;
-
-import com.sequenceiq.cloudbreak.shell.model.model.CloudbreakContext;
+package com.sequenceiq.cloudbreak.shell.model;
 
 /**
- * Manages the text of the shell's prompt.
+ * Provides some guidance's to the user, what he/she can follow.
  */
-@Component
-public class CloudbreakPrompt implements PromptProvider {
+public enum Hints {
 
-  @Autowired
-  private CloudbreakContext context;
+    NONE("No hints for you.. :(");
 
-  @Override
-  public String getProviderName() {
-    return CloudbreakPrompt.class.getSimpleName();
-  }
+    private final String message;
 
-  @Override
-  public String getPrompt() {
-    return context.getPrompt();
-  }
+    private Hints(String message) {
+        this.message = message;
+    }
+
+    public String message() {
+        return message;
+    }
 }

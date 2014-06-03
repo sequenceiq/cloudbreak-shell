@@ -23,7 +23,7 @@ import org.springframework.shell.core.annotation.CliAvailabilityIndicator;
 import org.springframework.shell.core.annotation.CliCommand;
 import org.springframework.stereotype.Component;
 
-import com.sequenceiq.cloudbreak.shell.model.model.CloudbreakContext;
+import com.sequenceiq.cloudbreak.shell.model.CloudbreakContext;
 
 /**
  * Basic commands used in the shell. Delegating the commands
@@ -32,30 +32,30 @@ import com.sequenceiq.cloudbreak.shell.model.model.CloudbreakContext;
 @Component
 public class BasicCommands implements CommandMarker {
 
-  private CloudbreakContext context;
+    private CloudbreakContext context;
 
-  @Autowired
-  public BasicCommands(CloudbreakContext context) {
-    this.context = context;
-  }
+    @Autowired
+    public BasicCommands(CloudbreakContext context) {
+        this.context = context;
+    }
 
-  /**
-   * Checks whether the hint command is available or not.
-   *
-   * @return true if available false otherwise
-   */
-  @CliAvailabilityIndicator("hint")
-  public boolean isHintCommandAvailable() {
-    return true;
-  }
+    /**
+     * Checks whether the hint command is available or not.
+     *
+     * @return true if available false otherwise
+     */
+    @CliAvailabilityIndicator("hint")
+    public boolean isHintCommandAvailable() {
+        return true;
+    }
 
-  /**
-   * Provides some hints what you can do in the current context.
-   *
-   * @return hint message
-   */
-  @CliCommand(value = "hint", help = "Shows some hints")
-  public String hint() {
-    return context.getHint();
-  }
+    /**
+     * Provides some hints what you can do in the current context.
+     *
+     * @return hint message
+     */
+    @CliCommand(value = "hint", help = "Shows some hints")
+    public String hint() {
+        return context.getHint();
+    }
 }

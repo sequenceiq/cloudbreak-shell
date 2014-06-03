@@ -40,69 +40,69 @@ import org.springframework.shell.plugin.support.DefaultHistoryFileNameProvider;
 @Configuration
 public class ShellConfiguration {
 
-  @Value("${cloudbreak.host:localhost}")
-  private String host;
+    @Value("${cloudbreak.host:localhost}")
+    private String host;
 
-  @Value("${cloudbreak.port:8080}")
-  private String port;
+    @Value("${cloudbreak.port:8080}")
+    private String port;
 
-  @Value("${cloudbreak.user:user@seq.com}")
-  private String user;
+    @Value("${cloudbreak.user:user@seq.com}")
+    private String user;
 
-  @Value("${cloudbreak.password:test123}")
-  private String password;
+    @Value("${cloudbreak.password:test123}")
+    private String password;
 
-  @Value("${cmdfile:}")
-  private String cmdFile;
+    @Value("${cmdfile:}")
+    private String cmdFile;
 
-  @Bean
-  static PropertySourcesPlaceholderConfigurer propertyPlaceholderConfigurer() {
-    return new PropertySourcesPlaceholderConfigurer();
-  }
+    @Bean
+    static PropertySourcesPlaceholderConfigurer propertyPlaceholderConfigurer() {
+        return new PropertySourcesPlaceholderConfigurer();
+    }
 
-  @Bean
-  HistoryFileNameProvider defaultHistoryFileNameProvider() {
-    return new DefaultHistoryFileNameProvider();
-  }
+    @Bean
+    HistoryFileNameProvider defaultHistoryFileNameProvider() {
+        return new DefaultHistoryFileNameProvider();
+    }
 
-  @Bean(name = "shell")
-  JLineShellComponent shell() {
-    return new JLineShellComponent();
-  }
+    @Bean(name = "shell")
+    JLineShellComponent shell() {
+        return new JLineShellComponent();
+    }
 
-  @Bean
-  CommandLine commandLine() throws Exception {
-    String[] args = cmdFile.length() > 0 ? new String[]{"--cmdfile", cmdFile} : new String[0];
-    return SimpleShellCommandLineOptions.parseCommandLine(args);
-  }
+    @Bean
+    CommandLine commandLine() throws Exception {
+        String[] args = cmdFile.length() > 0 ? new String[]{"--cmdfile", cmdFile} : new String[0];
+        return SimpleShellCommandLineOptions.parseCommandLine(args);
+    }
 
-  @Bean
-  ThreadPoolExecutorFactoryBean getThreadPoolExecutorFactoryBean() {
-    return new ThreadPoolExecutorFactoryBean();
-  }
+    @Bean
+    ThreadPoolExecutorFactoryBean getThreadPoolExecutorFactoryBean() {
+        return new ThreadPoolExecutorFactoryBean();
+    }
 
-  @Bean
-  ObjectMapper getObjectMapper() {
-    return new ObjectMapper();
-  }
+    @Bean
+    ObjectMapper getObjectMapper() {
+        return new ObjectMapper();
+    }
 
-  @Bean
-  CommandMarker exitCommand() {
-    return new ExitCommands();
-  }
+    @Bean
+    CommandMarker exitCommand() {
+        return new ExitCommands();
+    }
 
-  @Bean
-  CommandMarker versionCommands() {
-    return new VersionCommands();
-  }
+    @Bean
+    CommandMarker versionCommands() {
+        return new VersionCommands();
+    }
 
-  @Bean
-  CommandMarker helpCommands() {
-    return new HelpCommands();
-  }
+    @Bean
+    CommandMarker helpCommands() {
+        return new HelpCommands();
+    }
 
-  @Bean
-  CommandMarker scriptCommands() {
-    return new ScriptCommands();
-  }
+    @Bean
+    CommandMarker scriptCommands() {
+        return new ScriptCommands();
+    }
 }

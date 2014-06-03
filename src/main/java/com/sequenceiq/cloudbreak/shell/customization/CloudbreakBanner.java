@@ -28,23 +28,23 @@ import com.github.lalyos.jfiglet.FigletFont;
 @Component
 public class CloudbreakBanner implements BannerProvider {
 
-  @Override
-  public String getProviderName() {
-    return "CloudbreakShell";
-  }
+    @Override
+    public String getProviderName() {
+        return "CloudbreakShell";
+    }
 
-  @Override
-  public String getBanner() {
-    return FigletFont.convertOneLine("CloudbreakShell");
-  }
+    @Override
+    public String getBanner() {
+        return FigletFont.convertOneLine("CloudbreakShell");
+    }
 
-  @Override
-  public String getVersion() {
-    return getClass().getPackage().getImplementationVersion();
-  }
+    @Override
+    public String getVersion() {
+        return getClass().getPackage().getImplementationVersion();
+    }
 
-  @Override
-  public String getWelcomeMessage() {
-    return "Welcome to Cloudbreak Shell. For command and param completion press TAB, for assistance type 'hint'.";
-  }
+    @Override
+    public String getWelcomeMessage() {
+        return "Welcome to Cloudbreak Shell. For command and param completion press TAB, for assistance type 'hint'.";
+    }
 }
