@@ -24,34 +24,43 @@ import org.springframework.shell.core.annotation.CliCommand;
 import org.springframework.stereotype.Component;
 
 import com.sequenceiq.cloudbreak.shell.model.CloudbreakContext;
+import com.sequenceiq.cloudbreak.shell.model.Hints;
 
-/**
- * Basic commands used in the shell. Delegating the commands
- * to the Cloudbreak server via a Groovy based client.
- */
 @Component
-public class BasicCommands implements CommandMarker {
+public class CredentialCommands implements CommandMarker {
 
     @Autowired
     private CloudbreakContext context;
 
-    /**
-     * Checks whether the hint command is available or not.
-     *
-     * @return true if available false otherwise
-     */
-    @CliAvailabilityIndicator("hint")
-    public boolean isHintCommandAvailable() {
+    @CliAvailabilityIndicator(value = "credential list")
+    public boolean isCredentialListCommandAvailable() {
+        return context.isCredentialAvailable();
+    }
+
+    @CliCommand(value = "credential list", help = "Shows all of your credentials")
+    public String listCredentials() {
+        return "list";
+    }
+
+    @CliAvailabilityIndicator(value = "credential createEC2")
+    public boolean isCredentialEc2CreateCommandAvailable() {
         return true;
     }
 
-    /**
-     * Provides some hints what you can do in the current context.
-     *
-     * @return hint message
-     */
-    @CliCommand(value = "hint", help = "Shows some hints")
-    public String hint() {
-        return context.getHint();
+    @CliCommand(value = "credential createEC2", help = "Create a new EC2 credential")
+    public String createEc2Credential() {
+        context.setCredentialAvailable(true);
+        context.setHint(Hints.ADD_BLUEPRINT);
+        return "Credential created";
+    }
+
+    @CliAvailabilityIndicator(value = "credential createAzure")
+    public boolean isCredentialAzureCreateCommandAvailable() {
+        return true;
+    }
+
+    @CliCommand(value = "credential createAzure", help = "Create a new Azure credential")
+    public String createAzureCredential() {
+        return "Not supported yet";
     }
 }

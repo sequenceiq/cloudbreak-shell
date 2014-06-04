@@ -24,15 +24,22 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.shell.CommandLine;
 import org.springframework.shell.core.JLineShellComponent;
+import org.springframework.shell.event.ShellStatus;
+import org.springframework.shell.event.ShellStatusListener;
+
+import com.sequenceiq.cloudbreak.shell.model.CloudbreakContext;
+import com.sequenceiq.cloudbreak.shell.model.Hints;
 
 @Configuration
 @ComponentScan(basePackageClasses = {CloudbreakShell.class})
-public class CloudbreakShell implements CommandLineRunner {
+public class CloudbreakShell implements CommandLineRunner, ShellStatusListener {
 
     @Autowired
     private CommandLine commandLine;
     @Autowired
     private JLineShellComponent shell;
+    @Autowired
+    private CloudbreakContext context;
 
     @Override
     public void run(String... arg) throws Exception {
@@ -44,9 +51,17 @@ public class CloudbreakShell implements CommandLineRunner {
                 }
             }
         } else {
+            shell.addShellStatusListener(this);
             shell.start();
             shell.promptLoop();
             shell.waitForComplete();
+        }
+    }
+
+    @Override
+    public void onShellStatusChange(ShellStatus oldStatus, ShellStatus newStatus) {
+        if (newStatus.getStatus() == ShellStatus.Status.STARTED) {
+            context.setHint(Hints.CREATE_CREDENTIAL);
         }
     }
 
