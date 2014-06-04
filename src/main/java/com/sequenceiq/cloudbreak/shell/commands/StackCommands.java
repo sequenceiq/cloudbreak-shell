@@ -21,8 +21,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.CommandMarker;
 import org.springframework.shell.core.annotation.CliAvailabilityIndicator;
 import org.springframework.shell.core.annotation.CliCommand;
+import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.stereotype.Component;
 
+import com.sequenceiq.cloudbreak.client.CloudbreakClient;
 import com.sequenceiq.cloudbreak.shell.model.CloudbreakContext;
 import com.sequenceiq.cloudbreak.shell.model.Hints;
 
@@ -31,6 +33,8 @@ public class StackCommands implements CommandMarker {
 
     @Autowired
     private CloudbreakContext context;
+    @Autowired
+    private CloudbreakClient cloudbreak;
 
     @CliAvailabilityIndicator(value = "stack create")
     public boolean isStackCreateCommandAvailable() {
@@ -38,9 +42,12 @@ public class StackCommands implements CommandMarker {
     }
 
     @CliCommand(value = "stack create", help = "Create a new stack based on a template")
-    public String createStack() {
+    public String createStack(
+            @CliOption(key = "nodeCount", mandatory = true, help = "Number of nodes to create") String count,
+            @CliOption(key = "name", mandatory = true, help = "Name of the stack") String name) {
+        String id = cloudbreak.postStack(name, count);
+        context.addStack(id);
         context.setHint(Hints.CREATE_CLUSTER);
-        context.setStackAvailable(true);
-        return "Stack created";
+        return "Stack created, id: " + id;
     }
 }

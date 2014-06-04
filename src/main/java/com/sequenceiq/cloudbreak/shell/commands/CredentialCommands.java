@@ -23,6 +23,7 @@ import org.springframework.shell.core.annotation.CliAvailabilityIndicator;
 import org.springframework.shell.core.annotation.CliCommand;
 import org.springframework.stereotype.Component;
 
+import com.sequenceiq.cloudbreak.client.CloudbreakClient;
 import com.sequenceiq.cloudbreak.shell.model.CloudbreakContext;
 import com.sequenceiq.cloudbreak.shell.model.Hints;
 
@@ -31,15 +32,17 @@ public class CredentialCommands implements CommandMarker {
 
     @Autowired
     private CloudbreakContext context;
+    @Autowired
+    private CloudbreakClient cloudbreak;
 
     @CliAvailabilityIndicator(value = "credential list")
     public boolean isCredentialListCommandAvailable() {
-        return context.isCredentialAvailable();
+        return false;
     }
 
     @CliCommand(value = "credential list", help = "Shows all of your credentials")
     public String listCredentials() {
-        return "list";
+        return "credential-list";
     }
 
     @CliAvailabilityIndicator(value = "credential createEC2")
@@ -49,9 +52,10 @@ public class CredentialCommands implements CommandMarker {
 
     @CliCommand(value = "credential createEC2", help = "Create a new EC2 credential")
     public String createEc2Credential() {
-        context.setCredentialAvailable(true);
+        String id = cloudbreak.postCredentials();
+        context.setCredential(id);
         context.setHint(Hints.ADD_BLUEPRINT);
-        return "Credential created";
+        return "Credential created, id: " + id;
     }
 
     @CliAvailabilityIndicator(value = "credential createAzure")

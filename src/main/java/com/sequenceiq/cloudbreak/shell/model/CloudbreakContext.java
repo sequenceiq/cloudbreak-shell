@@ -19,6 +19,9 @@ package com.sequenceiq.cloudbreak.shell.model;
 
 import org.springframework.stereotype.Component;
 
+import com.google.common.collect.LinkedListMultimap;
+import com.google.common.collect.ListMultimap;
+
 /**
  * Holds information about the connected Cloudbreak server.
  */
@@ -27,10 +30,7 @@ public class CloudbreakContext {
 
     private Focus focus;
     private Hints hint;
-    private boolean credentialAvailable = false;
-    private boolean blueprintAvailable = false;
-    private boolean templateAvailable = false;
-    private boolean stackAvailable = false;
+    private ListMultimap<PropertyKey, String> properties = LinkedListMultimap.create();
 
     public CloudbreakContext() {
         this.focus = getRootFocus();
@@ -38,35 +38,39 @@ public class CloudbreakContext {
     }
 
     public boolean isStackAvailable() {
-        return stackAvailable;
+        return isPropertyAvailable(PropertyKey.STACK_ID);
     }
 
-    public void setStackAvailable(boolean stackAvailable) {
-        this.stackAvailable = stackAvailable;
+    public void addStack(String id) {
+        addProperty(PropertyKey.STACK_ID, id);
     }
 
     public boolean isTemplateAvailable() {
-        return templateAvailable;
+        return isPropertyAvailable(PropertyKey.TEMPLATE_ID);
     }
 
-    public void setTemplateAvailable(boolean templateAvailable) {
-        this.templateAvailable = templateAvailable;
+    public void addTemplate(String id) {
+        addProperty(PropertyKey.TEMPLATE_ID, id);
     }
 
     public boolean isBlueprintAvailable() {
-        return blueprintAvailable;
+        return isPropertyAvailable(PropertyKey.BLUEPRINT_ID);
     }
 
-    public void setBlueprintAvailable(boolean blueprintAvailable) {
-        this.blueprintAvailable = blueprintAvailable;
+    public void addBlueprint(String id) {
+        addProperty(PropertyKey.BLUEPRINT_ID, id);
     }
 
     public boolean isCredentialAvailable() {
-        return credentialAvailable;
+        return isPropertyAvailable(PropertyKey.CREDENTIAL_ID);
     }
 
-    public void setCredentialAvailable(boolean credentialAvailable) {
-        this.credentialAvailable = credentialAvailable;
+    public void setCredential(String id) {
+        addProperty(PropertyKey.CREDENTIAL_ID, id);
+    }
+
+    public String getStackId() {
+        return getFirstPropertyValue(PropertyKey.STACK_ID);
     }
 
     /**
@@ -132,5 +136,21 @@ public class CloudbreakContext {
 
     private String formatPrompt(String prefix, String postfix) {
         return String.format("%s:%s>", prefix, postfix);
+    }
+
+    private boolean isPropertyAvailable(PropertyKey key) {
+        return !properties.get(key).isEmpty();
+    }
+
+    private void addProperty(PropertyKey key, String value) {
+        properties.put(key, value);
+    }
+
+    private String getFirstPropertyValue(PropertyKey key) {
+        return properties.get(key).get(0);
+    }
+
+    private enum PropertyKey {
+        CREDENTIAL_ID, BLUEPRINT_ID, TEMPLATE_ID, STACK_ID
     }
 }
