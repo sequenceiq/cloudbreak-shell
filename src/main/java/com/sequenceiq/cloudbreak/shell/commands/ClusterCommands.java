@@ -17,12 +17,16 @@
  */
 package com.sequenceiq.cloudbreak.shell.commands;
 
+import static java.lang.Integer.parseInt;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.CommandMarker;
 import org.springframework.shell.core.annotation.CliAvailabilityIndicator;
 import org.springframework.shell.core.annotation.CliCommand;
+import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.stereotype.Component;
 
+import com.sequenceiq.cloudbreak.client.CloudbreakClient;
 import com.sequenceiq.cloudbreak.shell.model.CloudbreakContext;
 import com.sequenceiq.cloudbreak.shell.model.Hints;
 
@@ -31,6 +35,8 @@ public class ClusterCommands implements CommandMarker {
 
     @Autowired
     private CloudbreakContext context;
+    @Autowired
+    private CloudbreakClient cloudbreak;
 
     @CliAvailabilityIndicator(value = "cluster create")
     public boolean isClusterCreateCommandAvailable() {
@@ -38,9 +44,12 @@ public class ClusterCommands implements CommandMarker {
     }
 
     @CliCommand(value = "cluster create", help = "Create a new cluster based on a blueprint and template")
-    public String createCluster() {
+    public String createCluster(
+            @CliOption(key = "name", mandatory = true, help = "Name of the cluster") String name,
+            @CliOption(key = "blueprint", mandatory = true, help = "Id of the blueprint") String blueprint) {
+        cloudbreak.postCluster(name, parseInt(blueprint), parseInt(context.getStackId()));
         context.setHint(Hints.NONE);
-        return "cluster created";
+        return "Cluster created";
     }
 
 }

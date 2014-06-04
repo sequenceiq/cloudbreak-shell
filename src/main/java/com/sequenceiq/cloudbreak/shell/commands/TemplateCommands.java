@@ -21,8 +21,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.CommandMarker;
 import org.springframework.shell.core.annotation.CliAvailabilityIndicator;
 import org.springframework.shell.core.annotation.CliCommand;
+import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.stereotype.Component;
 
+import com.sequenceiq.cloudbreak.client.CloudbreakClient;
 import com.sequenceiq.cloudbreak.shell.model.CloudbreakContext;
 import com.sequenceiq.cloudbreak.shell.model.Hints;
 
@@ -31,6 +33,8 @@ public class TemplateCommands implements CommandMarker {
 
     @Autowired
     private CloudbreakContext context;
+    @Autowired
+    private CloudbreakClient cloudbreak;
 
     @CliAvailabilityIndicator(value = "template list")
     public boolean isTemplateListCommandAvailable() {
@@ -48,9 +52,10 @@ public class TemplateCommands implements CommandMarker {
     }
 
     @CliCommand(value = "template create", help = "Create a new cloud template")
-    public String createTemplate() {
-        context.setTemplateAvailable(true);
+    public String createTemplate(@CliOption(key = "name", mandatory = true, help = "Name of the cloud template") String name) {
+        String id = cloudbreak.postTemplate(name);
+        context.addTemplate(id);
         context.setHint(Hints.CREATE_STACK);
-        return "Template created";
+        return "Template created, id: " + id;
     }
 }
