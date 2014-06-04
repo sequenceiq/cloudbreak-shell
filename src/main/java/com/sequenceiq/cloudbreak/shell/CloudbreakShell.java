@@ -27,6 +27,7 @@ import org.springframework.shell.core.JLineShellComponent;
 import org.springframework.shell.event.ShellStatus;
 import org.springframework.shell.event.ShellStatusListener;
 
+import com.sequenceiq.cloudbreak.client.CloudbreakClient;
 import com.sequenceiq.cloudbreak.shell.model.CloudbreakContext;
 import com.sequenceiq.cloudbreak.shell.model.Hints;
 
@@ -40,6 +41,8 @@ public class CloudbreakShell implements CommandLineRunner, ShellStatusListener {
     private JLineShellComponent shell;
     @Autowired
     private CloudbreakContext context;
+    @Autowired
+    private CloudbreakClient cloudbreak;
 
     @Override
     public void run(String... arg) throws Exception {
@@ -61,7 +64,13 @@ public class CloudbreakShell implements CommandLineRunner, ShellStatusListener {
     @Override
     public void onShellStatusChange(ShellStatus oldStatus, ShellStatus newStatus) {
         if (newStatus.getStatus() == ShellStatus.Status.STARTED) {
-            context.setHint(Hints.CREATE_CREDENTIAL);
+            try {
+                cloudbreak.health();
+                context.setHint(Hints.CREATE_CREDENTIAL);
+            } catch (Exception e) {
+                System.out.println("Cannot connect to Cloudbreak");
+                shell.executeCommand("quit");
+            }
         }
     }
 
