@@ -27,10 +27,46 @@ public class CloudbreakContext {
 
     private Focus focus;
     private Hints hint;
+    private boolean credentialAvailable = false;
+    private boolean blueprintAvailable = false;
+    private boolean templateAvailable = false;
+    private boolean stackAvailable = false;
 
     public CloudbreakContext() {
         this.focus = getRootFocus();
         this.hint = Hints.NONE;
+    }
+
+    public boolean isStackAvailable() {
+        return stackAvailable;
+    }
+
+    public void setStackAvailable(boolean stackAvailable) {
+        this.stackAvailable = stackAvailable;
+    }
+
+    public boolean isTemplateAvailable() {
+        return templateAvailable;
+    }
+
+    public void setTemplateAvailable(boolean templateAvailable) {
+        this.templateAvailable = templateAvailable;
+    }
+
+    public boolean isBlueprintAvailable() {
+        return blueprintAvailable;
+    }
+
+    public void setBlueprintAvailable(boolean blueprintAvailable) {
+        this.blueprintAvailable = blueprintAvailable;
+    }
+
+    public boolean isCredentialAvailable() {
+        return credentialAvailable;
+    }
+
+    public void setCredentialAvailable(boolean credentialAvailable) {
+        this.credentialAvailable = credentialAvailable;
     }
 
     /**

@@ -34,6 +34,8 @@ import org.springframework.shell.core.JLineShellComponent;
 import org.springframework.shell.plugin.HistoryFileNameProvider;
 import org.springframework.shell.plugin.support.DefaultHistoryFileNameProvider;
 
+import com.sequenceiq.cloudbreak.client.CloudbreakClient;
+
 /**
  * Spring bean definitions.
  */
@@ -54,6 +56,11 @@ public class ShellConfiguration {
 
     @Value("${cmdfile:}")
     private String cmdFile;
+
+    @Bean
+    CloudbreakClient createCloudbreakClient() {
+        return new CloudbreakClient(host, port, user, password);
+    }
 
     @Bean
     static PropertySourcesPlaceholderConfigurer propertyPlaceholderConfigurer() {

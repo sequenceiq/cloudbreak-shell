@@ -17,41 +17,47 @@
  */
 package com.sequenceiq.cloudbreak.shell.commands;
 
+import java.io.File;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.CommandMarker;
 import org.springframework.shell.core.annotation.CliAvailabilityIndicator;
 import org.springframework.shell.core.annotation.CliCommand;
+import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.stereotype.Component;
 
 import com.sequenceiq.cloudbreak.shell.model.CloudbreakContext;
+import com.sequenceiq.cloudbreak.shell.model.Hints;
 
-/**
- * Basic commands used in the shell. Delegating the commands
- * to the Cloudbreak server via a Groovy based client.
- */
 @Component
-public class BasicCommands implements CommandMarker {
+public class BlueprintCommands implements CommandMarker {
 
     @Autowired
     private CloudbreakContext context;
 
-    /**
-     * Checks whether the hint command is available or not.
-     *
-     * @return true if available false otherwise
-     */
-    @CliAvailabilityIndicator("hint")
-    public boolean isHintCommandAvailable() {
+    @CliAvailabilityIndicator(value = "blueprint list")
+    public boolean isBlueprintListCommandAvailable() {
+        return context.isBlueprintAvailable();
+    }
+
+    @CliCommand(value = "blueprint list", help = "Shows the currently available blueprints")
+    public String listBlueprints() {
+        return "blueprint list";
+    }
+
+    @CliAvailabilityIndicator(value = "blueprint add")
+    public boolean isBlueprintAddCommandAvailable() {
         return true;
     }
 
-    /**
-     * Provides some hints what you can do in the current context.
-     *
-     * @return hint message
-     */
-    @CliCommand(value = "hint", help = "Shows some hints")
-    public String hint() {
-        return context.getHint();
+    @CliCommand(value = "blueprint add", help = "Add a new blueprint with either --url or --file")
+    public String addBlueprint(
+            @CliOption(key = "url", mandatory = false, help = "URL of the blueprint to download from") String url,
+            @CliOption(key = "file", mandatory = false, help = "File which contains the blueprint") File file) {
+        context.setBlueprintAvailable(true);
+        context.setHint(Hints.CREATE_TEMPLATE);
+        return "message";
     }
+
+
 }

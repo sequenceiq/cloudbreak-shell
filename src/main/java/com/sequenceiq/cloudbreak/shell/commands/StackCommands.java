@@ -24,34 +24,23 @@ import org.springframework.shell.core.annotation.CliCommand;
 import org.springframework.stereotype.Component;
 
 import com.sequenceiq.cloudbreak.shell.model.CloudbreakContext;
+import com.sequenceiq.cloudbreak.shell.model.Hints;
 
-/**
- * Basic commands used in the shell. Delegating the commands
- * to the Cloudbreak server via a Groovy based client.
- */
 @Component
-public class BasicCommands implements CommandMarker {
+public class StackCommands implements CommandMarker {
 
     @Autowired
     private CloudbreakContext context;
 
-    /**
-     * Checks whether the hint command is available or not.
-     *
-     * @return true if available false otherwise
-     */
-    @CliAvailabilityIndicator("hint")
-    public boolean isHintCommandAvailable() {
-        return true;
+    @CliAvailabilityIndicator(value = "stack create")
+    public boolean isStackCreateCommandAvailable() {
+        return context.isCredentialAvailable();
     }
 
-    /**
-     * Provides some hints what you can do in the current context.
-     *
-     * @return hint message
-     */
-    @CliCommand(value = "hint", help = "Shows some hints")
-    public String hint() {
-        return context.getHint();
+    @CliCommand(value = "stack create", help = "Create a new stack based on a template")
+    public String createStack() {
+        context.setHint(Hints.CREATE_CLUSTER);
+        context.setStackAvailable(true);
+        return "Stack created";
     }
 }

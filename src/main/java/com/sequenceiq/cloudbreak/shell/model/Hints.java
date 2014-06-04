@@ -22,7 +22,12 @@ package com.sequenceiq.cloudbreak.shell.model;
  */
 public enum Hints {
 
-    NONE("No hints for you.. :(");
+    CREATE_CREDENTIAL("Create a new credential with the 'credential create' command"),
+    ADD_BLUEPRINT("Add a blueprint with the 'blueprint add' command"),
+    CREATE_TEMPLATE("Create a cloud template with the 'template create' command"),
+    CREATE_STACK("Create a stack based on a template with the 'stack create' command"),
+    CREATE_CLUSTER("Create a cluster with the 'cluster create' command"),
+    NONE("No more hints for you.. :(");
 
     private final String message;
 
