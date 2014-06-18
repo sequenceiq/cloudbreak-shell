@@ -82,7 +82,7 @@ public class CloudbreakShell implements CommandLineRunner, ShellStatusListener {
                             "  java -jar cloudbreak-shell.jar                  : Starts Cloudbreak Shell in interactive mode.\n" +
                             "  java -jar cloudbreak-shell.jar --cmdfile=<FILE> : Cloudbreak Shell executes commands read from the file.\n\n" +
                             "Options:\n" +
-                            "  --cloudbreak.host=<HOSTNAME>       Hostname of the Cloudbreak Server [default: cloudbreak.sequenceiq.com].\n" +
+                            "  --cloudbreak.host=<HOSTNAME>       Hostname of the Cloudbreak Server [default: cloudbreak-api.sequenceiq.com].\n" +
                             "  --cloudbreak.port=<PORT>           Port of the Cloudbreak Server [default: 80].\n" +
                             "  --cloudbreak.user=<USER>           Username of the Cloudbreak user [default: user@sequenceiq.com].\n" +
                             "  --cloudbreak.password=<PASSWORD>   Password of the Cloudbreak user [default: password].\n\n" +
