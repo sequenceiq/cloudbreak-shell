@@ -48,6 +48,11 @@ public class CredentialCommands implements CommandMarker {
         return true;
     }
 
+    @CliAvailabilityIndicator(value = "credential defaults")
+    public boolean isCredentialDefaultsCommandAvailable() {
+        return true;
+    }
+
     @CliCommand(value = "credential show", help = "Shows the credential by its id")
     public Object showBlueprint(
             @CliOption(key = "id", mandatory = true, help = "Id of the credential") String id) {
@@ -64,11 +69,27 @@ public class CredentialCommands implements CommandMarker {
         return true;
     }
 
+    @CliCommand(value = "credential defaults", help = "Adds the default credentials to Cloudbreak")
+    public String addDefaultCredentials() {
+        String message = "Default credentials added";
+        try {
+            cloudbreak.addDefaultCredentials();
+        } catch (Exception e) {
+            message = "Failed to add the default credentials: " + e.getMessage();
+        }
+        return message;
+    }
+
     @CliCommand(value = "credential createEC2", help = "Create a new EC2 credential")
-    public String createEc2Credential() {
-        String id = cloudbreak.postCredentials();
+    public String createEc2Credential(
+            @CliOption(key = "description", mandatory = true, help = "Description of the credential") String description,
+            @CliOption(key = "name", mandatory = true, help = "Name of the credential") String name,
+            @CliOption(key = "roleArn", mandatory = true, help = "roleArn of the credential") String roleArn,
+            @CliOption(key = "instanceProfileRoleArn", mandatory = true, help = "instanceProfileRoleArn of the credential") String instanceProfileRoleArn
+    ) {
+        String id = cloudbreak.postEc2Credential("AWS", name, description, roleArn, instanceProfileRoleArn);
         context.setCredential(id);
-        context.setHint(Hints.ADD_BLUEPRINT);
+        context.setHint(Hints.CREATE_TEMPLATE);
         return "Credential created, id: " + id;
     }
 
