@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.CommandMarker;
 import org.springframework.shell.core.annotation.CliAvailabilityIndicator;
 import org.springframework.shell.core.annotation.CliCommand;
+import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.stereotype.Component;
 
 import com.sequenceiq.cloudbreak.client.CloudbreakClient;
@@ -40,6 +41,17 @@ public class CredentialCommands implements CommandMarker {
     @CliAvailabilityIndicator(value = "credential list")
     public boolean isCredentialListCommandAvailable() {
         return true;
+    }
+
+    @CliAvailabilityIndicator(value = "credential show")
+    public boolean isCredentialShowCommandAvailable() {
+        return true;
+    }
+
+    @CliCommand(value = "credential show", help = "Shows the credential by its id")
+    public Object showBlueprint(
+            @CliOption(key = "id", mandatory = true, help = "Id of the credential") String id) {
+        return cloudbreak.getCredential(id);
     }
 
     @CliCommand(value = "credential list", help = "Shows all of your credentials")
