@@ -52,24 +52,53 @@ public class BlueprintCommands implements CommandMarker {
         return true;
     }
 
-    @CliCommand(value = "blueprint list", help = "Shows the currently available blueprints")
-    public String listBlueprints() {
-        return renderSingleMap(cloudbreak.getBlueprintsMap(), "ID", "INFO");
-    }
-
     @CliAvailabilityIndicator(value = "blueprint add")
     public boolean isBlueprintAddCommandAvailable() {
         return true;
     }
 
+    @CliAvailabilityIndicator(value = "blueprint show")
+    public boolean isBlueprintShowCommandAvailable() {
+        return true;
+    }
+
+    @CliAvailabilityIndicator(value = "blueprint defaults")
+    public boolean isBlueprintDefaultsAddCommandAvailable() {
+        return true;
+    }
+
+    @CliCommand(value = "blueprint defaults", help = "Adds the default blueprints to Ambari")
+    public String addBlueprint() {
+        String message = "Default blueprints added";
+        try {
+            cloudbreak.addDefaultBlueprints();
+        } catch (Exception e) {
+            message = "Failed to add the default blueprints: " + e.getMessage();
+        }
+        return message;
+    }
+
+    @CliCommand(value = "blueprint list", help = "Shows the currently available blueprints")
+    public String listBlueprints() {
+        return renderSingleMap(cloudbreak.getBlueprintsMap(), "ID", "INFO");
+    }
+
+    @CliCommand(value = "blueprint show", help = "Shows the blueprint by its id")
+    public Object showBlueprint(
+            @CliOption(key = "id", mandatory = true, help = "Id of the blueprint") String id) {
+        return cloudbreak.getBlueprint(id);
+    }
+
     @CliCommand(value = "blueprint add", help = "Add a new blueprint with either --url or --file")
     public String addBlueprint(
+            @CliOption(key = "description", mandatory = true, help = "Description of the blueprint to download from") String description,
+            @CliOption(key = "name", mandatory = true, help = "Name of the blueprint to download from") String name,
             @CliOption(key = "url", mandatory = false, help = "URL of the blueprint to download from") String url,
             @CliOption(key = "file", mandatory = false, help = "File which contains the blueprint") File file) {
         String message;
         String json = file == null ? readContent(url) : readContent(file);
         if (json != null) {
-            String id = cloudbreak.postBlueprint(json);
+            String id = cloudbreak.postBlueprint(name, description, json);
             context.addBlueprint(id);
             context.setHint(Hints.CREATE_TEMPLATE);
             message = String.format("Blueprint: '%s' has been added, id: %s", getBlueprintName(json), id);
