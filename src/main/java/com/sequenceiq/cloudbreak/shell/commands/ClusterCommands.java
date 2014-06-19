@@ -44,11 +44,34 @@ public class ClusterCommands implements CommandMarker {
         return context.isBlueprintAvailable() && context.isCredentialAvailable() && context.isStackAvailable();
     }
 
+    @CliAvailabilityIndicator(value = "cluster show")
+    public boolean isClusterShowCommandAvailable() {
+        return true;
+    }
+
+    @CliAvailabilityIndicator(value = "cluster list")
+    public boolean isClusterListCommandAvailable() {
+        return true;
+    }
+
+    @CliCommand(value = "cluster show", help = "Shows the cluster by its id")
+    public Object showCluster(
+            @CliOption(key = "id", mandatory = true, help = "Id of the cluster") String id) {
+        return cloudbreak.getCluster(id);
+    }
+
+    @CliCommand(value = "cluster list", help = "Shows all of your clusters")
+    public String listClusters() {
+        return renderSingleMap(cloudbreak.getClustersMap(), "ID", "INFO");
+    }
+
+
     @CliCommand(value = "cluster create", help = "Create a new cluster based on a blueprint and template")
     public String createCluster(
             @CliOption(key = "name", mandatory = true, help = "Name of the cluster") String name,
-            @CliOption(key = "blueprint", mandatory = true, help = "Id of the blueprint") String blueprint) {
-        cloudbreak.postCluster(name, parseInt(blueprint), parseInt(context.getStackId()));
+            @CliOption(key = "description", mandatory = true, help = "Description of the blueprint") String description,
+            @CliOption(key = "blueprintId", mandatory = true, help = "Id of the blueprint") String blueprint) {
+        cloudbreak.postCluster(name, parseInt(blueprint), description, parseInt(context.getStackId()));
         context.setHint(Hints.NONE);
         return "Cluster created";
     }

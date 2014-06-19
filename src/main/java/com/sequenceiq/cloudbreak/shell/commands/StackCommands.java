@@ -38,16 +38,28 @@ public class StackCommands implements CommandMarker {
     @Autowired
     private CloudbreakClient cloudbreak;
 
+    @CliAvailabilityIndicator(value = "stack list")
+    public boolean isStackListCommandAvailable() {
+        return true;
+    }
+
     @CliAvailabilityIndicator(value = "stack create")
     public boolean isStackCreateCommandAvailable() {
-        return context.isCredentialAvailable();
+        return true;
+    }
+
+    @CliAvailabilityIndicator(value = "stack show")
+    public boolean isStackShowCommandAvailable() {
+        return true;
     }
 
     @CliCommand(value = "stack create", help = "Create a new stack based on a template")
     public String createStack(
             @CliOption(key = "nodeCount", mandatory = true, help = "Number of nodes to create") String count,
-            @CliOption(key = "name", mandatory = true, help = "Name of the stack") String name) {
-        String id = cloudbreak.postStack(name, count);
+            @CliOption(key = "name", mandatory = true, help = "Name of the stack") String name,
+            @CliOption(key = "credentialId", mandatory = true, help = "credentialId of the stack") String credentialId,
+            @CliOption(key = "templateId", mandatory = true, help = "templateId of the stack") String templateId) {
+        String id = cloudbreak.postStack(name, count, credentialId, templateId);
         context.addStack(id);
         context.setHint(Hints.CREATE_CLUSTER);
         return "Stack created, id: " + id;
@@ -57,4 +69,12 @@ public class StackCommands implements CommandMarker {
     public String listStacks() {
         return renderSingleMap(cloudbreak.getStacksMap(), "ID", "INFO");
     }
+
+    @CliCommand(value = "stack show", help = "Shows the stack by its id")
+    public Object showStack(
+            @CliOption(key = "id", mandatory = true, help = "Id of the stack") String id) {
+        return cloudbreak.getStack(id);
+    }
+
+
 }
