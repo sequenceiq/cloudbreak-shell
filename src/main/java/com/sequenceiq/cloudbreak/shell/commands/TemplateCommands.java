@@ -53,14 +53,19 @@ public class TemplateCommands implements CommandMarker {
         return true;
     }
 
-    @CliCommand(value = "template list", help = "Shows the currently available cloud templates")
-    public String listTemplates() {
-        return renderSingleMap(cloudbreak.getTemplatesMap(), "ID", "INFO");
-    }
-
     @CliAvailabilityIndicator(value = "template create")
     public boolean isTemplateCreateCommandAvailable() {
         return true;
+    }
+
+    @CliAvailabilityIndicator(value = "template select")
+    public boolean isTemplateSelectCommandAvailable() {
+        return true;
+    }
+
+    @CliCommand(value = "template list", help = "Shows the currently available cloud templates")
+    public String listTemplates() {
+        return renderSingleMap(cloudbreak.getTemplatesMap(), "ID", "INFO");
     }
 
     @CliCommand(value = "template defaults", help = "Adds the default templates to Cloudbreak")
@@ -74,6 +79,18 @@ public class TemplateCommands implements CommandMarker {
         return message;
     }
 
+    @CliCommand(value = "template select", help = "Select the template by its id")
+    public String selectTemplate(
+            @CliOption(key = "id", mandatory = true, help = "Id of the template") String id) {
+        if (cloudbreak.getTemplate(id) != null) {
+            context.addTemplate(id);
+            context.setHint(Hints.CREATE_CLUSTER);
+            return "Template selected, id: " + id;
+        } else {
+            return "No template specified";
+        }
+    }
+
     @CliCommand(value = "template createEC2", help = "Create a new EC2 template")
     public String createEc2Template(
             @CliOption(key = "description", mandatory = true, help = "Description of the template") String description,
@@ -85,6 +102,7 @@ public class TemplateCommands implements CommandMarker {
             @CliOption(key = "instanceType", mandatory = true, help = "instanceType of the template") String instanceType
     ) {
         String id = cloudbreak.postEc2Template(name, description, region, amiId, keyName, sshLocation, instanceType);
+        context.addTemplate(id);
         context.setHint(Hints.CREATE_CLUSTER);
         return "Template created, id: " + id;
     }

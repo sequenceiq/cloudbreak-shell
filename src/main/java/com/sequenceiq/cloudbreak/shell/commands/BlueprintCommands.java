@@ -52,6 +52,11 @@ public class BlueprintCommands implements CommandMarker {
         return true;
     }
 
+    @CliAvailabilityIndicator(value = "blueprint select")
+    public boolean isBlueprintSelectCommandAvailable() {
+        return true;
+    }
+
     @CliAvailabilityIndicator(value = "blueprint add")
     public boolean isBlueprintAddCommandAvailable() {
         return true;
@@ -87,6 +92,20 @@ public class BlueprintCommands implements CommandMarker {
     public Object showBlueprint(
             @CliOption(key = "id", mandatory = true, help = "Id of the blueprint") String id) {
         return cloudbreak.getBlueprint(id);
+    }
+
+    @CliCommand(value = "blueprint select", help = "Select the blueprint by its id")
+    public String selectBlueprint(
+            @CliOption(key = "id", mandatory = true, help = "Id of the blueprint") String id) {
+        String message;
+        if (cloudbreak.getBlueprint(id) != null) {
+            context.addBlueprint(id);
+            context.setHint(Hints.CREATE_TEMPLATE);
+            message = String.format("Blueprint has been selected, id: %s", id);
+        } else {
+            message = "No blueprint specified";
+        }
+        return message;
     }
 
     @CliCommand(value = "blueprint add", help = "Add a new blueprint with either --url or --file")

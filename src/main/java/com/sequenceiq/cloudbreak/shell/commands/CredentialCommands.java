@@ -53,6 +53,16 @@ public class CredentialCommands implements CommandMarker {
         return true;
     }
 
+    @CliAvailabilityIndicator(value = "credential select")
+    public boolean isCredentialSelectCommandAvailable() {
+        return true;
+    }
+
+    @CliAvailabilityIndicator(value = "credential createEC2")
+    public boolean isCredentialEc2CreateCommandAvailable() {
+        return true;
+    }
+
     @CliCommand(value = "credential show", help = "Shows the credential by its id")
     public Object showBlueprint(
             @CliOption(key = "id", mandatory = true, help = "Id of the credential") String id) {
@@ -64,11 +74,6 @@ public class CredentialCommands implements CommandMarker {
         return renderSingleMap(cloudbreak.getCredentialsMap(), "ID", "INFO");
     }
 
-    @CliAvailabilityIndicator(value = "credential createEC2")
-    public boolean isCredentialEc2CreateCommandAvailable() {
-        return true;
-    }
-
     @CliCommand(value = "credential defaults", help = "Adds the default credentials to Cloudbreak")
     public String addDefaultCredentials() {
         String message = "Default credentials added";
@@ -78,6 +83,18 @@ public class CredentialCommands implements CommandMarker {
             message = "Failed to add the default credentials: " + e.getMessage();
         }
         return message;
+    }
+
+    @CliCommand(value = "credential select", help = "Select the credential by its id")
+    public String selectCredential(
+            @CliOption(key = "id", mandatory = true, help = "Id of the credential") String id) {
+        if (cloudbreak.getCredential(id) != null) {
+            context.setCredential(id);
+            context.setHint(Hints.CREATE_TEMPLATE);
+            return "Credential selected, id: " + id;
+        } else {
+            return "No credential specified";
+        }
     }
 
     @CliCommand(value = "credential createEC2", help = "Create a new EC2 credential")

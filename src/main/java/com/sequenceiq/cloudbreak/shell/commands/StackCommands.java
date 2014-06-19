@@ -53,6 +53,11 @@ public class StackCommands implements CommandMarker {
         return true;
     }
 
+    @CliAvailabilityIndicator(value = "stack select")
+    public boolean isStackSelectCommandAvailable() {
+        return true;
+    }
+
     @CliCommand(value = "stack create", help = "Create a new stack based on a template")
     public String createStack(
             @CliOption(key = "nodeCount", mandatory = true, help = "Number of nodes to create") String count,
@@ -63,6 +68,18 @@ public class StackCommands implements CommandMarker {
         context.addStack(id);
         context.setHint(Hints.CREATE_CLUSTER);
         return "Stack created, id: " + id;
+    }
+
+    @CliCommand(value = "stack select", help = "Select the stack by its id")
+    public String selectStack(
+            @CliOption(key = "id", mandatory = true, help = "Id of the stack") String id) {
+        if (cloudbreak.getStack(id) != null) {
+            context.addStack(id);
+            context.setHint(Hints.CREATE_CLUSTER);
+            return "Stack selected, id: " + id;
+        } else {
+            return "No stack specified";
+        }
     }
 
     @CliCommand(value = "stack list", help = "Shows all of your stack")
