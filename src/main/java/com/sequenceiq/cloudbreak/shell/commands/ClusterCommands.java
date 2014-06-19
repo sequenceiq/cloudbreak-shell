@@ -17,6 +17,7 @@
  */
 package com.sequenceiq.cloudbreak.shell.commands;
 
+import static com.sequenceiq.cloudbreak.shell.support.TableRenderer.renderSingleMap;
 import static java.lang.Integer.parseInt;
 
 import org.springframework.beans.factory.annotation.Autowired;

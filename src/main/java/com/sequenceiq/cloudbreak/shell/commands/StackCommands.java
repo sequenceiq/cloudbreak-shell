@@ -17,6 +17,8 @@
  */
 package com.sequenceiq.cloudbreak.shell.commands;
 
+import static com.sequenceiq.cloudbreak.shell.support.TableRenderer.renderSingleMap;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.CommandMarker;
 import org.springframework.shell.core.annotation.CliAvailabilityIndicator;
@@ -49,5 +51,10 @@ public class StackCommands implements CommandMarker {
         context.addStack(id);
         context.setHint(Hints.CREATE_CLUSTER);
         return "Stack created, id: " + id;
+    }
+
+    @CliCommand(value = "stack list", help = "Shows all of your stack")
+    public String listStacks() {
+        return renderSingleMap(cloudbreak.getStacksMap(), "ID", "INFO");
     }
 }

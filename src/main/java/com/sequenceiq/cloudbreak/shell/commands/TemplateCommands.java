@@ -17,6 +17,8 @@
  */
 package com.sequenceiq.cloudbreak.shell.commands;
 
+import static com.sequenceiq.cloudbreak.shell.support.TableRenderer.renderSingleMap;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.CommandMarker;
 import org.springframework.shell.core.annotation.CliAvailabilityIndicator;
@@ -38,12 +40,12 @@ public class TemplateCommands implements CommandMarker {
 
     @CliAvailabilityIndicator(value = "template list")
     public boolean isTemplateListCommandAvailable() {
-        return context.isTemplateAvailable();
+        return true;
     }
 
     @CliCommand(value = "template list", help = "Shows the currently available cloud templates")
     public String listTemplates() {
-        return "template list";
+        return renderSingleMap(cloudbreak.getTemplatesMap(), "ID", "INFO");
     }
 
     @CliAvailabilityIndicator(value = "template create")

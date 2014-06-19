@@ -17,6 +17,8 @@
  */
 package com.sequenceiq.cloudbreak.shell.commands;
 
+import static com.sequenceiq.cloudbreak.shell.support.TableRenderer.renderSingleMap;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.CommandMarker;
 import org.springframework.shell.core.annotation.CliAvailabilityIndicator;
@@ -37,12 +39,12 @@ public class CredentialCommands implements CommandMarker {
 
     @CliAvailabilityIndicator(value = "credential list")
     public boolean isCredentialListCommandAvailable() {
-        return false;
+        return true;
     }
 
     @CliCommand(value = "credential list", help = "Shows all of your credentials")
     public String listCredentials() {
-        return "credential-list";
+        return renderSingleMap(cloudbreak.getCredentialsMap(), "ID", "INFO");
     }
 
     @CliAvailabilityIndicator(value = "credential createEC2")

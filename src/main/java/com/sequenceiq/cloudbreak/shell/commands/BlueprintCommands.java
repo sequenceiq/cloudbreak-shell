@@ -17,6 +17,8 @@
  */
 package com.sequenceiq.cloudbreak.shell.commands;
 
+import static com.sequenceiq.cloudbreak.shell.support.TableRenderer.renderSingleMap;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -47,12 +49,12 @@ public class BlueprintCommands implements CommandMarker {
 
     @CliAvailabilityIndicator(value = "blueprint list")
     public boolean isBlueprintListCommandAvailable() {
-        return context.isBlueprintAvailable();
+        return true;
     }
 
     @CliCommand(value = "blueprint list", help = "Shows the currently available blueprints")
     public String listBlueprints() {
-        return "blueprint list";
+        return renderSingleMap(cloudbreak.getBlueprintsMap(), "ID", "INFO");
     }
 
     @CliAvailabilityIndicator(value = "blueprint add")
