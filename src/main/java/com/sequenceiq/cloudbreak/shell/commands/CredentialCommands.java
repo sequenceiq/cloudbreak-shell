@@ -87,7 +87,7 @@ public class CredentialCommands implements CommandMarker {
             @CliOption(key = "roleArn", mandatory = true, help = "roleArn of the credential") String roleArn,
             @CliOption(key = "instanceProfileRoleArn", mandatory = true, help = "instanceProfileRoleArn of the credential") String instanceProfileRoleArn
     ) {
-        String id = cloudbreak.postEc2Credential("AWS", name, description, roleArn, instanceProfileRoleArn);
+        String id = cloudbreak.postEc2Credential(name, description, roleArn, instanceProfileRoleArn);
         context.setCredential(id);
         context.setHint(Hints.CREATE_TEMPLATE);
         return "Credential created, id: " + id;
