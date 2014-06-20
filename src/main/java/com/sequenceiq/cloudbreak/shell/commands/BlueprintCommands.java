@@ -100,7 +100,7 @@ public class BlueprintCommands implements CommandMarker {
         String message;
         if (cloudbreak.getBlueprint(id) != null) {
             context.addBlueprint(id);
-            context.setHint(Hints.CREATE_TEMPLATE);
+            context.setHint(Hints.CREATE_STACK);
             message = String.format("Blueprint has been selected, id: %s", id);
         } else {
             message = "No blueprint specified";
@@ -119,7 +119,7 @@ public class BlueprintCommands implements CommandMarker {
         if (json != null) {
             String id = cloudbreak.postBlueprint(name, description, json);
             context.addBlueprint(id);
-            context.setHint(Hints.CREATE_TEMPLATE);
+            context.setHint(Hints.CREATE_STACK);
             message = String.format("Blueprint: '%s' has been added, id: %s", getBlueprintName(json), id);
         } else {
             message = "No blueprint specified";

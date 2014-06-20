@@ -90,7 +90,7 @@ public class StackCommands implements CommandMarker {
             @CliOption(key = "id", mandatory = true, help = "Id of the stack") String id) {
         try {
             cloudbreak.terminateStack(id);
-            context.setHint(Hints.CREATE_STACK);
+            context.setHint(Hints.CREATE_CLUSTER);
             context.removeStack(id);
             return "Stack terminated with id:" + id ;
         } catch (Exception ex) {
