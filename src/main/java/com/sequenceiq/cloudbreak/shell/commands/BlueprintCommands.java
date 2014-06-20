@@ -107,7 +107,7 @@ public class BlueprintCommands implements CommandMarker {
             }
         }
 
-        return renderSingleMap(map, "ID", "INFO") + "\n\n" + renderMultiValueMap(hosts, "HOSTGROUP", "COMPONENT");
+        return renderSingleMap(map, "FIELD", "INFO") + "\n\n" + renderMultiValueMap(hosts, "HOSTGROUP", "COMPONENT");
 
     }
 
