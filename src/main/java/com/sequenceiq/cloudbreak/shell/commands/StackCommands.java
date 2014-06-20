@@ -90,7 +90,7 @@ public class StackCommands implements CommandMarker {
     @CliCommand(value = "stack show", help = "Shows the stack by its id")
     public Object showStack(
             @CliOption(key = "id", mandatory = true, help = "Id of the stack") String id) {
-        return cloudbreak.getStack(id);
+        return renderSingleMap(cloudbreak.getStackMap(id), "FIELD", "VALUE");
     }
 
 

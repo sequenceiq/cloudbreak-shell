@@ -66,7 +66,7 @@ public class CredentialCommands implements CommandMarker {
     @CliCommand(value = "credential show", help = "Shows the credential by its id")
     public Object showBlueprint(
             @CliOption(key = "id", mandatory = true, help = "Id of the credential") String id) {
-        return cloudbreak.getCredential(id);
+        return renderSingleMap(cloudbreak.getCredentialMap(id), "FIELD", "VALUE");
     }
 
     @CliCommand(value = "credential list", help = "Shows all of your credentials")

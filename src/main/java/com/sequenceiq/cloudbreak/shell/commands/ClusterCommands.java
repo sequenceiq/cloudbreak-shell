@@ -57,7 +57,7 @@ public class ClusterCommands implements CommandMarker {
     @CliCommand(value = "cluster show", help = "Shows the cluster by its id")
     public Object showCluster(
             @CliOption(key = "id", mandatory = true, help = "Id of the cluster") String id) {
-        return cloudbreak.getCluster(id);
+        return renderSingleMap(cloudbreak.getClusterMap(id), "FIELD", "VALUE");
     }
 
     @CliCommand(value = "cluster list", help = "Shows all of your clusters")

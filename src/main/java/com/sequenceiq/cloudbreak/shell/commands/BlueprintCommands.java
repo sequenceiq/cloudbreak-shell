@@ -85,13 +85,13 @@ public class BlueprintCommands implements CommandMarker {
 
     @CliCommand(value = "blueprint list", help = "Shows the currently available blueprints")
     public String listBlueprints() {
-        return renderSingleMap(cloudbreak.getBlueprintsMap(), "ID", "INFO");
+        return renderSingleMap(cloudbreak.getBlueprintsMap(), "FIELD", "VALUE");
     }
 
     @CliCommand(value = "blueprint show", help = "Shows the blueprint by its id")
     public Object showBlueprint(
             @CliOption(key = "id", mandatory = true, help = "Id of the blueprint") String id) {
-        return cloudbreak.getBlueprint(id);
+        return renderSingleMap(cloudbreak.getBlueprintMap(id), "ID", "INFO");
     }
 
     @CliCommand(value = "blueprint select", help = "Select the blueprint by its id")

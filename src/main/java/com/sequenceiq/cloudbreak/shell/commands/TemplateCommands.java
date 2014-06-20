@@ -29,6 +29,8 @@ import org.springframework.stereotype.Component;
 import com.sequenceiq.cloudbreak.client.CloudbreakClient;
 import com.sequenceiq.cloudbreak.shell.model.CloudbreakContext;
 import com.sequenceiq.cloudbreak.shell.model.Hints;
+import com.sequenceiq.cloudbreak.shell.model.InstanceType;
+import com.sequenceiq.cloudbreak.shell.model.Region;
 
 @Component
 public class TemplateCommands implements CommandMarker {
@@ -95,13 +97,13 @@ public class TemplateCommands implements CommandMarker {
     public String createEc2Template(
             @CliOption(key = "description", mandatory = true, help = "Description of the template") String description,
             @CliOption(key = "name", mandatory = true, help = "Name of the template") String name,
-            @CliOption(key = "region", mandatory = true, help = "region of the template") String region,
-            @CliOption(key = "amiId", mandatory = true, help = "amiId of the template") String amiId,
+            @CliOption(key = "region", mandatory = false, specifiedDefaultValue = "EU_WEST_1", help = "region of the template") Region region,
+            @CliOption(key = "amiId", mandatory = false, specifiedDefaultValue = "ami-f39f5684", help = "amiId of the template: ami-f39f5684 (ambari-warmup) or ami-f39f5684 (with-nagios)") String amiId,
             @CliOption(key = "keyName", mandatory = true, help = "keyName of the template") String keyName,
-            @CliOption(key = "sshLocation", mandatory = true, help = "sshLocation of the template") String sshLocation,
-            @CliOption(key = "instanceType", mandatory = true, help = "instanceType of the template") String instanceType
+            @CliOption(key = "sshLocation", mandatory = false, specifiedDefaultValue = "0.0.0.0/0", help = "sshLocation of the template") String sshLocation,
+            @CliOption(key = "instanceType", mandatory = true, help = "instanceType of the template") InstanceType instanceType
     ) {
-        String id = cloudbreak.postEc2Template(name, description, region, amiId, keyName, sshLocation, instanceType);
+        String id = cloudbreak.postEc2Template(name, description, region.name(), amiId, keyName, sshLocation, instanceType.name());
         context.addTemplate(id);
         context.setHint(Hints.CREATE_CLUSTER);
         return "Template created, id: " + id;
@@ -110,7 +112,7 @@ public class TemplateCommands implements CommandMarker {
     @CliCommand(value = "template show", help = "Shows the template by its id")
     public Object showTemlate(
             @CliOption(key = "id", mandatory = true, help = "Id of the template") String id) {
-        return cloudbreak.getTemplate(id);
+        return renderSingleMap(cloudbreak.getTemplateMap(id), "FIELD", "VALUE");
     }
 
 
