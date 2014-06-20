@@ -75,6 +75,7 @@ public class TemplateCommands implements CommandMarker {
         String message = "Default templates added";
         try {
             cloudbreak.addDefaultTemplates();
+            context.setHint(Hints.SELECT_TEMPLATE);
         } catch (Exception e) {
             message = "Failed to add the default templates: " + e.getMessage();
         }
