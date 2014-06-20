@@ -41,7 +41,7 @@ public class ClusterCommands implements CommandMarker {
 
     @CliAvailabilityIndicator(value = "cluster create")
     public boolean isClusterCreateCommandAvailable() {
-        return context.isBlueprintAvailable() && context.isCredentialAvailable() && context.isStackAvailable();
+        return context.isBlueprintAvailable() && context.isStackAvailable();
     }
 
     @CliAvailabilityIndicator(value = "cluster show")
@@ -69,9 +69,8 @@ public class ClusterCommands implements CommandMarker {
     @CliCommand(value = "cluster create", help = "Create a new cluster based on a blueprint and template")
     public String createCluster(
             @CliOption(key = "name", mandatory = true, help = "Name of the cluster") String name,
-            @CliOption(key = "description", mandatory = true, help = "Description of the blueprint") String description,
-            @CliOption(key = "blueprintId", mandatory = true, help = "Id of the blueprint") String blueprint) {
-        cloudbreak.postCluster(name, parseInt(blueprint), description, parseInt(context.getStackId()));
+            @CliOption(key = "description", mandatory = true, help = "Description of the blueprint") String description) {
+        cloudbreak.postCluster(name, parseInt(context.getBlueprintId()), description, parseInt(context.getStackId()));
         context.setHint(Hints.NONE);
         return "Cluster created";
     }

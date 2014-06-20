@@ -73,6 +73,18 @@ public class CloudbreakContext {
         return getFirstPropertyValue(PropertyKey.STACK_ID);
     }
 
+    public String getTemplateId() {
+        return getFirstPropertyValue(PropertyKey.TEMPLATE_ID);
+    }
+
+    public String getBlueprintId() {
+        return getFirstPropertyValue(PropertyKey.BLUEPRINT_ID);
+    }
+
+    public String getCredentialId() {
+        return getFirstPropertyValue(PropertyKey.CREDENTIAL_ID);
+    }
+
     /**
      * Sets the focus to the root.
      */
