@@ -45,6 +45,10 @@ public class CloudbreakContext {
         addProperty(PropertyKey.STACK_ID, id);
     }
 
+    public void removeStack(String id) {
+        removeProperty(PropertyKey.STACK_ID, id);
+    }
+
     public boolean isTemplateAvailable() {
         return isPropertyAvailable(PropertyKey.TEMPLATE_ID);
     }
@@ -156,6 +160,10 @@ public class CloudbreakContext {
 
     private void addProperty(PropertyKey key, String value) {
         properties.put(key, value);
+    }
+
+    private void removeProperty(PropertyKey key, String value) {
+        properties.remove(key, value);
     }
 
     private String getFirstPropertyValue(PropertyKey key) {

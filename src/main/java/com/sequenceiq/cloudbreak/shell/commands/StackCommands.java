@@ -43,6 +43,11 @@ public class StackCommands implements CommandMarker {
         return true;
     }
 
+    @CliAvailabilityIndicator(value = "stack terminate")
+    public boolean isStackTerminateCommandAvailable() {
+        return true;
+    }
+
     @CliAvailabilityIndicator(value = "stack create")
     public boolean isStackCreateCommandAvailable() {
         return context.isTemplateAvailable() && context.isCredentialAvailable();
@@ -77,6 +82,19 @@ public class StackCommands implements CommandMarker {
             return "Stack selected, id: " + id;
         } else {
             return "No stack specified";
+        }
+    }
+
+    @CliCommand(value = "stack terminate", help = "Terminate the stack by its id")
+    public String terminateStack(
+            @CliOption(key = "id", mandatory = true, help = "Id of the stack") String id) {
+        try {
+            cloudbreak.terminateStack(id);
+            context.setHint(Hints.CREATE_STACK);
+            context.removeStack(id);
+            return "Stack terminated with id:" + id ;
+        } catch (Exception ex) {
+            return "Stack terminated was not success with id:" + id ;
         }
     }
 

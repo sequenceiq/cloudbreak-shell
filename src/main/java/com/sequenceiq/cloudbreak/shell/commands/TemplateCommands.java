@@ -57,7 +57,7 @@ public class TemplateCommands implements CommandMarker {
 
     @CliAvailabilityIndicator(value = "template create")
     public boolean isTemplateCreateCommandAvailable() {
-        return true;
+        return false;
     }
 
     @CliAvailabilityIndicator(value = "template select")
@@ -86,7 +86,7 @@ public class TemplateCommands implements CommandMarker {
             @CliOption(key = "id", mandatory = true, help = "Id of the template") String id) {
         if (cloudbreak.getTemplate(id) != null) {
             context.addTemplate(id);
-            context.setHint(Hints.CREATE_CLUSTER);
+            context.setHint(Hints.ADD_BLUEPRINT);
             return "Template selected, id: " + id;
         } else {
             return "No template specified";
@@ -105,7 +105,7 @@ public class TemplateCommands implements CommandMarker {
     ) {
         String id = cloudbreak.postEc2Template(name, description, region.name(), amiId, keyName, sshLocation, instanceType.name());
         context.addTemplate(id);
-        context.setHint(Hints.CREATE_CLUSTER);
+        context.setHint(Hints.ADD_BLUEPRINT);
         return "Template created, id: " + id;
     }
 
