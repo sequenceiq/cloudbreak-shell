@@ -19,6 +19,8 @@ package com.sequenceiq.cloudbreak.shell.commands;
 
 import static com.sequenceiq.cloudbreak.shell.support.TableRenderer.renderSingleMap;
 
+import java.util.HashMap;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.CommandMarker;
 import org.springframework.shell.core.annotation.CliAvailabilityIndicator;
@@ -68,7 +70,7 @@ public class StackCommands implements CommandMarker {
             @CliOption(key = "nodeCount", mandatory = true, help = "Number of nodes to create") String count,
             @CliOption(key = "name", mandatory = true, help = "Name of the stack") String name) {
         String id = cloudbreak.postStack(name, count, context.getCredentialId(), context.getTemplateId());
-        context.addStack(id);
+        context.addStack(id, name);
         context.setHint(Hints.CREATE_CLUSTER);
         return "Stack created, id: " + id;
     }
@@ -76,8 +78,9 @@ public class StackCommands implements CommandMarker {
     @CliCommand(value = "stack select", help = "Select the stack by its id")
     public String selectStack(
             @CliOption(key = "id", mandatory = true, help = "Id of the stack") String id) {
-        if (cloudbreak.getStack(id) != null) {
-            context.addStack(id);
+        Object stack = cloudbreak.getStack(id);
+        if (stack != null) {
+            context.addStack(id, ((HashMap) stack).get("name").toString());
             context.setHint(Hints.CREATE_CLUSTER);
             return "Stack selected, id: " + id;
         } else {
@@ -92,9 +95,9 @@ public class StackCommands implements CommandMarker {
             cloudbreak.terminateStack(id);
             context.setHint(Hints.CREATE_CLUSTER);
             context.removeStack(id);
-            return "Stack terminated with id:" + id ;
+            return "Stack terminated with id:" + id;
         } catch (Exception ex) {
-            return "Stack terminated was not success with id:" + id ;
+            return "Stack terminated was not success with id:" + id;
         }
     }
 

@@ -41,8 +41,9 @@ public class CloudbreakContext {
         return isPropertyAvailable(PropertyKey.STACK_ID);
     }
 
-    public void addStack(String id) {
+    public void addStack(String id, String name) {
         addProperty(PropertyKey.STACK_ID, id);
+        addProperty(PropertyKey.STACK_NAME, name);
     }
 
     public void removeStack(String id) {
@@ -75,6 +76,10 @@ public class CloudbreakContext {
 
     public String getStackId() {
         return getFirstPropertyValue(PropertyKey.STACK_ID);
+    }
+
+    public String getStackName() {
+        return getFirstPropertyValue(PropertyKey.STACK_NAME);
     }
 
     public String getTemplateId() {
@@ -171,6 +176,6 @@ public class CloudbreakContext {
     }
 
     private enum PropertyKey {
-        CREDENTIAL_ID, BLUEPRINT_ID, TEMPLATE_ID, STACK_ID
+        CREDENTIAL_ID, BLUEPRINT_ID, TEMPLATE_ID, STACK_ID, STACK_NAME
     }
 }

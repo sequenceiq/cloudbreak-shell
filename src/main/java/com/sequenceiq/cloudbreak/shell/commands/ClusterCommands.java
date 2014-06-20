@@ -49,28 +49,15 @@ public class ClusterCommands implements CommandMarker {
         return true;
     }
 
-    @CliAvailabilityIndicator(value = "cluster list")
-    public boolean isClusterListCommandAvailable() {
-        return true;
+    @CliCommand(value = "cluster show", help = "Shows the cluster by stack id")
+    public Object showCluster() {
+        return renderSingleMap(cloudbreak.getClusterMap(context.getStackId()), "FIELD", "VALUE");
     }
-
-    @CliCommand(value = "cluster show", help = "Shows the cluster by its id")
-    public Object showCluster(
-            @CliOption(key = "id", mandatory = true, help = "Id of the cluster") String id) {
-        return renderSingleMap(cloudbreak.getClusterMap(id), "FIELD", "VALUE");
-    }
-
-    @CliCommand(value = "cluster list", help = "Shows all of your clusters")
-    public String listClusters() {
-        return renderSingleMap(cloudbreak.getClustersMap(), "ID", "INFO");
-    }
-
 
     @CliCommand(value = "cluster create", help = "Create a new cluster based on a blueprint and template")
     public String createCluster(
-            @CliOption(key = "name", mandatory = true, help = "Name of the cluster") String name,
             @CliOption(key = "description", mandatory = true, help = "Description of the blueprint") String description) {
-        cloudbreak.postCluster(name, parseInt(context.getBlueprintId()), description, parseInt(context.getStackId()));
+        cloudbreak.postCluster(context.getStackName(), parseInt(context.getBlueprintId()), description, parseInt(context.getStackId()));
         context.setHint(Hints.NONE);
         return "Cluster created";
     }
