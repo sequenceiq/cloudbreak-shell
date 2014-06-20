@@ -17,12 +17,16 @@
  */
 package com.sequenceiq.cloudbreak.shell.commands;
 
+import static com.sequenceiq.cloudbreak.shell.support.TableRenderer.renderMultiValueMap;
 import static com.sequenceiq.cloudbreak.shell.support.TableRenderer.renderSingleMap;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -91,7 +95,20 @@ public class BlueprintCommands implements CommandMarker {
     @CliCommand(value = "blueprint show", help = "Shows the blueprint by its id")
     public Object showBlueprint(
             @CliOption(key = "id", mandatory = true, help = "Id of the blueprint") String id) {
-        return renderSingleMap(cloudbreak.getBlueprintMap(id), "ID", "INFO");
+        Map<String, String> map = new HashMap<>();
+        Map<String, List<String>> hosts = new HashMap<>();
+        Map<String, Object> blueprintMap = cloudbreak.getBlueprintMap(id);
+
+        for (Map.Entry<String, Object> stringStringEntry : blueprintMap.entrySet()) {
+            if ("ambariBlueprint".equals(stringStringEntry.getKey().toString())) {
+                hosts = (Map<String, List<String>>) stringStringEntry.getValue();
+            } else {
+                map.put(stringStringEntry.getKey(), stringStringEntry.getValue().toString());
+            }
+        }
+
+        return renderSingleMap(map, "ID", "INFO") + "\n\n" + renderMultiValueMap(hosts, "HOSTGROUP", "COMPONENT");
+
     }
 
     @CliCommand(value = "blueprint select", help = "Select the blueprint by its id")
