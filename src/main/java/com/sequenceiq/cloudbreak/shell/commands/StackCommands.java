@@ -45,7 +45,7 @@ public class StackCommands implements CommandMarker {
 
     @CliAvailabilityIndicator(value = "stack create")
     public boolean isStackCreateCommandAvailable() {
-        return true;
+        return context.isBlueprintAvailable() && context.isCredentialAvailable();
     }
 
     @CliAvailabilityIndicator(value = "stack show")
