@@ -11,3 +11,10 @@ Cloudbreak is a RESTful application development platform with the goal of helpin
 
 The Cloudbreak Shell is based on  the REST [API](http://docs.cloudbreak.apiary.io/).
 
+In order to start with the shell use `java -jar cloudbreak-shell-0.1-SNAPSHOT.jar --cloudbreak.host=cloudbreak-api.sequenceiq.com --cloudbreak.port=80 --cloudbreak.user=xxxxx@sequenceiq.com --cloudbreak.password=xxxxx` where
+  
+    * cloudbreak.host - the host name or IP address of a Cloudbreak deployment
+    * cloudbreak.port - port where Cloudbreak is accessible
+    * cloudbreak.user - user name 
+    * cloudbreak.password - password 
+
