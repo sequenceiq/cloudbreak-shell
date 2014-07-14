@@ -55,8 +55,13 @@ public class TemplateCommands implements CommandMarker {
         return true;
     }
 
-    @CliAvailabilityIndicator(value = "template create")
-    public boolean isTemplateCreateCommandAvailable() {
+    @CliAvailabilityIndicator(value = "template createEC2")
+    public boolean isTemplateEc2CreateCommandAvailable() {
+        return false;
+    }
+
+    @CliAvailabilityIndicator(value = "template createAzure")
+    public boolean isTemplateAzureCreateCommandAvailable() {
         return false;
     }
 
@@ -105,6 +110,23 @@ public class TemplateCommands implements CommandMarker {
             @CliOption(key = "instanceType", mandatory = true, help = "instanceType of the template") InstanceType instanceType
     ) {
         String id = cloudbreak.postEc2Template(name, description, region.name(), amiId, keyName, sshLocation, instanceType.name());
+        context.addTemplate(id);
+        context.setHint(Hints.ADD_BLUEPRINT);
+        return "Template created, id: " + id;
+    }
+
+
+    @CliCommand(value = "template createAZURE", help = "Create a new AZURE template")
+    public String createAzureTemplate(
+            @CliOption(key = "description", mandatory = true, help = "Description of the template") String description,
+            @CliOption(key = "name", mandatory = true, help = "Name of the template") String name,
+            @CliOption(key = "location", mandatory = false, specifiedDefaultValue = "NORTH_EUROPE", help = "location of the template") String location,
+            @CliOption(key = "imageName", mandatory = false, specifiedDefaultValue = "ambari-docker-v1", help = "instance name of the template: ambari-docker-v1") String imageName,
+            @CliOption(key = "sshKey", mandatory = false, help = "sshKey of the template") String sshKey,
+            @CliOption(key = "vmType", mandatory = false, specifiedDefaultValue = "MEDIUM", help = "type of the VM") String vmType,
+            @CliOption(key = "password", mandatory = false, help = "password of the VM") String password
+    ) {
+        String id = cloudbreak.postAzureTemplate(name, description, location, imageName, vmType, sshKey, password);
         context.addTemplate(id);
         context.setHint(Hints.ADD_BLUEPRINT);
         return "Template created, id: " + id;

@@ -101,18 +101,30 @@ public class CredentialCommands implements CommandMarker {
     public String createEc2Credential(
             @CliOption(key = "description", mandatory = true, help = "Description of the credential") String description,
             @CliOption(key = "name", mandatory = true, help = "Name of the credential") String name,
-            @CliOption(key = "roleArn", mandatory = true, help = "roleArn of the credential") String roleArn,
-            @CliOption(key = "instanceProfileRoleArn", mandatory = true, help = "instanceProfileRoleArn of the credential") String instanceProfileRoleArn
+            @CliOption(key = "roleArn", mandatory = true, help = "roleArn of the credential") String roleArn
     ) {
-        String id = cloudbreak.postEc2Credential(name, description, roleArn, instanceProfileRoleArn);
+        String id = cloudbreak.postEc2Credential(name, description, roleArn);
         context.setCredential(id);
         context.setHint(Hints.CREATE_TEMPLATE);
         return "Credential created, id: " + id;
     }
 
-    @CliAvailabilityIndicator(value = "credential createAzure")
+    @CliAvailabilityIndicator(value = "credential createAZURE")
     public boolean isCredentialAzureCreateCommandAvailable() {
         return true;
+    }
+
+    @CliCommand(value = "credential createAZURE", help = "Create a new AZURE credential")
+    public String createAzureCredential(
+            @CliOption(key = "description", mandatory = true, help = "Description of the credential") String description,
+            @CliOption(key = "name", mandatory = true, help = "Name of the credential") String name,
+            @CliOption(key = "subscriptionId", mandatory = true, help = "subscriptionId of the credential") String subscriptionId,
+            @CliOption(key = "jksPassword", mandatory = true, help = "jksPassword of the credential") String jksPassword
+    ) {
+        String id = cloudbreak.postAzureCredential(name, description, subscriptionId, jksPassword);
+        context.setCredential(id);
+        context.setHint(Hints.CREATE_TEMPLATE);
+        return "Credential created, id: " + id;
     }
 
     @CliCommand(value = "credential createAzure", help = "Create a new Azure credential")
