@@ -51,7 +51,11 @@ public class ClusterCommands implements CommandMarker {
 
     @CliCommand(value = "cluster show", help = "Shows the cluster by stack id")
     public Object showCluster() {
-        return renderSingleMap(cloudbreak.getClusterMap(context.getStackId()), "FIELD", "VALUE");
+        try {
+            return renderSingleMap(cloudbreak.getClusterMap(context.getStackId()), "FIELD", "VALUE");
+        } catch (IndexOutOfBoundsException ex) {
+            return "There was no cluster for this account.";
+        }
     }
 
     @CliCommand(value = "cluster create", help = "Create a new cluster based on a blueprint and template")

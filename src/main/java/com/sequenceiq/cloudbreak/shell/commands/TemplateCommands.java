@@ -19,6 +19,10 @@ package com.sequenceiq.cloudbreak.shell.commands;
 
 import static com.sequenceiq.cloudbreak.shell.support.TableRenderer.renderSingleMap;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.CommandMarker;
 import org.springframework.shell.core.annotation.CliAvailabilityIndicator;
@@ -27,6 +31,9 @@ import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.stereotype.Component;
 
 import com.sequenceiq.cloudbreak.client.CloudbreakClient;
+import com.sequenceiq.cloudbreak.shell.model.AzureInstanceName;
+import com.sequenceiq.cloudbreak.shell.model.AzureLocation;
+import com.sequenceiq.cloudbreak.shell.model.AzureVmType;
 import com.sequenceiq.cloudbreak.shell.model.CloudbreakContext;
 import com.sequenceiq.cloudbreak.shell.model.Hints;
 import com.sequenceiq.cloudbreak.shell.model.InstanceType;
@@ -35,6 +42,7 @@ import com.sequenceiq.cloudbreak.shell.model.Region;
 @Component
 public class TemplateCommands implements CommandMarker {
 
+    public static final int BUFFER = 1024;
     @Autowired
     private CloudbreakContext context;
     @Autowired
@@ -103,13 +111,12 @@ public class TemplateCommands implements CommandMarker {
     public String createEc2Template(
             @CliOption(key = "description", mandatory = true, help = "Description of the template") String description,
             @CliOption(key = "name", mandatory = true, help = "Name of the template") String name,
-            @CliOption(key = "region", mandatory = false, specifiedDefaultValue = "EU_WEST_1", help = "region of the template") Region region,
-            @CliOption(key = "amiId", mandatory = false, specifiedDefaultValue = "ami-f39f5684", help = "amiId of the template: ami-f39f5684 (ambari-warmup) or ami-190ac26e (with-nagios)") String amiId,
+            @CliOption(key = "region", mandatory = true, help = "region of the template") Region region,
             @CliOption(key = "keyName", mandatory = true, help = "keyName of the template") String keyName,
             @CliOption(key = "sshLocation", mandatory = false, specifiedDefaultValue = "0.0.0.0/0", help = "sshLocation of the template") String sshLocation,
             @CliOption(key = "instanceType", mandatory = true, help = "instanceType of the template") InstanceType instanceType
     ) {
-        String id = cloudbreak.postEc2Template(name, description, region.name(), amiId, keyName, sshLocation, instanceType.name());
+        String id = cloudbreak.postEc2Template(name, description, region.name(), region.getAmi(), keyName, sshLocation, instanceType.name());
         context.addTemplate(id);
         context.setHint(Hints.ADD_BLUEPRINT);
         return "Template created, id: " + id;
@@ -120,16 +127,36 @@ public class TemplateCommands implements CommandMarker {
     public String createAzureTemplate(
             @CliOption(key = "description", mandatory = true, help = "Description of the template") String description,
             @CliOption(key = "name", mandatory = true, help = "Name of the template") String name,
-            @CliOption(key = "location", mandatory = false, specifiedDefaultValue = "NORTH_EUROPE", help = "location of the template") String location,
-            @CliOption(key = "imageName", mandatory = false, specifiedDefaultValue = "ambari-docker-v1", help = "instance name of the template: ambari-docker-v1") String imageName,
-            @CliOption(key = "sshKey", mandatory = false, help = "sshKey of the template") String sshKey,
-            @CliOption(key = "vmType", mandatory = false, specifiedDefaultValue = "MEDIUM", help = "type of the VM") String vmType,
+            @CliOption(key = "location", mandatory = true, help = "location of the template") AzureLocation location,
+            @CliOption(key = "imageName", mandatory = true, help = "instance name of the template: AMBARI_DOCKER_V1") AzureInstanceName imageName,
+            @CliOption(key = "sshKeyPath", mandatory = false, help = "sshKeyPath of the template") String sshKeyPath,
+            @CliOption(key = "vmType", mandatory = true, help = "type of the VM") AzureVmType vmType,
             @CliOption(key = "password", mandatory = false, help = "password of the VM") String password
     ) {
-        String id = cloudbreak.postAzureTemplate(name, description, location, imageName, vmType, sshKey, password);
-        context.addTemplate(id);
-        context.setHint(Hints.ADD_BLUEPRINT);
-        return "Template created, id: " + id;
+        if (sshKeyPath == null || sshKeyPath.isEmpty()) {
+            if (password.isEmpty() || password == null) {
+                return "Password cannot be null if sshKeyPath null";
+            }
+            String id = cloudbreak.postAzureTemplate(name, description, location.name(), imageName.name(), vmType.name(), "", password);
+            context.addTemplate(id);
+            context.setHint(Hints.ADD_BLUEPRINT);
+            return "Template created, id: " + id;
+        } else {
+            if (sshKeyPath.isEmpty() || sshKeyPath == null) {
+                return "SshKeyPath cannot be null if password null";
+            }
+            String sshKey = "";
+            try {
+                sshKey = readFileAsString(sshKeyPath);
+            } catch (IOException e) {
+                return "File not found with ssh key.";
+            }
+            String id = cloudbreak.postAzureTemplate(name, description, location.name(), imageName.name(), vmType.name(), sshKey, "");
+            context.addTemplate(id);
+            context.setHint(Hints.ADD_BLUEPRINT);
+            return "Template created, id: " + id;
+        }
+
     }
 
     @CliCommand(value = "template show", help = "Shows the template by its id")
@@ -145,5 +172,19 @@ public class TemplateCommands implements CommandMarker {
         context.addTemplate(id);
         context.setHint(Hints.CREATE_STACK);
         return "Template created, id: " + id;
+    }
+
+    private String readFileAsString(String filePath) throws IOException {
+        StringBuffer fileData = new StringBuffer();
+        BufferedReader reader = new BufferedReader(
+                new FileReader(filePath));
+        char[] buf = new char[BUFFER];
+        int numRead = 0;
+        while ((numRead = reader.read(buf)) != -1) {
+            String readData = String.valueOf(buf, 0, numRead);
+            fileData.append(readData);
+        }
+        reader.close();
+        return fileData.toString();
     }
 }

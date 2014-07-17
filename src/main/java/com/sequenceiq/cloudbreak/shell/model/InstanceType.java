@@ -1,9 +1,11 @@
 package com.sequenceiq.cloudbreak.shell.model;
 
 public enum InstanceType {
-    T1Micro,
-    M1Small,
-    M1Medium,
-    M1Large,
-    M1Xlarge;
+    T2Micro,
+    T2Small,
+    T2Medium,
+    M3Medium,
+    M3large,
+    M32xlarge,
+    M3Xlarge;
 }
