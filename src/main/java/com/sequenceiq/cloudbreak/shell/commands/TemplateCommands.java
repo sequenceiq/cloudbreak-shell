@@ -22,6 +22,8 @@ import static com.sequenceiq.cloudbreak.shell.support.TableRenderer.renderSingle
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.CommandMarker;
@@ -147,7 +149,7 @@ public class TemplateCommands implements CommandMarker {
             }
             String sshKey = "";
             try {
-                sshKey = readFileAsString(sshKeyPath);
+                sshKey = new String(Files.readAllBytes(Paths.get(sshKeyPath)));;
             } catch (IOException e) {
                 return "File not found with ssh key.";
             }

@@ -19,6 +19,10 @@ package com.sequenceiq.cloudbreak.shell.commands;
 
 import static com.sequenceiq.cloudbreak.shell.support.TableRenderer.renderSingleMap;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.CommandMarker;
 import org.springframework.shell.core.annotation.CliAvailabilityIndicator;
@@ -33,6 +37,8 @@ import com.sequenceiq.cloudbreak.shell.model.Hints;
 @Component
 public class CredentialCommands implements CommandMarker {
 
+    public static final String AZURE = "AZURE";
+    List<Map> maps = new ArrayList<>();
     @Autowired
     private CloudbreakContext context;
     @Autowired
@@ -126,6 +132,33 @@ public class CredentialCommands implements CommandMarker {
         context.setHint(Hints.CREATE_TEMPLATE);
         return "Credential created, id: " + id;
     }
+
+    @CliAvailabilityIndicator(value = "credential certificate")
+    public boolean isCredentialCertificateCommandAvailable() {
+        List<Map> credentials = cloudbreak.getCredentials();
+        int count = 0;
+        maps = new ArrayList<>();
+        for (Map map : credentials) {
+            if (map.get("cloudPlatform").toString().equals(AZURE)) {
+                maps.add(map);
+                count++;
+            }
+        }
+        return count == 0 ? false : true;
+    }
+
+    @CliCommand(value = "credential certificate", help = "get Azure certificate")
+    public String getAzureCertificate(
+            @CliOption(key = "id", mandatory = true, help = "id of the credential") String id
+    ) {
+        for (Map map : maps) {
+            if (map.get("id").toString().equals(id)) {
+                return cloudbreak.getCertificate(id);
+            }
+        }
+        return "Azure certificate with this id is not exist";
+    }
+
 
     @CliCommand(value = "credential createAzure", help = "Create a new Azure credential")
     public String createAzureCredential() {
