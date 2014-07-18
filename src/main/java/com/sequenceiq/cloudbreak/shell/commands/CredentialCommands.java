@@ -65,7 +65,7 @@ public class CredentialCommands implements CommandMarker {
 
     @CliAvailabilityIndicator(value = "credential defaults")
     public boolean isCredentialDefaultsCommandAvailable() {
-        return true;
+        return false;
     }
 
     @CliAvailabilityIndicator(value = "credential select")
