@@ -108,7 +108,9 @@ public final class TableRenderer {
     Map<String, List<String>> result = new HashMap<String, List<String>>(map.size());
     if (map != null) {
       for (String key : map.keySet()) {
-        result.put(key, singletonList(map.get(key)));
+         if (map.get(key) != null) {
+            result.put(key, singletonList(map.get(key)));
+        }
       }
     }
     return result;
