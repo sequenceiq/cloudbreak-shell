@@ -112,7 +112,7 @@ public class CredentialCommands implements CommandMarker {
             @CliOption(key = "description", mandatory = true, help = "Description of the credential") String description,
             @CliOption(key = "name", mandatory = true, help = "Name of the credential") String name,
             @CliOption(key = "roleArn", mandatory = true, help = "roleArn of the credential") String roleArn,
-            @CliOption(key = "sshKeyPath", mandatory = false, help = "sshKeyPath of the template") String sshKeyPath
+            @CliOption(key = "sshKeyPath", mandatory = true, help = "sshKeyPath of the template") String sshKeyPath
     ) {
         if (sshKeyPath.isEmpty() || sshKeyPath == null) {
             return "SshKeyPath cannot be null if password null";
@@ -140,7 +140,7 @@ public class CredentialCommands implements CommandMarker {
             @CliOption(key = "name", mandatory = true, help = "Name of the credential") String name,
             @CliOption(key = "subscriptionId", mandatory = true, help = "subscriptionId of the credential") String subscriptionId,
             @CliOption(key = "jksPassword", mandatory = true, help = "jksPassword of the credential") String jksPassword,
-            @CliOption(key = "sshKeyPath", mandatory = false, help = "sshKeyPath of the template") String sshKeyPath
+            @CliOption(key = "sshKeyPath", mandatory = true, help = "sshKeyPath of the template") String sshKeyPath
     ) {
         if (sshKeyPath.isEmpty() || sshKeyPath == null) {
             return "SshKeyPath cannot be null if password null";
