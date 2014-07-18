@@ -149,7 +149,7 @@ public class TemplateCommands implements CommandMarker {
             }
             String sshKey = "";
             try {
-                sshKey = new String(Files.readAllBytes(Paths.get(sshKeyPath)));;
+                sshKey = new String(Files.readAllBytes(Paths.get(sshKeyPath))).replaceAll("\n", "");
             } catch (IOException e) {
                 return "File not found with ssh key.";
             }

@@ -156,12 +156,6 @@ public class CredentialCommands implements CommandMarker {
                 return cloudbreak.getCertificate(id);
             }
         }
-        return "Azure certificate with this id is not exist";
-    }
-
-
-    @CliCommand(value = "credential createAzure", help = "Create a new Azure credential")
-    public String createAzureCredential() {
-        return "Not supported yet";
+        return "Azure certificate with this id does not exist";
     }
 }
