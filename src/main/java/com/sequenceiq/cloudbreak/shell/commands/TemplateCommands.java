@@ -22,8 +22,6 @@ import static com.sequenceiq.cloudbreak.shell.support.TableRenderer.renderSingle
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.CommandMarker;
@@ -114,11 +112,10 @@ public class TemplateCommands implements CommandMarker {
             @CliOption(key = "description", mandatory = true, help = "Description of the template") String description,
             @CliOption(key = "name", mandatory = true, help = "Name of the template") String name,
             @CliOption(key = "region", mandatory = true, help = "region of the template") Region region,
-            @CliOption(key = "keyName", mandatory = true, help = "keyName of the template") String keyName,
             @CliOption(key = "sshLocation", mandatory = false, specifiedDefaultValue = "0.0.0.0/0", help = "sshLocation of the template") String sshLocation,
             @CliOption(key = "instanceType", mandatory = true, help = "instanceType of the template") InstanceType instanceType
     ) {
-        String id = cloudbreak.postEc2Template(name, description, region.name(), region.getAmi(), keyName, sshLocation, instanceType.name());
+        String id = cloudbreak.postEc2Template(name, description, region.name(), region.getAmi(), sshLocation, instanceType.name());
         context.addTemplate(id);
         context.setHint(Hints.ADD_BLUEPRINT);
         return "Template created, id: " + id;
@@ -131,33 +128,15 @@ public class TemplateCommands implements CommandMarker {
             @CliOption(key = "name", mandatory = true, help = "Name of the template") String name,
             @CliOption(key = "location", mandatory = true, help = "location of the template") AzureLocation location,
             @CliOption(key = "imageName", mandatory = true, help = "instance name of the template: AMBARI_DOCKER_V1") AzureInstanceName imageName,
-            @CliOption(key = "sshKeyPath", mandatory = false, help = "sshKeyPath of the template") String sshKeyPath,
-            @CliOption(key = "vmType", mandatory = true, help = "type of the VM") AzureVmType vmType,
-            @CliOption(key = "password", mandatory = false, help = "password of the VM") String password
+            @CliOption(key = "vmType", mandatory = true, help = "type of the VM") AzureVmType vmType
     ) {
-        if (sshKeyPath == null || sshKeyPath.isEmpty()) {
-            if (password.isEmpty() || password == null) {
-                return "Password cannot be null if sshKeyPath null";
-            }
-            String id = cloudbreak.postAzureTemplate(name, description, location.name(), imageName.name(), vmType.name(), "", password);
-            context.addTemplate(id);
-            context.setHint(Hints.ADD_BLUEPRINT);
-            return "Template created, id: " + id;
-        } else {
-            if (sshKeyPath.isEmpty() || sshKeyPath == null) {
-                return "SshKeyPath cannot be null if password null";
-            }
-            String sshKey = "";
-            try {
-                sshKey = new String(Files.readAllBytes(Paths.get(sshKeyPath))).replaceAll("\n", "");
-            } catch (IOException e) {
-                return "File not found with ssh key.";
-            }
-            String id = cloudbreak.postAzureTemplate(name, description, location.name(), imageName.name(), vmType.name(), sshKey, "");
-            context.addTemplate(id);
-            context.setHint(Hints.ADD_BLUEPRINT);
-            return "Template created, id: " + id;
-        }
+
+       
+        String id = cloudbreak.postAzureTemplate(name, description, location.name(), imageName.name(), vmType.name());
+        context.addTemplate(id);
+        context.setHint(Hints.ADD_BLUEPRINT);
+        return "Template created, id: " + id;
+
 
     }
 

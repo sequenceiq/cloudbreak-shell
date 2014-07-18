@@ -19,6 +19,9 @@ package com.sequenceiq.cloudbreak.shell.commands;
 
 import static com.sequenceiq.cloudbreak.shell.support.TableRenderer.renderSingleMap;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +41,8 @@ import com.sequenceiq.cloudbreak.shell.model.Hints;
 public class CredentialCommands implements CommandMarker {
 
     public static final String AZURE = "AZURE";
-    List<Map> maps = new ArrayList<>();
+    private List<Map> maps = new ArrayList<>();
+    
     @Autowired
     private CloudbreakContext context;
     @Autowired
@@ -107,9 +111,19 @@ public class CredentialCommands implements CommandMarker {
     public String createEc2Credential(
             @CliOption(key = "description", mandatory = true, help = "Description of the credential") String description,
             @CliOption(key = "name", mandatory = true, help = "Name of the credential") String name,
-            @CliOption(key = "roleArn", mandatory = true, help = "roleArn of the credential") String roleArn
+            @CliOption(key = "roleArn", mandatory = true, help = "roleArn of the credential") String roleArn,
+            @CliOption(key = "sshKeyPath", mandatory = false, help = "sshKeyPath of the template") String sshKeyPath
     ) {
-        String id = cloudbreak.postEc2Credential(name, description, roleArn);
+        if (sshKeyPath.isEmpty() || sshKeyPath == null) {
+            return "SshKeyPath cannot be null if password null";
+        }
+        String sshKey = "";
+        try {
+            sshKey = new String(Files.readAllBytes(Paths.get(sshKeyPath))).replaceAll("\n", "");
+        } catch (IOException e) {
+            return "File not found with ssh key.";
+        }
+        String id = cloudbreak.postEc2Credential(name, description, roleArn, sshKey);
         context.setCredential(id);
         context.setHint(Hints.CREATE_TEMPLATE);
         return "Credential created, id: " + id;
@@ -125,9 +139,19 @@ public class CredentialCommands implements CommandMarker {
             @CliOption(key = "description", mandatory = true, help = "Description of the credential") String description,
             @CliOption(key = "name", mandatory = true, help = "Name of the credential") String name,
             @CliOption(key = "subscriptionId", mandatory = true, help = "subscriptionId of the credential") String subscriptionId,
-            @CliOption(key = "jksPassword", mandatory = true, help = "jksPassword of the credential") String jksPassword
+            @CliOption(key = "jksPassword", mandatory = true, help = "jksPassword of the credential") String jksPassword,
+            @CliOption(key = "sshKeyPath", mandatory = false, help = "sshKeyPath of the template") String sshKeyPath
     ) {
-        String id = cloudbreak.postAzureCredential(name, description, subscriptionId, jksPassword);
+        if (sshKeyPath.isEmpty() || sshKeyPath == null) {
+            return "SshKeyPath cannot be null if password null";
+        }
+        String sshKey = "";
+        try {
+            sshKey = new String(Files.readAllBytes(Paths.get(sshKeyPath))).replaceAll("\n", "");
+        } catch (IOException e) {
+            return "File not found with ssh key.";
+        }
+        String id = cloudbreak.postAzureCredential(name, description, subscriptionId, jksPassword, sshKey);
         context.setCredential(id);
         context.setHint(Hints.CREATE_TEMPLATE);
         return "Credential created, id: " + id;
