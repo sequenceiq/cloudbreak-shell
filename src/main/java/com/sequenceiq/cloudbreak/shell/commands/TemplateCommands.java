@@ -130,14 +130,10 @@ public class TemplateCommands implements CommandMarker {
             @CliOption(key = "imageName", mandatory = true, help = "instance name of the template: AMBARI_DOCKER_V1") AzureInstanceName imageName,
             @CliOption(key = "vmType", mandatory = true, help = "type of the VM") AzureVmType vmType
     ) {
-
-       
         String id = cloudbreak.postAzureTemplate(name, description, location.name(), imageName.name(), vmType.name());
         context.addTemplate(id);
         context.setHint(Hints.ADD_BLUEPRINT);
         return "Template created, id: " + id;
-
-
     }
 
     @CliCommand(value = "template show", help = "Shows the template by its id")

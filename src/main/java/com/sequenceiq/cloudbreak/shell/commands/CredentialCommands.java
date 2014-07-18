@@ -42,7 +42,7 @@ public class CredentialCommands implements CommandMarker {
 
     public static final String AZURE = "AZURE";
     private List<Map> maps = new ArrayList<>();
-    
+
     @Autowired
     private CloudbreakContext context;
     @Autowired
