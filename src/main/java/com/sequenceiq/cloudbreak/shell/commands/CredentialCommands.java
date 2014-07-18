@@ -53,6 +53,11 @@ public class CredentialCommands implements CommandMarker {
         return true;
     }
 
+    @CliAvailabilityIndicator(value = "credential delete")
+    public boolean isCredentialDeleteCommandAvailable() {
+        return true;
+    }
+
     @CliAvailabilityIndicator(value = "credential show")
     public boolean isCredentialShowCommandAvailable() {
         return true;
@@ -74,9 +79,15 @@ public class CredentialCommands implements CommandMarker {
     }
 
     @CliCommand(value = "credential show", help = "Shows the credential by its id")
-    public Object showBlueprint(
+    public Object showCredential(
             @CliOption(key = "id", mandatory = true, help = "Id of the credential") String id) {
         return renderSingleMap(cloudbreak.getCredentialMap(id), "FIELD", "VALUE");
+    }
+
+    @CliCommand(value = "credential delete", help = "Delete the credential by its id")
+    public Object deleteCredential(
+            @CliOption(key = "id", mandatory = true, help = "Id of the credential") String id) {
+        return cloudbreak.deleteCredential(id);
     }
 
     @CliCommand(value = "credential list", help = "Shows all of your credentials")

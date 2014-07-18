@@ -71,6 +71,11 @@ public class BlueprintCommands implements CommandMarker {
         return true;
     }
 
+    @CliAvailabilityIndicator(value = "blueprint delete")
+    public boolean isBlueprintDeleteCommandAvailable() {
+        return true;
+    }
+
     @CliAvailabilityIndicator(value = "blueprint defaults")
     public boolean isBlueprintDefaultsAddCommandAvailable() {
         return true;
@@ -85,6 +90,12 @@ public class BlueprintCommands implements CommandMarker {
             message = "Failed to add the default blueprints: " + e.getMessage();
         }
         return message;
+    }
+
+    @CliCommand(value = "blueprint delete", help = "Delete the blueprint by its id")
+    public Object deleteBlueprint(
+            @CliOption(key = "id", mandatory = true, help = "Id of the blueprint") String id) {
+        return cloudbreak.deleteBlueprint(id);
     }
 
     @CliCommand(value = "blueprint list", help = "Shows the currently available blueprints")

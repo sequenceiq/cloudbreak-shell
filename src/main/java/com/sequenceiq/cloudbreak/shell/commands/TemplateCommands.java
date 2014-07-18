@@ -63,6 +63,11 @@ public class TemplateCommands implements CommandMarker {
         return true;
     }
 
+    @CliAvailabilityIndicator(value = "template delete")
+    public boolean isTemplateDeleteCommandAvailable() {
+        return true;
+    }
+
     @CliAvailabilityIndicator(value = "template createEC2")
     public boolean isTemplateEc2CreateCommandAvailable() {
         return false;
@@ -140,6 +145,12 @@ public class TemplateCommands implements CommandMarker {
     public Object showTemlate(
             @CliOption(key = "id", mandatory = true, help = "Id of the template") String id) {
         return renderSingleMap(cloudbreak.getTemplateMap(id), "FIELD", "VALUE");
+    }
+
+    @CliCommand(value = "template delete", help = "Shows the template by its id")
+    public Object deleteTemlate(
+            @CliOption(key = "id", mandatory = true, help = "Id of the template") String id) {
+        return cloudbreak.deleteTemplate(id);
     }
 
 
