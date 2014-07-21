@@ -66,6 +66,7 @@ public class CloudbreakShell implements CommandLineRunner, ShellStatusListener {
         if (newStatus.getStatus() == ShellStatus.Status.STARTED) {
             try {
                 cloudbreak.health();
+                cloudbreak.login();
                 context.setHint(Hints.CREATE_CREDENTIAL);
             } catch (Exception e) {
                 System.out.println("Cannot connect to Cloudbreak");
