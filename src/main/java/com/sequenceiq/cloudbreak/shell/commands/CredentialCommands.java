@@ -19,7 +19,10 @@ package com.sequenceiq.cloudbreak.shell.commands;
 
 import static com.sequenceiq.cloudbreak.shell.support.TableRenderer.renderSingleMap;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -123,16 +126,25 @@ public class CredentialCommands implements CommandMarker {
             @CliOption(key = "description", mandatory = true, help = "Description of the credential") String description,
             @CliOption(key = "name", mandatory = true, help = "Name of the credential") String name,
             @CliOption(key = "roleArn", mandatory = true, help = "roleArn of the credential") String roleArn,
-            @CliOption(key = "sshKeyPath", mandatory = true, help = "sshKeyPath of the template") String sshKeyPath
+            @CliOption(key = "sshKeyPath", mandatory = false, help = "sshKeyPath of the template") String sshKeyPath,
+            @CliOption(key = "sshKeyUrl", mandatory = false, help = "sshKeyUrl of the template") String sshKeyUrl
     ) {
-        if (sshKeyPath.isEmpty() || sshKeyPath == null) {
-            return "SshKeyPath cannot be null if password null";
+        if ((sshKeyPath == null || sshKeyPath.isEmpty()) && (sshKeyUrl == null || sshKeyUrl.isEmpty())) {
+            return "SshKey cannot be null if password null";
         }
         String sshKey = "";
-        try {
-            sshKey = new String(Files.readAllBytes(Paths.get(sshKeyPath))).replaceAll("\n", "");
-        } catch (IOException e) {
-            return "File not found with ssh key.";
+        if (sshKeyPath != null) {
+            try {
+                sshKey = new String(Files.readAllBytes(Paths.get(sshKeyPath))).replaceAll("\n", "");
+            } catch (IOException e) {
+                return "File not found with ssh key.";
+            }
+        } else {
+            try {
+                sshKey = readUrl(sshKeyUrl);
+            } catch (IOException e) {
+                return "Url not found with ssh key.";
+            }
         }
         String id = cloudbreak.postEc2Credential(name, description, roleArn, sshKey);
         context.setCredential(id);
@@ -145,22 +157,45 @@ public class CredentialCommands implements CommandMarker {
         return true;
     }
 
+    private String readUrl(String url) throws IOException {
+        if (!url.startsWith("http://") && !url.startsWith("https://")) {
+            url = "http://" + url;
+        }
+        BufferedReader in = new BufferedReader(new InputStreamReader(new URL(url).openStream()));
+        String str;
+        StringBuffer sb = new StringBuffer();
+        while ((str = in.readLine()) != null) {
+            sb.append(str);
+        }
+        in.close();
+        return sb.toString();
+    }
+
     @CliCommand(value = "credential createAZURE", help = "Create a new AZURE credential")
     public String createAzureCredential(
             @CliOption(key = "description", mandatory = true, help = "Description of the credential") String description,
             @CliOption(key = "name", mandatory = true, help = "Name of the credential") String name,
             @CliOption(key = "subscriptionId", mandatory = true, help = "subscriptionId of the credential") String subscriptionId,
             @CliOption(key = "jksPassword", mandatory = true, help = "jksPassword of the credential") String jksPassword,
-            @CliOption(key = "sshKeyPath", mandatory = true, help = "sshKeyPath of the template") String sshKeyPath
+            @CliOption(key = "sshKeyPath", mandatory = false, help = "sshKeyPath of the template") String sshKeyPath,
+            @CliOption(key = "sshKeyUrl", mandatory = false, help = "sshKeyUrl of the template") String sshKeyUrl
     ) {
-        if (sshKeyPath.isEmpty() || sshKeyPath == null) {
-            return "SshKeyPath cannot be null if password null";
+        if ((sshKeyPath == null || sshKeyPath.isEmpty()) && (sshKeyUrl == null || sshKeyUrl.isEmpty())) {
+            return "SshKey cannot be null if password null";
         }
         String sshKey = "";
-        try {
-            sshKey = new String(Files.readAllBytes(Paths.get(sshKeyPath))).replaceAll("\n", "");
-        } catch (IOException e) {
-            return "File not found with ssh key.";
+        if (sshKeyPath != null) {
+            try {
+                sshKey = new String(Files.readAllBytes(Paths.get(sshKeyPath))).replaceAll("\n", "");
+            } catch (IOException e) {
+                return "File not found with ssh key.";
+            }
+        } else {
+            try {
+                sshKey = readUrl(sshKeyUrl);
+            } catch (IOException e) {
+                return "Url not found with ssh key.";
+            }
         }
         String id = cloudbreak.postAzureCredential(name, description, subscriptionId, jksPassword, sshKey);
         context.setCredential(id);
