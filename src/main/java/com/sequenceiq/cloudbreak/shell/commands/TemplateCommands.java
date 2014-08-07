@@ -120,7 +120,7 @@ public class TemplateCommands implements CommandMarker {
             @CliOption(key = "sshLocation", mandatory = false, specifiedDefaultValue = "0.0.0.0/0", help = "sshLocation of the template") String sshLocation,
             @CliOption(key = "instanceType", mandatory = true, help = "instanceType of the template") InstanceType instanceType
     ) {
-        String id = cloudbreak.postEc2Template(name, description, region.name(), region.getAmi(), sshLocation, instanceType.name());
+        String id = cloudbreak.postEc2Template(name, description, region.name(), region.getAmi(), sshLocation, instanceType.toString());
         context.addTemplate(id);
         context.setHint(Hints.ADD_BLUEPRINT);
         return "Template created, id: " + id;
