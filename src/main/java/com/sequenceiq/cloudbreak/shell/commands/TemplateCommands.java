@@ -70,12 +70,12 @@ public class TemplateCommands implements CommandMarker {
 
     @CliAvailabilityIndicator(value = "template createEC2")
     public boolean isTemplateEc2CreateCommandAvailable() {
-        return false;
+        return true;
     }
 
-    @CliAvailabilityIndicator(value = "template createAzure")
+    @CliAvailabilityIndicator(value = "template createAZURE")
     public boolean isTemplateAzureCreateCommandAvailable() {
-        return false;
+        return true;
     }
 
     @CliAvailabilityIndicator(value = "template select")
