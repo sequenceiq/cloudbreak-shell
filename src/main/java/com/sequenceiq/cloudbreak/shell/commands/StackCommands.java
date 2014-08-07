@@ -68,9 +68,8 @@ public class StackCommands implements CommandMarker {
     @CliCommand(value = "stack create", help = "Create a new stack based on a template")
     public String createStack(
             @CliOption(key = "nodeCount", mandatory = true, help = "Number of nodes to create") String count,
-            @CliOption(key = "description", mandatory = false, help = "Description of the stack") String description,
             @CliOption(key = "name", mandatory = true, help = "Name of the stack") String name) {
-        String id = cloudbreak.postStack(name, count, (description == null) ? "" : description, context.getCredentialId(), context.getTemplateId());
+        String id = cloudbreak.postStack(name, count, context.getCredentialId(), context.getTemplateId());
         context.addStack(id, name);
         context.setHint(Hints.CREATE_CLUSTER);
         return "Stack created, id: " + id;
