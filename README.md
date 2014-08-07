@@ -22,7 +22,7 @@ In order to start with the shell use `java -jar cloudbreak-shell-0.1-SNAPSHOT.ja
 The list of available commands:
 
     * blueprint add - Add a new blueprint with either --url or --file
-    * blueprint defaults - Adds the default blueprints to Ambari
+    * blueprint defaults - Adds the default blueprints to Cloudbreak
     * blueprint list - Shows the currently available blueprints
     * blueprint select - Select the blueprint by its id
     * blueprint show - Shows the blueprint by its id
