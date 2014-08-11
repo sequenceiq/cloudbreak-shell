@@ -22,6 +22,7 @@ import static com.sequenceiq.cloudbreak.shell.support.TableRenderer.renderSingle
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.CommandMarker;
@@ -39,6 +40,8 @@ import com.sequenceiq.cloudbreak.shell.model.Hints;
 import com.sequenceiq.cloudbreak.shell.model.InstanceType;
 import com.sequenceiq.cloudbreak.shell.model.Region;
 
+import groovyx.net.http.HttpResponseException;
+
 @Component
 public class TemplateCommands implements CommandMarker {
 
@@ -51,11 +54,6 @@ public class TemplateCommands implements CommandMarker {
     @CliAvailabilityIndicator(value = "template list")
     public boolean isTemplateListCommandAvailable() {
         return true;
-    }
-
-    @CliAvailabilityIndicator(value = "template defaults")
-    public boolean isTemplateDefaultCommandAvailable() {
-        return false;
     }
 
     @CliAvailabilityIndicator(value = "template show")
@@ -85,30 +83,32 @@ public class TemplateCommands implements CommandMarker {
 
     @CliCommand(value = "template list", help = "Shows the currently available cloud templates")
     public String listTemplates() {
-        return renderSingleMap(cloudbreak.getTemplatesMap(), "ID", "INFO");
-    }
-
-    @CliCommand(value = "template defaults", help = "Adds the default templates to Cloudbreak")
-    public String addDefaultTemplates() {
-        String message = "Default templates added";
         try {
-            cloudbreak.addDefaultTemplates();
-            context.setHint(Hints.SELECT_TEMPLATE);
+            Map<String, String> templatesMap = cloudbreak.getTemplatesMap();
+            return renderSingleMap(templatesMap, "ID", "INFO");
+        } catch (HttpResponseException ex) {
+            return ex.getResponse().getData().toString();
         } catch (Exception e) {
-            message = "Failed to add the default templates: " + e.getMessage();
+            return e.getMessage();
         }
-        return message;
     }
 
     @CliCommand(value = "template select", help = "Select the template by its id")
     public String selectTemplate(
             @CliOption(key = "id", mandatory = true, help = "Id of the template") String id) {
-        if (cloudbreak.getTemplate(id) != null) {
-            context.addTemplate(id);
-            context.setHint(Hints.ADD_BLUEPRINT);
-            return "Template selected, id: " + id;
-        } else {
-            return "No template specified";
+        try {
+            Object template = cloudbreak.getTemplate(id);
+            if (template == null) {
+                context.addTemplate(id);
+                context.setHint(Hints.ADD_BLUEPRINT);
+                return "Template selected, id: " + id;
+            } else {
+                return "No template specified";
+            }
+        } catch (HttpResponseException ex) {
+            return ex.getResponse().getData().toString();
+        } catch (Exception ex) {
+            return ex.getMessage();
         }
     }
 
@@ -120,10 +120,16 @@ public class TemplateCommands implements CommandMarker {
             @CliOption(key = "sshLocation", mandatory = true, specifiedDefaultValue = "0.0.0.0/0", help = "sshLocation of the template") String sshLocation,
             @CliOption(key = "instanceType", mandatory = true, help = "instanceType of the template") InstanceType instanceType
     ) {
-        String id = cloudbreak.postEc2Template(name, description, region.name(), region.getAmi(), sshLocation, instanceType.toString());
-        context.addTemplate(id);
-        context.setHint(Hints.ADD_BLUEPRINT);
-        return "Template created, id: " + id;
+        try {
+            String id = cloudbreak.postEc2Template(name, description, region.name(), region.getAmi(), sshLocation, instanceType.toString());
+            context.addTemplate(id);
+            context.setHint(Hints.ADD_BLUEPRINT);
+            return "Template created, id: " + id;
+        } catch (HttpResponseException ex) {
+            return ex.getResponse().getData().toString();
+        } catch (Exception ex) {
+            return ex.getMessage();
+        }
     }
 
 
@@ -135,31 +141,40 @@ public class TemplateCommands implements CommandMarker {
             @CliOption(key = "imageName", mandatory = true, help = "instance name of the template: AMBARI_DOCKER_V1") AzureInstanceName imageName,
             @CliOption(key = "vmType", mandatory = true, help = "type of the VM") AzureVmType vmType
     ) {
-        String id = cloudbreak.postAzureTemplate(name, description, location.name(), imageName.name(), vmType.name());
-        context.addTemplate(id);
-        context.setHint(Hints.ADD_BLUEPRINT);
-        return "Template created, id: " + id;
+        try {
+            String id = cloudbreak.postAzureTemplate(name, description, location.name(), imageName.name(), vmType.name());
+            context.addTemplate(id);
+            context.setHint(Hints.ADD_BLUEPRINT);
+            return "Template created, id: " + id;
+        } catch (HttpResponseException ex) {
+            return ex.getResponse().getData().toString();
+        } catch (Exception ex) {
+            return ex.getMessage();
+        }
     }
 
     @CliCommand(value = "template show", help = "Shows the template by its id")
     public Object showTemlate(
             @CliOption(key = "id", mandatory = true, help = "Id of the template") String id) {
-        return renderSingleMap(cloudbreak.getTemplateMap(id), "FIELD", "VALUE");
+        try {
+            return renderSingleMap(cloudbreak.getTemplateMap(id), "FIELD", "VALUE");
+        } catch (HttpResponseException ex) {
+            return ex.getResponse().getData().toString();
+        } catch (Exception ex) {
+            return ex.getMessage();
+        }
     }
 
     @CliCommand(value = "template delete", help = "Shows the template by its id")
     public Object deleteTemlate(
             @CliOption(key = "id", mandatory = true, help = "Id of the template") String id) {
-        return cloudbreak.deleteTemplate(id);
-    }
-
-
-    @CliCommand(value = "template create", help = "Create a new cloud template")
-    public String createTemplate(@CliOption(key = "name", mandatory = true, help = "Name of the cloud template") String name) {
-        String id = cloudbreak.postTemplate(name);
-        context.addTemplate(id);
-        context.setHint(Hints.CREATE_STACK);
-        return "Template created, id: " + id;
+        try {
+            return cloudbreak.deleteTemplate(id);
+        } catch (HttpResponseException ex) {
+            return ex.getResponse().getData().toString();
+        } catch (Exception ex) {
+            return ex.getMessage();
+        }
     }
 
     private String readFileAsString(String filePath) throws IOException {

@@ -32,6 +32,8 @@ import com.sequenceiq.cloudbreak.client.CloudbreakClient;
 import com.sequenceiq.cloudbreak.shell.model.CloudbreakContext;
 import com.sequenceiq.cloudbreak.shell.model.Hints;
 
+import groovyx.net.http.HttpResponseException;
+
 @Component
 public class StackCommands implements CommandMarker {
 
@@ -69,22 +71,34 @@ public class StackCommands implements CommandMarker {
     public String createStack(
             @CliOption(key = "nodeCount", mandatory = true, help = "Number of nodes to create") String count,
             @CliOption(key = "name", mandatory = true, help = "Name of the stack") String name) {
-        String id = cloudbreak.postStack(name, count, context.getCredentialId(), context.getTemplateId());
-        context.addStack(id, name);
-        context.setHint(Hints.CREATE_CLUSTER);
-        return "Stack created, id: " + id;
+        try {
+            String id = cloudbreak.postStack(name, count, context.getCredentialId(), context.getTemplateId());
+            context.addStack(id, name);
+            context.setHint(Hints.CREATE_CLUSTER);
+            return "Stack created, id: " + id;
+        } catch (HttpResponseException ex) {
+            return ex.getResponse().getData().toString();
+        } catch (Exception ex) {
+            return ex.getMessage();
+        }
     }
 
     @CliCommand(value = "stack select", help = "Select the stack by its id")
     public String selectStack(
             @CliOption(key = "id", mandatory = true, help = "Id of the stack") String id) {
-        Object stack = cloudbreak.getStack(id);
-        if (stack != null) {
-            context.addStack(id, ((HashMap) stack).get("name").toString());
-            context.setHint(Hints.CREATE_CLUSTER);
-            return "Stack selected, id: " + id;
-        } else {
-            return "No stack specified";
+        try {
+            Object stack = cloudbreak.getStack(id);
+            if (stack != null) {
+                context.addStack(id, ((HashMap) stack).get("name").toString());
+                context.setHint(Hints.CREATE_CLUSTER);
+                return "Stack selected, id: " + id;
+            } else {
+                return "No stack specified";
+            }
+        } catch (HttpResponseException ex) {
+            return ex.getResponse().getData().toString();
+        } catch (Exception ex) {
+            return ex.getMessage();
         }
     }
 
@@ -96,20 +110,34 @@ public class StackCommands implements CommandMarker {
             context.setHint(Hints.CREATE_CLUSTER);
             context.removeStack(id);
             return "Stack terminated with id:" + id;
+        } catch (HttpResponseException ex) {
+            return ex.getResponse().getData().toString();
         } catch (Exception ex) {
-            return "Stack terminated was not success with id:" + id;
+            return ex.getMessage();
         }
     }
 
     @CliCommand(value = "stack list", help = "Shows all of your stack")
     public String listStacks() {
-        return renderSingleMap(cloudbreak.getStacksMap(), "ID", "INFO");
+        try {
+            return renderSingleMap(cloudbreak.getStacksMap(), "ID", "INFO");
+        } catch (HttpResponseException ex) {
+            return ex.getResponse().getData().toString();
+        } catch (Exception ex) {
+            return ex.getMessage();
+        }
     }
 
     @CliCommand(value = "stack show", help = "Shows the stack by its id")
     public Object showStack(
             @CliOption(key = "id", mandatory = true, help = "Id of the stack") String id) {
-        return renderSingleMap(cloudbreak.getStackMap(id), "FIELD", "VALUE");
+        try {
+            return renderSingleMap(cloudbreak.getStackMap(id), "FIELD", "VALUE");
+        } catch (HttpResponseException ex) {
+            return ex.getResponse().getData().toString();
+        } catch (Exception ex) {
+            return ex.getMessage();
+        }
     }
 
 

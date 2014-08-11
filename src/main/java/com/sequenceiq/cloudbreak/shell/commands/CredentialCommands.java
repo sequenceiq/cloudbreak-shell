@@ -40,6 +40,8 @@ import com.sequenceiq.cloudbreak.client.CloudbreakClient;
 import com.sequenceiq.cloudbreak.shell.model.CloudbreakContext;
 import com.sequenceiq.cloudbreak.shell.model.Hints;
 
+import groovyx.net.http.HttpResponseException;
+
 @Component
 public class CredentialCommands implements CommandMarker {
 
@@ -66,11 +68,6 @@ public class CredentialCommands implements CommandMarker {
         return true;
     }
 
-    @CliAvailabilityIndicator(value = "credential defaults")
-    public boolean isCredentialDefaultsCommandAvailable() {
-        return false;
-    }
-
     @CliAvailabilityIndicator(value = "credential select")
     public boolean isCredentialSelectCommandAvailable() {
         return true;
@@ -84,40 +81,46 @@ public class CredentialCommands implements CommandMarker {
     @CliCommand(value = "credential show", help = "Shows the credential by its id")
     public Object showCredential(
             @CliOption(key = "id", mandatory = true, help = "Id of the credential") String id) {
-        return renderSingleMap(cloudbreak.getCredentialMap(id), "FIELD", "VALUE");
+        try {
+            return renderSingleMap(cloudbreak.getCredentialMap(id), "FIELD", "VALUE");
+        } catch (Exception ex) {
+            return ex.getMessage();
+        }
     }
 
     @CliCommand(value = "credential delete", help = "Delete the credential by its id")
     public Object deleteCredential(
             @CliOption(key = "id", mandatory = true, help = "Id of the credential") String id) {
-        return cloudbreak.deleteCredential(id);
+        try {
+            return cloudbreak.deleteCredential(id);
+        } catch (Exception ex) {
+            return ex.getMessage();
+        }
     }
 
     @CliCommand(value = "credential list", help = "Shows all of your credentials")
     public String listCredentials() {
-        return renderSingleMap(cloudbreak.getCredentialsMap(), "ID", "INFO");
-    }
-
-    @CliCommand(value = "credential defaults", help = "Adds the default credentials to Cloudbreak")
-    public String addDefaultCredentials() {
-        String message = "Default credentials added";
         try {
-            cloudbreak.addDefaultCredentials();
-        } catch (Exception e) {
-            message = "Failed to add the default credentials: " + e.getMessage();
+            return renderSingleMap(cloudbreak.getCredentialsMap(), "ID", "INFO");
+        } catch (Exception ex) {
+            return ex.getMessage();
         }
-        return message;
     }
 
     @CliCommand(value = "credential select", help = "Select the credential by its id")
     public String selectCredential(
             @CliOption(key = "id", mandatory = true, help = "Id of the credential") String id) {
-        if (cloudbreak.getCredential(id) != null) {
-            context.setCredential(id);
-            context.setHint(Hints.CREATE_TEMPLATE);
-            return "Credential selected, id: " + id;
-        } else {
-            return "No credential specified";
+        try {
+
+            if (cloudbreak.getCredential(id) != null) {
+                context.setCredential(id);
+                context.setHint(Hints.CREATE_TEMPLATE);
+                return "Credential selected, id: " + id;
+            } else {
+                return "No credential specified";
+            }
+        } catch (Exception ex) {
+            return ex.getMessage();
         }
     }
 
@@ -146,10 +149,16 @@ public class CredentialCommands implements CommandMarker {
                 return "Url not found with ssh key.";
             }
         }
-        String id = cloudbreak.postEc2Credential(name, description, roleArn, sshKey);
-        context.setCredential(id);
-        context.setHint(Hints.CREATE_TEMPLATE);
-        return "Credential created, id: " + id;
+        try {
+            String id = cloudbreak.postEc2Credential(name, description, roleArn, sshKey);
+            context.setCredential(id);
+            context.setHint(Hints.CREATE_TEMPLATE);
+            return "Credential created, id: " + id;
+        } catch (HttpResponseException ex) {
+            return ex.getResponse().getData().toString();
+        } catch (Exception ex) {
+            return ex.getMessage();
+        }
     }
 
     @CliAvailabilityIndicator(value = "credential createAZURE")
@@ -197,35 +206,51 @@ public class CredentialCommands implements CommandMarker {
                 return "Url not found with ssh key.";
             }
         }
-        String id = cloudbreak.postAzureCredential(name, description, subscriptionId, jksPassword, sshKey);
-        context.setCredential(id);
-        context.setHint(Hints.CREATE_TEMPLATE);
-        return "Credential created, id: " + id;
+        try {
+            String id = cloudbreak.postAzureCredential(name, description, subscriptionId, jksPassword, sshKey);
+            context.setCredential(id);
+            context.setHint(Hints.CREATE_TEMPLATE);
+            return "Credential created, id: " + id;
+        } catch (HttpResponseException ex) {
+            return ex.getResponse().getData().toString();
+        } catch (Exception ex) {
+            return ex.getMessage();
+        }
     }
 
     @CliAvailabilityIndicator(value = "credential certificate")
     public boolean isCredentialCertificateCommandAvailable() {
-        List<Map> credentials = cloudbreak.getCredentials();
-        int count = 0;
-        maps = new ArrayList<>();
-        for (Map map : credentials) {
-            if (map.get("cloudPlatform").toString().equals(AZURE)) {
-                maps.add(map);
-                count++;
+        try {
+            List<Map> credentials = cloudbreak.getCredentials();
+            int count = 0;
+            maps = new ArrayList<>();
+            for (Map map : credentials) {
+                if (map.get("cloudPlatform").toString().equals(AZURE)) {
+                    maps.add(map);
+                    count++;
+                }
             }
+            return count == 0 ? false : true;
+        } catch (Exception ex) {
+            return false;
         }
-        return count == 0 ? false : true;
     }
 
     @CliCommand(value = "credential certificate", help = "get Azure certificate")
     public String getAzureCertificate(
             @CliOption(key = "id", mandatory = true, help = "id of the credential") String id
     ) {
-        for (Map map : maps) {
-            if (map.get("id").toString().equals(id)) {
-                return cloudbreak.getCertificate(id);
+        try {
+            for (Map map : maps) {
+                if (map.get("id").toString().equals(id)) {
+                    return cloudbreak.getCertificate(id);
+                }
             }
+            return "Azure certificate with this id does not exist";
+        } catch (HttpResponseException ex) {
+            return ex.getResponse().getData().toString();
+        } catch (Exception ex) {
+            return ex.getMessage();
         }
-        return "Azure certificate with this id does not exist";
     }
 }

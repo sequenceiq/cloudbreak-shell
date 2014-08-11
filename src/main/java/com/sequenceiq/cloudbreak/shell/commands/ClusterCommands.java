@@ -31,6 +31,8 @@ import com.sequenceiq.cloudbreak.client.CloudbreakClient;
 import com.sequenceiq.cloudbreak.shell.model.CloudbreakContext;
 import com.sequenceiq.cloudbreak.shell.model.Hints;
 
+import groovyx.net.http.HttpResponseException;
+
 @Component
 public class ClusterCommands implements CommandMarker {
 
@@ -55,15 +57,25 @@ public class ClusterCommands implements CommandMarker {
             return renderSingleMap(cloudbreak.getClusterMap(context.getStackId()), "FIELD", "VALUE");
         } catch (IndexOutOfBoundsException ex) {
             return "There was no cluster for this account.";
+        } catch (HttpResponseException ex) {
+            return ex.getResponse().getData().toString();
+        } catch (Exception ex) {
+            return ex.getMessage();
         }
     }
 
     @CliCommand(value = "cluster create", help = "Create a new cluster based on a blueprint and template")
     public String createCluster(
             @CliOption(key = "description", mandatory = true, help = "Description of the blueprint") String description) {
-        cloudbreak.postCluster(context.getStackName(), parseInt(context.getBlueprintId()), description, parseInt(context.getStackId()));
-        context.setHint(Hints.NONE);
-        return "Cluster created";
+        try {
+            cloudbreak.postCluster(context.getStackName(), parseInt(context.getBlueprintId()), description, parseInt(context.getStackId()));
+            context.setHint(Hints.NONE);
+            return "Cluster created";
+        } catch (HttpResponseException ex) {
+            return ex.getResponse().getData().toString();
+        } catch (Exception ex) {
+            return ex.getMessage();
+        }
     }
 
 }

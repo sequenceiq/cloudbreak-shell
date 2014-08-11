@@ -41,6 +41,8 @@ import com.sequenceiq.cloudbreak.client.CloudbreakClient;
 import com.sequenceiq.cloudbreak.shell.model.CloudbreakContext;
 import com.sequenceiq.cloudbreak.shell.model.Hints;
 
+import groovyx.net.http.HttpResponseException;
+
 @Component
 public class BlueprintCommands implements CommandMarker {
 
@@ -86,6 +88,8 @@ public class BlueprintCommands implements CommandMarker {
         String message = "Default blueprints added";
         try {
             cloudbreak.addDefaultBlueprints();
+        } catch (HttpResponseException ex) {
+            return ex.getResponse().getData().toString();
         } catch (Exception e) {
             message = "Failed to add the default blueprints: " + e.getMessage();
         }
@@ -95,30 +99,48 @@ public class BlueprintCommands implements CommandMarker {
     @CliCommand(value = "blueprint delete", help = "Delete the blueprint by its id")
     public Object deleteBlueprint(
             @CliOption(key = "id", mandatory = true, help = "Id of the blueprint") String id) {
-        return cloudbreak.deleteBlueprint(id);
+        try {
+            return cloudbreak.deleteBlueprint(id);
+        } catch (HttpResponseException ex) {
+            return ex.getResponse().getData().toString();
+        } catch (Exception ex) {
+            return ex.getMessage();
+        }
     }
 
     @CliCommand(value = "blueprint list", help = "Shows the currently available blueprints")
     public String listBlueprints() {
-        return renderSingleMap(cloudbreak.getBlueprintsMap(), "FIELD", "VALUE");
+        try {
+            return renderSingleMap(cloudbreak.getBlueprintsMap(), "FIELD", "VALUE");
+        } catch (HttpResponseException ex) {
+            return ex.getResponse().getData().toString();
+        } catch (Exception ex) {
+            return ex.getMessage();
+        }
     }
 
     @CliCommand(value = "blueprint show", help = "Shows the blueprint by its id")
     public Object showBlueprint(
             @CliOption(key = "id", mandatory = true, help = "Id of the blueprint") String id) {
-        Map<String, String> map = new HashMap<>();
-        Map<String, List<String>> hosts = new HashMap<>();
-        Map<String, Object> blueprintMap = cloudbreak.getBlueprintMap(id);
+        try {
+            Map<String, String> map = new HashMap<>();
+            Map<String, List<String>> hosts = new HashMap<>();
+            Map<String, Object> blueprintMap = cloudbreak.getBlueprintMap(id);
 
-        for (Map.Entry<String, Object> stringStringEntry : blueprintMap.entrySet()) {
-            if ("ambariBlueprint".equals(stringStringEntry.getKey().toString())) {
-                hosts = (Map<String, List<String>>) stringStringEntry.getValue();
-            } else {
-                map.put(stringStringEntry.getKey(), stringStringEntry.getValue().toString());
+            for (Map.Entry<String, Object> stringStringEntry : blueprintMap.entrySet()) {
+                if ("ambariBlueprint".equals(stringStringEntry.getKey().toString())) {
+                    hosts = (Map<String, List<String>>) stringStringEntry.getValue();
+                } else {
+                    map.put(stringStringEntry.getKey(), stringStringEntry.getValue().toString());
+                }
             }
-        }
 
-        return renderSingleMap(map, "FIELD", "INFO") + "\n\n" + renderMultiValueMap(hosts, "HOSTGROUP", "COMPONENT");
+            return renderSingleMap(map, "FIELD", "INFO") + "\n\n" + renderMultiValueMap(hosts, "HOSTGROUP", "COMPONENT");
+        } catch (HttpResponseException ex) {
+            return ex.getResponse().getData().toString();
+        } catch (Exception ex) {
+            return ex.getMessage();
+        }
 
     }
 
@@ -126,14 +148,20 @@ public class BlueprintCommands implements CommandMarker {
     public String selectBlueprint(
             @CliOption(key = "id", mandatory = true, help = "Id of the blueprint") String id) {
         String message;
-        if (cloudbreak.getBlueprint(id) != null) {
-            context.addBlueprint(id);
-            context.setHint(Hints.CREATE_STACK);
-            message = String.format("Blueprint has been selected, id: %s", id);
-        } else {
-            message = "No blueprint specified";
+        try {
+            if (cloudbreak.getBlueprint(id) != null) {
+                context.addBlueprint(id);
+                context.setHint(Hints.CREATE_STACK);
+                message = String.format("Blueprint has been selected, id: %s", id);
+            } else {
+                message = "No blueprint specified";
+            }
+            return message;
+        } catch (HttpResponseException ex) {
+            return ex.getResponse().getData().toString();
+        } catch (Exception ex) {
+            return ex.getMessage();
         }
-        return message;
     }
 
     @CliCommand(value = "blueprint add", help = "Add a new blueprint with either --url or --file")
@@ -143,16 +171,22 @@ public class BlueprintCommands implements CommandMarker {
             @CliOption(key = "url", mandatory = false, help = "URL of the blueprint to download from") String url,
             @CliOption(key = "file", mandatory = false, help = "File which contains the blueprint") File file) {
         String message;
-        String json = file == null ? readContent(url) : readContent(file);
-        if (json != null) {
-            String id = cloudbreak.postBlueprint(name, description, json);
-            context.addBlueprint(id);
-            context.setHint(Hints.CREATE_STACK);
-            message = String.format("Blueprint: '%s' has been added, id: %s", getBlueprintName(json), id);
-        } else {
-            message = "No blueprint specified";
+        try {
+            String json = file == null ? readContent(url) : readContent(file);
+            if (json != null) {
+                String id = cloudbreak.postBlueprint(name, description, json);
+                context.addBlueprint(id);
+                context.setHint(Hints.CREATE_STACK);
+                message = String.format("Blueprint: '%s' has been added, id: %s", getBlueprintName(json), id);
+            } else {
+                message = "No blueprint specified";
+            }
+            return message;
+        } catch (HttpResponseException ex) {
+            return ex.getResponse().getData().toString();
+        } catch (Exception ex) {
+            return ex.getMessage();
         }
-        return message;
     }
 
     private String readContent(File file) {
