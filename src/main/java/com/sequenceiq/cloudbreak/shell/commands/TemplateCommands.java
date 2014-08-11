@@ -55,7 +55,7 @@ public class TemplateCommands implements CommandMarker {
 
     @CliAvailabilityIndicator(value = "template defaults")
     public boolean isTemplateDefaultCommandAvailable() {
-        return true;
+        return false;
     }
 
     @CliAvailabilityIndicator(value = "template show")
