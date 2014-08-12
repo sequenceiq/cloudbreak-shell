@@ -39,6 +39,7 @@ import com.sequenceiq.cloudbreak.shell.model.CloudbreakContext;
 import com.sequenceiq.cloudbreak.shell.model.Hints;
 import com.sequenceiq.cloudbreak.shell.model.InstanceType;
 import com.sequenceiq.cloudbreak.shell.model.Region;
+import com.sequenceiq.cloudbreak.shell.model.VolumeType;
 
 import groovyx.net.http.HttpResponseException;
 
@@ -118,10 +119,38 @@ public class TemplateCommands implements CommandMarker {
             @CliOption(key = "name", mandatory = true, help = "Name of the template") String name,
             @CliOption(key = "region", mandatory = true, help = "region of the template") Region region,
             @CliOption(key = "sshLocation", mandatory = true, specifiedDefaultValue = "0.0.0.0/0", help = "sshLocation of the template") String sshLocation,
-            @CliOption(key = "instanceType", mandatory = true, help = "instanceType of the template") InstanceType instanceType
+            @CliOption(key = "instanceType", mandatory = true, help = "instanceType of the template") InstanceType instanceType,
+            @CliOption(key = "volumeCount", mandatory = true, help = "volumeCount of the template") Integer volumeCount,
+            @CliOption(key = "volumeSize", mandatory = true, help = "volumeSize of the template") Integer volumeSize,
+            @CliOption(key = "volumeType", mandatory = true, help = "volumeType of the template") VolumeType volumeType,
+            @CliOption(key = "spotPrice", mandatory = false, help = "spotPrice of the template") Double spotPrice
     ) {
         try {
-            String id = cloudbreak.postEc2Template(name, description, region.name(), region.getAmi(), sshLocation, instanceType.toString());
+            String id = "";
+            if(spotPrice == null) {
+                id = cloudbreak.postEc2Template(name,
+                        description,
+                        region.name(),
+                        region.getAmi(),
+                        sshLocation,
+                        instanceType.toString(),
+                        volumeCount.toString(),
+                        volumeSize.toString(),
+                        volumeType.name()
+                );
+            } else {
+                id = cloudbreak.postSpotEc2Template(name,
+                        description,
+                        region.name(),
+                        region.getAmi(),
+                        sshLocation,
+                        instanceType.toString(),
+                        volumeCount.toString(),
+                        volumeSize.toString(),
+                        volumeType.name(),
+                        spotPrice.toString()
+                );
+            }
             context.addTemplate(id);
             context.setHint(Hints.ADD_BLUEPRINT);
             return "Template created, id: " + id;
@@ -139,10 +168,19 @@ public class TemplateCommands implements CommandMarker {
             @CliOption(key = "name", mandatory = true, help = "Name of the template") String name,
             @CliOption(key = "location", mandatory = true, help = "location of the template") AzureLocation location,
             @CliOption(key = "imageName", mandatory = true, help = "instance name of the template: AMBARI_DOCKER_V1") AzureInstanceName imageName,
-            @CliOption(key = "vmType", mandatory = true, help = "type of the VM") AzureVmType vmType
+            @CliOption(key = "vmType", mandatory = true, help = "type of the VM") AzureVmType vmType,
+            @CliOption(key = "volumeCount", mandatory = true, help = "volumeCount of the template") Integer volumeCount,
+            @CliOption(key = "volumeSize", mandatory = true, help = "volumeSize of the template") Integer volumeSize
     ) {
         try {
-            String id = cloudbreak.postAzureTemplate(name, description, location.name(), imageName.name(), vmType.name());
+            String id = cloudbreak.postAzureTemplate(name,
+                    description,
+                    location.name(),
+                    imageName.name(),
+                    vmType.name(),
+                    volumeCount.toString(),
+                    volumeSize.toString()
+            );
             context.addTemplate(id);
             context.setHint(Hints.ADD_BLUEPRINT);
             return "Template created, id: " + id;
