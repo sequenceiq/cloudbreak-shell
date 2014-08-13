@@ -99,7 +99,7 @@ public class TemplateCommands implements CommandMarker {
             @CliOption(key = "id", mandatory = true, help = "Id of the template") String id) {
         try {
             Object template = cloudbreak.getTemplate(id);
-            if (template == null) {
+            if (template != null) {
                 context.addTemplate(id);
                 context.setHint(Hints.ADD_BLUEPRINT);
                 return "Template selected, id: " + id;

@@ -172,7 +172,11 @@ public class CloudbreakContext {
     }
 
     private String getFirstPropertyValue(PropertyKey key) {
-        return properties.get(key).get(0);
+        try {
+            return properties.get(key).get(0);
+        } catch (Exception ex) {
+            return "";
+        }
     }
 
     private enum PropertyKey {

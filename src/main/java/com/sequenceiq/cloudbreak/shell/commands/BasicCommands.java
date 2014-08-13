@@ -54,4 +54,24 @@ public class BasicCommands implements CommandMarker {
     public String hint() {
         return context.getHint();
     }
+
+    @CliAvailabilityIndicator("context")
+    public boolean isContextCommandAvailable() {
+        return true;
+    }
+
+    @CliCommand(value = "context", help = "Shows some context")
+    public String context() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(getRow("blueprintId", context.getBlueprintId()));
+        sb.append(getRow("credentialId", context.getCredentialId()));
+        sb.append(getRow("stackId", context.getStackId()));
+        sb.append(getRow("stackName", context.getStackName()));
+        sb.append(getRow("templateId", context.getTemplateId()));
+        return sb.toString();
+    }
+
+    private String getRow(String name, String value) {
+        return String.format("%s: %s\n", name, value);
+    }
 }
