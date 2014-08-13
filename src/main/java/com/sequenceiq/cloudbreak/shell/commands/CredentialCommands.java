@@ -20,6 +20,7 @@ package com.sequenceiq.cloudbreak.shell.commands;
 import static com.sequenceiq.cloudbreak.shell.support.TableRenderer.renderSingleMap;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -29,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.CommandMarker;
 import org.springframework.shell.core.annotation.CliAvailabilityIndicator;
@@ -238,12 +240,17 @@ public class CredentialCommands implements CommandMarker {
 
     @CliCommand(value = "credential certificate", help = "get Azure certificate")
     public String getAzureCertificate(
-            @CliOption(key = "id", mandatory = true, help = "id of the credential") String id
+            @CliOption(key = "id", mandatory = true, help = "id of the credential") String id,
+            @CliOption(key = "resultPath", mandatory = true, help = "path of the certificate") String path
     ) {
         try {
             for (Map map : maps) {
                 if (map.get("id").toString().equals(id)) {
-                    return cloudbreak.getCertificate(id);
+                    String certicate = cloudbreak.getCertificate(id);
+                    FileUtils.writeStringToFile(new File(path, "certicate.cer"), certicate);
+                    return "Your certicate was saved into " + String.format("%s/%s", path, "certicate.cer")
+                            + "\nPlease upload to the Azure portal before you continue"
+                            + "\nThe file contains your certificate which is:\n" + certicate;
                 }
             }
             return "Azure certificate with this id does not exist";
