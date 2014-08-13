@@ -109,30 +109,39 @@ public class TemplateCommands implements CommandMarker {
         } catch (HttpResponseException ex) {
             return ex.getResponse().getData().toString();
         } catch (Exception ex) {
-            return ex.getMessage();
+            return ex.toString();
         }
     }
 
     @CliCommand(value = "template createEC2", help = "Create a new EC2 template")
     public String createEc2Template(
-            @CliOption(key = "description", mandatory = true, help = "Description of the template") String description,
             @CliOption(key = "name", mandatory = true, help = "Name of the template") String name,
+            @CliOption(key = "description", mandatory = true, help = "Description of the template") String description,
             @CliOption(key = "region", mandatory = true, help = "region of the template") Region region,
-            @CliOption(key = "sshLocation", mandatory = true, specifiedDefaultValue = "0.0.0.0/0", help = "sshLocation of the template") String sshLocation,
             @CliOption(key = "instanceType", mandatory = true, help = "instanceType of the template") InstanceType instanceType,
             @CliOption(key = "volumeCount", mandatory = true, help = "volumeCount of the template") Integer volumeCount,
-            @CliOption(key = "volumeSize", mandatory = true, help = "volumeSize of the template") Integer volumeSize,
-            @CliOption(key = "volumeType", mandatory = true, help = "volumeType of the template") VolumeType volumeType,
-            @CliOption(key = "spotPrice", mandatory = false, help = "spotPrice of the template") Double spotPrice
+            @CliOption(key = "volumeSize", mandatory = true, help = "volumeSize(GB) of the template") Integer volumeSize,
+            @CliOption(key = "volumeType", mandatory = false, help = "volumeType of the template", specifiedDefaultValue = "Gp2") VolumeType volumeType,
+            @CliOption(key = "spotPrice", mandatory = false, help = "spotPrice of the template") Double spotPrice,
+            @CliOption(key = "sshLocation", mandatory = false, specifiedDefaultValue = "0.0.0.0/0", help = "sshLocation of the template") String sshLocation
     ) {
         try {
+            if (volumeCount < 1 || volumeCount > 8) {
+                return "volumeCount has to be between 1 and 8.";
+            }
+            if (volumeSize < 1 || volumeSize > 1024) {
+                return "VolumeSize has to be between 1 and 1024.";
+            }
+            if (volumeType == null) {
+                volumeType = VolumeType.Gp2;
+            }
             String id = "";
-            if(spotPrice == null) {
+            if (spotPrice == null) {
                 id = cloudbreak.postEc2Template(name,
                         description,
                         region.name(),
                         region.getAmi(),
-                        sshLocation,
+                        sshLocation == null ? "0.0.0.0/0" : sshLocation,
                         instanceType.toString(),
                         volumeCount.toString(),
                         volumeSize.toString(),
@@ -143,7 +152,7 @@ public class TemplateCommands implements CommandMarker {
                         description,
                         region.name(),
                         region.getAmi(),
-                        sshLocation,
+                        sshLocation == null ? "0.0.0.0/0" : sshLocation,
                         instanceType.toString(),
                         volumeCount.toString(),
                         volumeSize.toString(),
@@ -157,21 +166,30 @@ public class TemplateCommands implements CommandMarker {
         } catch (HttpResponseException ex) {
             return ex.getResponse().getData().toString();
         } catch (Exception ex) {
-            return ex.getMessage();
+            return ex.toString();
         }
     }
 
 
     @CliCommand(value = "template createAZURE", help = "Create a new AZURE template")
     public String createAzureTemplate(
-            @CliOption(key = "description", mandatory = true, help = "Description of the template") String description,
             @CliOption(key = "name", mandatory = true, help = "Name of the template") String name,
+            @CliOption(key = "description", mandatory = true, help = "Description of the template") String description,
             @CliOption(key = "location", mandatory = true, help = "location of the template") AzureLocation location,
-            @CliOption(key = "imageName", mandatory = true, help = "instance name of the template: AMBARI_DOCKER_V1") AzureInstanceName imageName,
             @CliOption(key = "vmType", mandatory = true, help = "type of the VM") AzureVmType vmType,
             @CliOption(key = "volumeCount", mandatory = true, help = "volumeCount of the template") Integer volumeCount,
-            @CliOption(key = "volumeSize", mandatory = true, help = "volumeSize of the template") Integer volumeSize
+            @CliOption(key = "volumeSize", mandatory = true, help = "volumeSize(GB) of the template") Integer volumeSize,
+            @CliOption(key = "imageName", mandatory = false, help = "instance name of the template: AMBARI_DOCKER_V1") AzureInstanceName imageName
     ) {
+        if (volumeCount < 1 || volumeCount > 8) {
+            return "volumeCount has to be between 1 and 8.";
+        }
+        if (volumeSize < 1 || volumeSize > 1024) {
+            return "VolumeSize has to be between 1 and 1024.";
+        }
+        if (imageName == null) {
+            imageName = AzureInstanceName.AMBARI_DOCKER_V1;
+        }
         try {
             String id = cloudbreak.postAzureTemplate(name,
                     description,
@@ -187,7 +205,7 @@ public class TemplateCommands implements CommandMarker {
         } catch (HttpResponseException ex) {
             return ex.getResponse().getData().toString();
         } catch (Exception ex) {
-            return ex.getMessage();
+            return ex.toString();
         }
     }
 
@@ -211,7 +229,7 @@ public class TemplateCommands implements CommandMarker {
         } catch (HttpResponseException ex) {
             return ex.getResponse().getData().toString();
         } catch (Exception ex) {
-            return ex.getMessage();
+            return ex.toString();
         }
     }
 

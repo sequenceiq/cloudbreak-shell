@@ -86,7 +86,7 @@ public class CredentialCommands implements CommandMarker {
         try {
             return renderSingleMap(cloudbreak.getCredentialMap(id), "FIELD", "VALUE");
         } catch (Exception ex) {
-            return ex.getMessage();
+            return ex.toString();
         }
     }
 
@@ -96,7 +96,7 @@ public class CredentialCommands implements CommandMarker {
         try {
             return cloudbreak.deleteCredential(id);
         } catch (Exception ex) {
-            return ex.getMessage();
+            return ex.toString();
         }
     }
 
@@ -105,7 +105,7 @@ public class CredentialCommands implements CommandMarker {
         try {
             return renderSingleMap(cloudbreak.getCredentialsMap(), "ID", "INFO");
         } catch (Exception ex) {
-            return ex.getMessage();
+            return ex.toString();
         }
     }
 
@@ -122,7 +122,7 @@ public class CredentialCommands implements CommandMarker {
                 return "No credential specified";
             }
         } catch (Exception ex) {
-            return ex.getMessage();
+            return ex.toString();
         }
     }
 
@@ -159,7 +159,7 @@ public class CredentialCommands implements CommandMarker {
         } catch (HttpResponseException ex) {
             return ex.getResponse().getData().toString();
         } catch (Exception ex) {
-            return ex.getMessage();
+            return ex.toString();
         }
     }
 
@@ -216,7 +216,7 @@ public class CredentialCommands implements CommandMarker {
         } catch (HttpResponseException ex) {
             return ex.getResponse().getData().toString();
         } catch (Exception ex) {
-            return ex.getMessage();
+            return ex.toString();
         }
     }
 
@@ -257,7 +257,7 @@ public class CredentialCommands implements CommandMarker {
         } catch (HttpResponseException ex) {
             return ex.getResponse().getData().toString();
         } catch (Exception ex) {
-            return ex.getMessage();
+            return ex.toString();
         }
     }
 }

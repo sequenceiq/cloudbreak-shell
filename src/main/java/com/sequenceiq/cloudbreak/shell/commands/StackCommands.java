@@ -79,7 +79,7 @@ public class StackCommands implements CommandMarker {
         } catch (HttpResponseException ex) {
             return ex.getResponse().getData().toString();
         } catch (Exception ex) {
-            return ex.getMessage();
+            return ex.toString();
         }
     }
 
@@ -98,7 +98,7 @@ public class StackCommands implements CommandMarker {
         } catch (HttpResponseException ex) {
             return ex.getResponse().getData().toString();
         } catch (Exception ex) {
-            return ex.getMessage();
+            return ex.toString();
         }
     }
 
@@ -113,7 +113,7 @@ public class StackCommands implements CommandMarker {
         } catch (HttpResponseException ex) {
             return ex.getResponse().getData().toString();
         } catch (Exception ex) {
-            return ex.getMessage();
+            return ex.toString();
         }
     }
 
@@ -124,7 +124,7 @@ public class StackCommands implements CommandMarker {
         } catch (HttpResponseException ex) {
             return ex.getResponse().getData().toString();
         } catch (Exception ex) {
-            return ex.getMessage();
+            return ex.toString();
         }
     }
 
@@ -136,7 +136,7 @@ public class StackCommands implements CommandMarker {
         } catch (HttpResponseException ex) {
             return ex.getResponse().getData().toString();
         } catch (Exception ex) {
-            return ex.getMessage();
+            return ex.toString();
         }
     }
 

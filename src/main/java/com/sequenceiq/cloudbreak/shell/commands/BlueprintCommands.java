@@ -104,18 +104,18 @@ public class BlueprintCommands implements CommandMarker {
         } catch (HttpResponseException ex) {
             return ex.getResponse().getData().toString();
         } catch (Exception ex) {
-            return ex.getMessage();
+            return ex.toString();
         }
     }
 
     @CliCommand(value = "blueprint list", help = "Shows the currently available blueprints")
     public String listBlueprints() {
         try {
-            return renderSingleMap(cloudbreak.getBlueprintsMap(), "FIELD", "VALUE");
+            return renderSingleMap(cloudbreak.getBlueprintsMap(), "ID", "INFO");
         } catch (HttpResponseException ex) {
             return ex.getResponse().getData().toString();
         } catch (Exception ex) {
-            return ex.getMessage();
+            return ex.toString();
         }
     }
 
@@ -139,7 +139,7 @@ public class BlueprintCommands implements CommandMarker {
         } catch (HttpResponseException ex) {
             return ex.getResponse().getData().toString();
         } catch (Exception ex) {
-            return ex.getMessage();
+            return ex.toString();
         }
 
     }
@@ -160,7 +160,7 @@ public class BlueprintCommands implements CommandMarker {
         } catch (HttpResponseException ex) {
             return ex.getResponse().getData().toString();
         } catch (Exception ex) {
-            return ex.getMessage();
+            return ex.toString();
         }
     }
 
@@ -185,7 +185,7 @@ public class BlueprintCommands implements CommandMarker {
         } catch (HttpResponseException ex) {
             return ex.getResponse().getData().toString();
         } catch (Exception ex) {
-            return ex.getMessage();
+            return ex.toString();
         }
     }
 
