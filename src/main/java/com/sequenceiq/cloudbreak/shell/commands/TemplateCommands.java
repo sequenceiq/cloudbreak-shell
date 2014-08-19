@@ -1,20 +1,3 @@
-/**
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.sequenceiq.cloudbreak.shell.commands;
 
 import static com.sequenceiq.cloudbreak.shell.support.TableRenderer.renderSingleMap;
@@ -47,6 +30,10 @@ import groovyx.net.http.HttpResponseException;
 public class TemplateCommands implements CommandMarker {
 
     public static final int BUFFER = 1024;
+    public static final int VOLUME_COUNT_MIN = 1;
+    public static final int VOLUME_COUNT_MAX = 8;
+    public static final int VOLUME_SIZE_MIN = 1;
+    public static final int VOLUME_SIZE_MAX = 1024;
     @Autowired
     private CloudbreakContext context;
     @Autowired
@@ -126,16 +113,16 @@ public class TemplateCommands implements CommandMarker {
             @CliOption(key = "sshLocation", mandatory = false, specifiedDefaultValue = "0.0.0.0/0", help = "sshLocation of the template") String sshLocation
     ) {
         try {
-            if (volumeCount < 1 || volumeCount > 8) {
+            if (volumeCount < VOLUME_COUNT_MIN || volumeCount > VOLUME_COUNT_MAX) {
                 return "volumeCount has to be between 1 and 8.";
             }
-            if (volumeSize < 1 || volumeSize > 1024) {
+            if (volumeSize < VOLUME_SIZE_MIN || volumeSize > VOLUME_SIZE_MAX) {
                 return "VolumeSize has to be between 1 and 1024.";
             }
             if (volumeType == null) {
                 volumeType = VolumeType.Gp2;
             }
-            String id = "";
+            String id;
             if (spotPrice == null) {
                 id = cloudbreak.postEc2Template(name,
                         description,
@@ -181,10 +168,10 @@ public class TemplateCommands implements CommandMarker {
             @CliOption(key = "volumeSize", mandatory = true, help = "volumeSize(GB) of the template") Integer volumeSize,
             @CliOption(key = "imageName", mandatory = false, help = "instance name of the template: AMBARI_DOCKER_V1") AzureInstanceName imageName
     ) {
-        if (volumeCount < 1 || volumeCount > 8) {
+        if (volumeCount < VOLUME_COUNT_MIN || volumeCount > VOLUME_COUNT_MAX) {
             return "volumeCount has to be between 1 and 8.";
         }
-        if (volumeSize < 1 || volumeSize > 1024) {
+        if (volumeSize < VOLUME_SIZE_MIN || volumeSize > VOLUME_SIZE_MAX) {
             return "VolumeSize has to be between 1 and 1024.";
         }
         if (imageName == null) {

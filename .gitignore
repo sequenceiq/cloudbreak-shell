@@ -5,3 +5,17 @@ target/
 *.DS_Store
 *.cbh
 atlassian*
+/build
+/bin
+.settings
+.project
+.classpath
+.gradle
+.idea
+*.iml
+.apib
+*.iml
+.DS_Store
+*.jks
+atlassian*
+userdatas/

@@ -1,0 +1,154 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.0.2.RELEASE")
+    }
+}
+
+def env = project.hasProperty('env') ? project.getProperty('env') : 'local'
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'spring-boot'
+apply plugin: 'maven'
+apply plugin: 'checkstyle'
+apply plugin: 'jacoco'
+apply plugin: 'sonar-runner'
+
+sourceCompatibility = 1.7
+group = 'com.sequenceiq'
+
+allprojects {
+    systemProperties = System.properties
+    apply from: "$rootDir/gradle/versioning.gradle"
+    ext.config = new ConfigSlurper(env).parse(file("$rootDir/gradle/config/buildConfig.groovy").toURL())
+}
+
+jar {
+    baseName = 'cloudbreak-shell'
+}
+
+configurations {
+    deployerJars
+    all*.exclude group: 'org.slf4j', module: 'slf4j-log4j12'
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            configuration = configurations.deployerJars
+            repository(url: "s3://maven.sequenceiq.com/releases") {
+                authentication(userName: "$System.env.AWS_ACCESS_KEY", passphrase: "$System.env.AWS_SECRET_ACCESS_KEY")
+            }
+            snapshotRepository(url: "s3://maven.sequenceiq.com/snapshots") {
+                authentication(userName: "$System.env.AWS_ACCESS_KEY", passphrase: "$System.env.AWS_SECRET_ACCESS_KEY")
+            }
+        }
+    }
+}
+
+checkstyleMain {
+    ignoreFailures = false
+    configProperties = ['config_loc': "$projectDir/config/checkstyle"]
+}
+
+checkstyleTest {
+    ignoreFailures = false
+    configProperties = ['config_loc': "$projectDir/config/checkstyle"]
+}
+
+jacoco {
+    toolVersion = "0.6.2.201302030002"
+    reportsDir = file("$buildDir/reports/jacoco")
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled false
+        csv.enabled false
+        html.destination "${buildDir}/jacocoHtml"
+    }
+}
+
+sonarRunner {
+    jacoco {
+        append = false
+        destinationFile = file("$buildDir/jacoco/jacocoTest.exec")
+        classDumpFile = file("$buildDir/jacoco/classpathdumps")
+    }
+    sonarProperties {
+        property "sonar.host.url", "$config.sonar_host_url"
+        property "sonar.jdbc.url", "$config.sonar_jdbc_url"
+        property "sonar.jdbc.driverClassName", "com.mysql.jdbc.Driver"
+        property "sonar.jdbc.username", "$System.env.SONAR_USERNAME"
+        property "sonar.jdbc.password", "$System.env.SONAR_PASSWORD"
+        property "project.reporting.outputEncoding", "UTF-8"
+        property "sonar.projectKey", "cloudbreak-shell"
+        property "sonar.projectName", "cloudbreak-shell"
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven { url "http://maven.sequenceiq.com/snapshots" }
+    maven { url "http://maven.sequenceiq.com/release" }
+    maven { url "http://seq-repo.s3-website-eu-west-1.amazonaws.com/releases" }
+    maven { url "http://seq-repo.s3-website-eu-west-1.amazonaws.com/snapshots" }
+}
+
+dependencies {
+    compile 'org.springframework.shell:spring-shell:1.1.0.RELEASE'
+    compile 'org.springframework.boot:spring-boot-starter:1.0.0.RELEASE'
+    compile 'org.springframework.boot:spring-boot-starter-test:1.0.0.RELEASE'
+    compile 'com.github.lalyos:jfiglet:0.0.3'
+    testCompile 'org.mockito:mockito-core:1.9.5'
+    testCompile 'junit:junit:4.10'
+    compile 'org.codehaus.jackson:jackson-mapper-asl:1.9.13'
+    compile 'com.sequenceiq.cloudbreak:cloudbreak-rest-client:0.1-SNAPSHOT'
+    compile 'com.github.lalyos:jfiglet:0.0.3'
+
+    testCompile 'org.springframework.boot:spring-boot-starter-test:1.0.2.RELEASE'
+    deployerJars 'org.springframework.build.aws:org.springframework.build.aws.maven:3.0.0.RELEASE'
+}
+
+task wrapper(type: Wrapper) { gradleVersion = "1.12" }
+
+task buildInfo(type: BuildInfoTask) {
+    systemProperties = System.properties
+    destination = file("$buildDir")
+    applicationPropertiesPath = "$buildDir"
+    basename = jar.baseName
+    buildVersion = version
+}
+
+compileJava.dependsOn buildInfo
+
+class BuildInfoTask extends DefaultTask {
+    File destination = new File("build.info")
+    String applicationPropertiesPath
+    String basename
+    String buildVersion
+
+    @TaskAction
+    def writeBuildInfo() {
+        destination.mkdirs()
+        File applicationDestination = new File(applicationPropertiesPath + "/resources/main")
+        applicationDestination.mkdirs()
+        new File(destination, "build.info").withWriter { out ->
+            [
+                    "ARTIFACT_BASENAME=" + basename,
+                    "ARTIFACT_VERSION=" + buildVersion,
+            ].each { out.println it }
+        }
+        new File(applicationDestination, "application.properties").withWriter { out ->
+            [
+                    "info.app.name=" + basename,
+                    "info.app.version=" + buildVersion,
+                    "management.contextPath=" + "\${CB_MANAGEMENT_CONTEXT_PATH}"
+            ].each { out.println it }
+        }
+    }
+}

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 : ${JAR_PATH:=/tmp/cloudbreak-shell.jar}
-SNAPSHOT_URL=http://maven.sequenceiq.com/snapshots
+SNAPSHOT_URL=http://maven.sequenceiq.com/releases
 PACKAGE=com/sequenceiq/cloudbreak
 ARTIFACT=cloudbreak-shell
 FULLNAME=$PACKAGE/$ARTIFACT
