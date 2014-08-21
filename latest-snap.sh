@@ -2,7 +2,7 @@
 
 : ${JAR_PATH:=/tmp/cloudbreak-shell.jar}
 SNAPSHOT_URL=http://maven.sequenceiq.com/releases
-PACKAGE=com/sequenceiq/cloudbreak
+PACKAGE=com/sequenceiq
 ARTIFACT=cloudbreak-shell
 FULLNAME=$PACKAGE/$ARTIFACT
 
@@ -10,6 +10,7 @@ VERSION=$(curl -Ls $SNAPSHOT_URL/$FULLNAME/maven-metadata.xml|sed -n "s/.*<versi
 
 LATEST=$(curl -Ls $SNAPSHOT_URL/$FULLNAME/$VERSION/maven-metadata.xml|sed -n "/>jar</ {n;s/.*<value>\([^<]*\).*/\1/p;}"|tail -1)
 
+echo latest jar version is $VERSION ...
 echo downloading exetuable jar into $JAR_PATH ...
 curl -o $JAR_PATH $SNAPSHOT_URL/$FULLNAME/$VERSION/$ARTIFACT-$LATEST.jar
 
