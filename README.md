@@ -29,6 +29,8 @@ cd cloudbreak-shell
 mvn clean package
 ```
 
+_Note: In case you build your own Cloudbreak from the `master`branch you should use the `latest-snap.sh` to get the right version of the CLI._
+
 <!--more-->
 
 ## Connect to Cloudbreak
