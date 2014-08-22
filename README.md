@@ -29,7 +29,8 @@ cd cloudbreak-shell
 mvn clean package
 ```
 
-_Note: In case you build your own Cloudbreak from the `master`branch you should use the `latest-snap.sh` to get the right version of the CLI._
+_Note: In case you use the hosted version of Cloudbreak you should use the `latest-release.sh` to get the right version of the CLI.
+In case you build your own Cloudbreak from the `master` branch you should use the `latest-snap.sh` to get the right version of the CLI._
 
 <!--more-->
 
