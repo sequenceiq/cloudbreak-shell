@@ -1,9 +1,9 @@
 package com.sequenceiq.cloudbreak.shell.model;
 
-import org.springframework.stereotype.Component;
+import java.util.HashMap;
+import java.util.Map;
 
-import com.google.common.collect.LinkedListMultimap;
-import com.google.common.collect.ListMultimap;
+import org.springframework.stereotype.Component;
 
 /**
  * Holds information about the connected Cloudbreak server.
@@ -13,7 +13,7 @@ public class CloudbreakContext {
 
     private Focus focus;
     private Hints hint;
-    private ListMultimap<PropertyKey, String> properties = LinkedListMultimap.create();
+    private Map<PropertyKey, String> properties = new HashMap<>();
 
     public CloudbreakContext() {
         this.focus = getRootFocus();
@@ -58,23 +58,23 @@ public class CloudbreakContext {
     }
 
     public String getStackId() {
-        return getFirstPropertyValue(PropertyKey.STACK_ID);
+        return getLastPropertyValue(PropertyKey.STACK_ID);
     }
 
     public String getStackName() {
-        return getFirstPropertyValue(PropertyKey.STACK_NAME);
+        return getLastPropertyValue(PropertyKey.STACK_NAME);
     }
 
     public String getTemplateId() {
-        return getFirstPropertyValue(PropertyKey.TEMPLATE_ID);
+        return getLastPropertyValue(PropertyKey.TEMPLATE_ID);
     }
 
     public String getBlueprintId() {
-        return getFirstPropertyValue(PropertyKey.BLUEPRINT_ID);
+        return getLastPropertyValue(PropertyKey.BLUEPRINT_ID);
     }
 
     public String getCredentialId() {
-        return getFirstPropertyValue(PropertyKey.CREDENTIAL_ID);
+        return getLastPropertyValue(PropertyKey.CREDENTIAL_ID);
     }
 
     /**
@@ -147,16 +147,17 @@ public class CloudbreakContext {
     }
 
     private void addProperty(PropertyKey key, String value) {
+        properties.remove(key);
         properties.put(key, value);
     }
 
     private void removeProperty(PropertyKey key, String value) {
-        properties.remove(key, value);
+        properties.remove(key);
     }
 
-    private String getFirstPropertyValue(PropertyKey key) {
+    private String getLastPropertyValue(PropertyKey key) {
         try {
-            return properties.get(key).get(0);
+            return properties.get(key);
         } catch (Exception ex) {
             return "";
         }
