@@ -75,6 +75,10 @@ public class CloudbreakShell implements CommandLineRunner, ShellStatusListener {
             );
             return;
         }
-        new SpringApplicationBuilder(CloudbreakShell.class).showBanner(false).run(args);
+        try {
+            new SpringApplicationBuilder(CloudbreakShell.class).showBanner(false).run(args);
+        } catch (Exception e) {
+            System.out.println("Cloudbreak shell cannot be started.");
+        }
     }
 }

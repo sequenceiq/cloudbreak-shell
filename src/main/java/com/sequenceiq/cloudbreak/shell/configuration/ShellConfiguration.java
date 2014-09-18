@@ -140,22 +140,26 @@ public class ShellConfiguration {
                 String[] parts = location.split("#|&|=");
                 token = parts[2];
             } else {
-                System.out.println("Couldn't get an access token from the identity server, check its configuration! Perhaps cloudbreak_shell is not autoapproved?");
+                System.out.println("Couldn't get an access token from the identity server, check its configuration! "
+                        + "Perhaps cloudbreak_shell is not autoapproved?");
                 System.out.println("Response from identity server: ");
-
                 System.out.println("Headers: " + authResponse);
+                throw new TokenUnavailableException("Wrong response from identity server.");
             }
         } catch (ResourceAccessException e) {
             System.out.println("Error occurred while trying to connect to identity server: " + e.getMessage());
             System.out.println("Check if your identity server is available and accepting requests on " + identityServerUrl);
+            throw new TokenUnavailableException("Error occurred while getting token from identity server", e);
         } catch (HttpClientErrorException e) {
             if (HttpStatus.UNAUTHORIZED == e.getStatusCode()) {
                 System.out.println("Error occurred while getting token from identity server: " + e.getMessage());
                 System.out.println("Check your username and password.");
             }
+            System.out.println("Something unexpected happened, couldn't get token from identity server. Please check your configurations.");
+            throw new TokenUnavailableException("Error occurred while getting token from identity server", e);
         } catch (Exception e) {
-            System.out.println("itt ez nem annyira okes");
-            throw e;
+            System.out.println("Something unexpected happened, couldn't get token from identity server. Please check your configurations.");
+            throw new TokenUnavailableException("Error occurred while getting token from identity server", e);
         }
         return token;
     }
