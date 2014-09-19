@@ -118,7 +118,7 @@ public class CredentialCommands implements CommandMarker {
             @CliOption(key = "sshKeyUrl", mandatory = false, help = "sshKeyUrl of the template") String sshKeyUrl
     ) {
         if ((sshKeyPath == null || sshKeyPath.isEmpty()) && (sshKeyUrl == null || sshKeyUrl.isEmpty())) {
-            return "SshKey cannot be null if password null";
+            return "An SSH public key must be specified either with --sshKeyPath or --sshKeyUrl";
         }
         String sshKey;
         if (sshKeyPath != null) {
