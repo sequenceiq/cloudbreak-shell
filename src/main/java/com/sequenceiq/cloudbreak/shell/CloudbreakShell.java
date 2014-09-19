@@ -49,7 +49,6 @@ public class CloudbreakShell implements CommandLineRunner, ShellStatusListener {
         if (newStatus.getStatus() == ShellStatus.Status.STARTED) {
             try {
                 cloudbreak.health();
-                cloudbreak.login();
                 context.setHint(Hints.CREATE_CREDENTIAL);
             } catch (Exception e) {
                 System.out.println("Cannot connect to Cloudbreak");
@@ -62,19 +61,23 @@ public class CloudbreakShell implements CommandLineRunner, ShellStatusListener {
         if (args.length == 0) {
             System.out.println(
                     "\nCloudbreak Shell: Interactive command line tool for managing Cloudbreak.\n\n"
-                    + "Usage:\n"
-                    + "  java -jar cloudbreak-shell.jar                  : Starts Cloudbreak Shell in interactive mode.\n"
-                    + "  java -jar cloudbreak-shell.jar --cmdfile=<FILE> : Cloudbreak Shell executes commands read from the file.\n\n"
-                    + "Options:\n"
-                    + "  --cloudbreak.host=<HOSTNAME>       Hostname of the Cloudbreak Server [default: cloudbreak-api.sequenceiq.com].\n"
-                    + "  --cloudbreak.port=<PORT>           Port of the Cloudbreak Server [default: 80].\n"
-                    + "  --cloudbreak.user=<USER>           Username of the Cloudbreak user [default: user@sequenceiq.com].\n"
-                    + "  --cloudbreak.password=<PASSWORD>   Password of the Cloudbreak user [default: password].\n\n"
-                    + "Note:\n"
-                    + "  At least one option is mandatory."
+                            + "Usage:\n"
+                            + "  java -jar cloudbreak-shell.jar                  : Starts Cloudbreak Shell in interactive mode.\n"
+                            + "  java -jar cloudbreak-shell.jar --cmdfile=<FILE> : Cloudbreak Shell executes commands read from the file.\n\n"
+                            + "Options:\n"
+                            + "  --cloudbreak.host=<HOSTNAME>       Hostname of the Cloudbreak Server [default: cloudbreak-api.sequenceiq.com].\n"
+                            + "  --cloudbreak.port=<PORT>           Port of the Cloudbreak Server [default: 80].\n"
+                            + "  --cloudbreak.user=<USER>           Username of the Cloudbreak user [default: user@sequenceiq.com].\n"
+                            + "  --cloudbreak.password=<PASSWORD>   Password of the Cloudbreak user [default: password].\n\n"
+                            + "Note:\n"
+                            + "  At least one option is mandatory."
             );
             return;
         }
-        new SpringApplicationBuilder(CloudbreakShell.class).showBanner(false).run(args);
+        try {
+            new SpringApplicationBuilder(CloudbreakShell.class).showBanner(false).run(args);
+        } catch (Exception e) {
+            System.out.println("Cloudbreak shell cannot be started.");
+        }
     }
 }
