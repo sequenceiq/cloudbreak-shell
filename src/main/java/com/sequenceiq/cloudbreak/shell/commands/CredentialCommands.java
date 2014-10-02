@@ -86,7 +86,7 @@ public class CredentialCommands implements CommandMarker {
     @CliCommand(value = "credential list", help = "Shows all of your credentials")
     public String listCredentials() {
         try {
-            return renderSingleMap(cloudbreak.getCredentialsMap(), "ID", "INFO");
+            return renderSingleMap(cloudbreak.getAccountCredentialsMap(), "ID", "INFO");
         } catch (Exception ex) {
             return ex.toString();
         }
@@ -114,8 +114,9 @@ public class CredentialCommands implements CommandMarker {
             @CliOption(key = "description", mandatory = true, help = "Description of the credential") String description,
             @CliOption(key = "name", mandatory = true, help = "Name of the credential") String name,
             @CliOption(key = "roleArn", mandatory = true, help = "roleArn of the credential") String roleArn,
-            @CliOption(key = "sshKeyPath", mandatory = false, help = "sshKeyPath of the template") String sshKeyPath,
-            @CliOption(key = "sshKeyUrl", mandatory = false, help = "sshKeyUrl of the template") String sshKeyUrl
+            @CliOption(key = "sshKeyPath", mandatory = false, help = "path of a public SSH key file") String sshKeyPath,
+            @CliOption(key = "sshKeyUrl", mandatory = false, help = "URL of a public SSH key file") String sshKeyUrl,
+            @CliOption(key = "publicInAccount", mandatory = false, help = "flags if the credential is public in the account") Boolean publicInAccount
     ) {
         if ((sshKeyPath == null || sshKeyPath.isEmpty()) && (sshKeyUrl == null || sshKeyUrl.isEmpty())) {
             return "An SSH public key must be specified either with --sshKeyPath or --sshKeyUrl";
@@ -135,7 +136,7 @@ public class CredentialCommands implements CommandMarker {
             }
         }
         try {
-            String id = cloudbreak.postEc2Credential(name, description, roleArn, sshKey);
+            String id = cloudbreak.postEc2Credential(name, description, roleArn, sshKey, publicInAccount);
             context.setCredential(id);
             context.setHint(Hints.CREATE_TEMPLATE);
             return "Credential created, id: " + id;
@@ -172,7 +173,8 @@ public class CredentialCommands implements CommandMarker {
             @CliOption(key = "subscriptionId", mandatory = true, help = "subscriptionId of the credential") String subscriptionId,
             @CliOption(key = "jksPassword", mandatory = true, help = "jksPassword of the credential") String jksPassword,
             @CliOption(key = "sshKeyPath", mandatory = false, help = "sshKeyPath of the template") String sshKeyPath,
-            @CliOption(key = "sshKeyUrl", mandatory = false, help = "sshKeyUrl of the template") String sshKeyUrl
+            @CliOption(key = "sshKeyUrl", mandatory = false, help = "sshKeyUrl of the template") String sshKeyUrl,
+            @CliOption(key = "publicInAccount", mandatory = false, help = "flags if the credential is public in the account") Boolean publicInAccount
     ) {
         if ((sshKeyPath == null || sshKeyPath.isEmpty()) && (sshKeyUrl == null || sshKeyUrl.isEmpty())) {
             return "SshKey cannot be null if password null";
@@ -192,7 +194,7 @@ public class CredentialCommands implements CommandMarker {
             }
         }
         try {
-            String id = cloudbreak.postAzureCredential(name, description, subscriptionId, jksPassword, sshKey);
+            String id = cloudbreak.postAzureCredential(name, description, subscriptionId, jksPassword, sshKey, publicInAccount);
             context.setCredential(id);
             context.setHint(Hints.CREATE_TEMPLATE);
             return "Credential created, id: " + id;
@@ -206,7 +208,7 @@ public class CredentialCommands implements CommandMarker {
     @CliAvailabilityIndicator(value = "credential certificate")
     public boolean isCredentialCertificateCommandAvailable() {
         try {
-            List<Map> credentials = cloudbreak.getCredentials();
+            List<Map> credentials = cloudbreak.getAccountCredentials();
             int count = 0;
             maps = new ArrayList<>();
             for (Map map : credentials) {
