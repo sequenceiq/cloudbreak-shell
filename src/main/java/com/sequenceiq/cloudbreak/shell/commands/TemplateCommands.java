@@ -72,7 +72,7 @@ public class TemplateCommands implements CommandMarker {
     @CliCommand(value = "template list", help = "Shows the currently available cloud templates")
     public String listTemplates() {
         try {
-            Map<String, String> templatesMap = cloudbreak.getTemplatesMap();
+            Map<String, String> templatesMap = cloudbreak.getAccountTemplatesMap();
             return renderSingleMap(templatesMap, "ID", "INFO");
         } catch (HttpResponseException ex) {
             return ex.getResponse().getData().toString();
@@ -110,7 +110,8 @@ public class TemplateCommands implements CommandMarker {
             @CliOption(key = "volumeSize", mandatory = true, help = "volumeSize(GB) of the template") Integer volumeSize,
             @CliOption(key = "volumeType", mandatory = false, help = "volumeType of the template", specifiedDefaultValue = "Gp2") VolumeType volumeType,
             @CliOption(key = "spotPrice", mandatory = false, help = "spotPrice of the template") Double spotPrice,
-            @CliOption(key = "sshLocation", mandatory = false, specifiedDefaultValue = "0.0.0.0/0", help = "sshLocation of the template") String sshLocation
+            @CliOption(key = "sshLocation", mandatory = false, specifiedDefaultValue = "0.0.0.0/0", help = "sshLocation of the template") String sshLocation,
+            @CliOption(key = "publicInAccount", mandatory = false, help = "flags if the template is public in the account") Boolean publicInAccount
     ) {
         try {
             if (volumeCount < VOLUME_COUNT_MIN || volumeCount > VOLUME_COUNT_MAX) {
@@ -132,7 +133,8 @@ public class TemplateCommands implements CommandMarker {
                         instanceType.toString(),
                         volumeCount.toString(),
                         volumeSize.toString(),
-                        volumeType.name()
+                        volumeType.name(),
+                        publicInAccount
                 );
             } else {
                 id = cloudbreak.postSpotEc2Template(name,
@@ -144,7 +146,8 @@ public class TemplateCommands implements CommandMarker {
                         volumeCount.toString(),
                         volumeSize.toString(),
                         volumeType.name(),
-                        spotPrice.toString()
+                        spotPrice.toString(),
+                        publicInAccount
                 );
             }
             context.addTemplate(id);
@@ -166,7 +169,8 @@ public class TemplateCommands implements CommandMarker {
             @CliOption(key = "vmType", mandatory = true, help = "type of the VM") AzureVmType vmType,
             @CliOption(key = "volumeCount", mandatory = true, help = "volumeCount of the template") Integer volumeCount,
             @CliOption(key = "volumeSize", mandatory = true, help = "volumeSize(GB) of the template") Integer volumeSize,
-            @CliOption(key = "imageName", mandatory = false, help = "instance name of the template: AMBARI_DOCKER_V1") AzureInstanceName imageName
+            @CliOption(key = "imageName", mandatory = false, help = "instance name of the template: AMBARI_DOCKER_V1") AzureInstanceName imageName,
+            @CliOption(key = "publicInAccount", mandatory = false, help = "flags if the template is public in the account") Boolean publicInAccount
     ) {
         if (volumeCount < VOLUME_COUNT_MIN || volumeCount > VOLUME_COUNT_MAX) {
             return "volumeCount has to be between 1 and 8.";
@@ -184,7 +188,8 @@ public class TemplateCommands implements CommandMarker {
                     imageName.name(),
                     vmType.name(),
                     volumeCount.toString(),
-                    volumeSize.toString()
+                    volumeSize.toString(),
+                    publicInAccount
             );
             context.addTemplate(id);
             context.setHint(Hints.ADD_BLUEPRINT);

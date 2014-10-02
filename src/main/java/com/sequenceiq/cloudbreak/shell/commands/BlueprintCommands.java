@@ -94,7 +94,7 @@ public class BlueprintCommands implements CommandMarker {
     @CliCommand(value = "blueprint list", help = "Shows the currently available blueprints")
     public String listBlueprints() {
         try {
-            return renderSingleMap(cloudbreak.getBlueprintsMap(), "ID", "INFO");
+            return renderSingleMap(cloudbreak.getAccountBlueprintsMap(), "ID", "INFO");
         } catch (HttpResponseException ex) {
             return ex.getResponse().getData().toString();
         } catch (Exception ex) {
@@ -152,12 +152,13 @@ public class BlueprintCommands implements CommandMarker {
             @CliOption(key = "description", mandatory = true, help = "Description of the blueprint to download from") String description,
             @CliOption(key = "name", mandatory = true, help = "Name of the blueprint to download from") String name,
             @CliOption(key = "url", mandatory = false, help = "URL of the blueprint to download from") String url,
-            @CliOption(key = "file", mandatory = false, help = "File which contains the blueprint") File file) {
+            @CliOption(key = "file", mandatory = false, help = "File which contains the blueprint") File file,
+            @CliOption(key = "publicInAccount", mandatory = false, help = "flags if the blueprint is public in the account") Boolean publicInAccount) {
         String message;
         try {
             String json = file == null ? readContent(url) : readContent(file);
             if (json != null) {
-                String id = cloudbreak.postBlueprint(name, description, json);
+                String id = cloudbreak.postBlueprint(name, description, json, publicInAccount);
                 context.addBlueprint(id);
                 context.setHint(Hints.CREATE_STACK);
                 message = String.format("Blueprint: '%s' has been added, id: %s", getBlueprintName(json), id);
