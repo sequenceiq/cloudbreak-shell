@@ -68,7 +68,9 @@ public class CloudbreakShell implements CommandLineRunner, ShellStatusListener {
                             + "  --cloudbreak.host=<HOSTNAME>       Hostname of the Cloudbreak Server [default: cloudbreak-api.sequenceiq.com].\n"
                             + "  --cloudbreak.port=<PORT>           Port of the Cloudbreak Server [default: 80].\n"
                             + "  --cloudbreak.user=<USER>           Username of the Cloudbreak user [default: user@sequenceiq.com].\n"
-                            + "  --cloudbreak.password=<PASSWORD>   Password of the Cloudbreak user [default: password].\n\n"
+                            + "  --cloudbreak.password=<PASSWORD>   Password of the Cloudbreak user [default: password].\n"
+                            + "  --identity.host=<HOSTNAME>         Hostname of the oauth identity server [default: localhost].\n"
+                            + "  --identity.port=<PORT>             Port of the oauth identity server [default: 8888].\n\n"
                             + "Note:\n"
                             + "  At least one option is mandatory."
             );
