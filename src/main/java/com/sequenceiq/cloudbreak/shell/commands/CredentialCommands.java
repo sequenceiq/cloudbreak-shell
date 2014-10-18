@@ -63,6 +63,11 @@ public class CredentialCommands implements CommandMarker {
         return true;
     }
 
+    @CliAvailabilityIndicator(value = "credential createGcc")
+    public boolean isCredentialGccCreateCommandAvailable() {
+        return true;
+    }
+
     @CliCommand(value = "credential show", help = "Shows the credential by its id")
     public Object showCredential(
             @CliOption(key = "id", mandatory = true, help = "Id of the credential") String id) {
@@ -137,6 +142,66 @@ public class CredentialCommands implements CommandMarker {
         }
         try {
             String id = cloudbreak.postEc2Credential(name, description, roleArn, sshKey, publicInAccount);
+            context.setCredential(id);
+            context.setHint(Hints.CREATE_TEMPLATE);
+            return "Credential created, id: " + id;
+        } catch (HttpResponseException ex) {
+            return ex.getResponse().getData().toString();
+        } catch (Exception ex) {
+            return ex.toString();
+        }
+    }
+
+    @CliCommand(value = "credential createGcc", help = "Create a new Gcc credential")
+    public String createGccCredential(
+            @CliOption(key = "description", mandatory = true, help = "Description of the credential") String description,
+            @CliOption(key = "name", mandatory = true, help = "Name of the credential") String name,
+            @CliOption(key = "projectId", mandatory = true, help = "projectId of the credential") String projectId,
+            @CliOption(key = "serviceAccountId", mandatory = true, help = "serviceAccountId of the credential") String serviceAccountId,
+            @CliOption(key = "serviceAccountPrivatKeyUrl", mandatory = false, help = "URL of a serviceAccountPrivatKey url") String serviceAccountPrivatKeyUrl,
+            @CliOption(key = "serviceAccountPrivatKeyPath", mandatory = false, help = "path of a serviceAccountPrivatKey file") String serviceAccountPrivatKeyPath,
+            @CliOption(key = "sshKeyPath", mandatory = false, help = "path of a public SSH key file") String sshKeyPath,
+            @CliOption(key = "sshKeyUrl", mandatory = false, help = "URL of a public SSH key url") String sshKeyUrl,
+            @CliOption(key = "publicInAccount", mandatory = false, help = "flags if the credential is public in the account") Boolean publicInAccount
+    ) {
+        if ((sshKeyPath == null || sshKeyPath.isEmpty()) && (sshKeyUrl == null || sshKeyUrl.isEmpty())) {
+            return "An SSH public key must be specified either with --sshKeyPath or --sshKeyUrl";
+        }
+        String sshKey;
+        if (sshKeyPath != null) {
+            try {
+                sshKey = new String(Files.readAllBytes(Paths.get(sshKeyPath))).replaceAll("\n", "");
+            } catch (IOException e) {
+                return "File not found with ssh key.";
+            }
+        } else {
+            try {
+                sshKey = readUrl(sshKeyUrl);
+            } catch (IOException e) {
+                return "Url not found with ssh key.";
+            }
+        }
+        if ((serviceAccountPrivatKeyPath == null || serviceAccountPrivatKeyPath.isEmpty())
+                && (serviceAccountPrivatKeyUrl == null || serviceAccountPrivatKeyUrl.isEmpty())) {
+            return "A serviceAccountPrivatKey must be specified either with --serviceAccountPrivatKeyPath or --serviceAccountPrivatKeyUrl";
+        }
+        String serviceAccountPrivatKey;
+        if (serviceAccountPrivatKeyPath != null) {
+            try {
+                serviceAccountPrivatKey = new String(Files.readAllBytes(Paths.get(serviceAccountPrivatKeyPath))).replaceAll("\n", "");
+            } catch (IOException e) {
+                return "File not found with ssh key.";
+            }
+        } else {
+            try {
+                serviceAccountPrivatKey = readUrl(serviceAccountPrivatKeyUrl);
+            } catch (IOException e) {
+                return "Url not found with ssh key.";
+            }
+        }
+
+        try {
+            String id = cloudbreak.postGccCredential(name, description, sshKey, publicInAccount, projectId, serviceAccountId, serviceAccountPrivatKey);
             context.setCredential(id);
             context.setHint(Hints.CREATE_TEMPLATE);
             return "Credential created, id: " + id;
