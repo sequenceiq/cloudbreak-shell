@@ -209,7 +209,7 @@ public class TemplateCommands implements CommandMarker {
         }
     }
 
-    @CliCommand(value = "template createAZURE", help = "Create a new AZURE template")
+    @CliCommand(value = "template createGcc", help = "Create a new GCC template")
     public String createGccTemplate(
             @CliOption(key = "name", mandatory = true, help = "Name of the template") String name,
             @CliOption(key = "description", mandatory = true, help = "Description of the template") String description,

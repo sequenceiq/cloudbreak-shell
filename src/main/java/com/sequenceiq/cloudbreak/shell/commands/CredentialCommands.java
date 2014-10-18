@@ -152,7 +152,7 @@ public class CredentialCommands implements CommandMarker {
         }
     }
 
-    @CliCommand(value = "credential createGcc", help = "Create a new EC2 credential")
+    @CliCommand(value = "credential createGcc", help = "Create a new Gcc credential")
     public String createGccCredential(
             @CliOption(key = "description", mandatory = true, help = "Description of the credential") String description,
             @CliOption(key = "name", mandatory = true, help = "Name of the credential") String name,
