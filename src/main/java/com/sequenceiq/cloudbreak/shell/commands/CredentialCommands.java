@@ -159,7 +159,8 @@ public class CredentialCommands implements CommandMarker {
             @CliOption(key = "projectId", mandatory = true, help = "projectId of the credential") String projectId,
             @CliOption(key = "serviceAccountId", mandatory = true, help = "serviceAccountId of the credential") String serviceAccountId,
             @CliOption(key = "serviceAccountPrivatKeyUrl", mandatory = false, help = "URL of a serviceAccountPrivatKey url") String serviceAccountPrivatKeyUrl,
-            @CliOption(key = "serviceAccountPrivatKeyPath", mandatory = false, help = "path of a serviceAccountPrivatKey file") String serviceAccountPrivatKeyPath,
+            @CliOption(key = "serviceAccountPrivatKeyPath", mandatory = false, help = "path of a serviceAccountPrivatKey file")
+            String serviceAccountPrivatKeyPath,
             @CliOption(key = "sshKeyPath", mandatory = false, help = "path of a public SSH key file") String sshKeyPath,
             @CliOption(key = "sshKeyUrl", mandatory = false, help = "URL of a public SSH key url") String sshKeyUrl,
             @CliOption(key = "publicInAccount", mandatory = false, help = "flags if the credential is public in the account") Boolean publicInAccount
