@@ -19,6 +19,9 @@ import com.sequenceiq.cloudbreak.shell.model.AzureInstanceName;
 import com.sequenceiq.cloudbreak.shell.model.AzureLocation;
 import com.sequenceiq.cloudbreak.shell.model.AzureVmType;
 import com.sequenceiq.cloudbreak.shell.model.CloudbreakContext;
+import com.sequenceiq.cloudbreak.shell.model.GccImageName;
+import com.sequenceiq.cloudbreak.shell.model.GccInstanceType;
+import com.sequenceiq.cloudbreak.shell.model.GccZone;
 import com.sequenceiq.cloudbreak.shell.model.Hints;
 import com.sequenceiq.cloudbreak.shell.model.InstanceType;
 import com.sequenceiq.cloudbreak.shell.model.Region;
@@ -56,6 +59,11 @@ public class TemplateCommands implements CommandMarker {
 
     @CliAvailabilityIndicator(value = "template createEC2")
     public boolean isTemplateEc2CreateCommandAvailable() {
+        return true;
+    }
+
+    @CliAvailabilityIndicator(value = "template createGcc")
+    public boolean isTemplateGccCreateCommandAvailable() {
         return true;
     }
 
@@ -166,7 +174,7 @@ public class TemplateCommands implements CommandMarker {
             @CliOption(key = "name", mandatory = true, help = "Name of the template") String name,
             @CliOption(key = "description", mandatory = true, help = "Description of the template") String description,
             @CliOption(key = "location", mandatory = true, help = "location of the template") AzureLocation location,
-            @CliOption(key = "vmType", mandatory = true, help = "type of the VM") AzureVmType vmType,
+            @CliOption(key = "instanceType", mandatory = true, help = "type of the VM") AzureVmType vmType,
             @CliOption(key = "volumeCount", mandatory = true, help = "volumeCount of the template") Integer volumeCount,
             @CliOption(key = "volumeSize", mandatory = true, help = "volumeSize(GB) of the template") Integer volumeSize,
             @CliOption(key = "imageName", mandatory = false, help = "instance name of the template: AMBARI_DOCKER_V1") AzureInstanceName imageName,
@@ -200,6 +208,47 @@ public class TemplateCommands implements CommandMarker {
             return ex.toString();
         }
     }
+
+    @CliCommand(value = "template createGcc", help = "Create a new GCC template")
+    public String createGccTemplate(
+            @CliOption(key = "name", mandatory = true, help = "Name of the template") String name,
+            @CliOption(key = "description", mandatory = true, help = "Description of the template") String description,
+            @CliOption(key = "location", mandatory = true, help = "location of the template") GccZone location,
+            @CliOption(key = "instanceType", mandatory = true, help = "type of the VM") GccInstanceType instanceType,
+            @CliOption(key = "volumeCount", mandatory = true, help = "volumeCount of the template") Integer volumeCount,
+            @CliOption(key = "volumeSize", mandatory = true, help = "volumeSize(GB) of the template") Integer volumeSize,
+            @CliOption(key = "imageName", mandatory = false, help = "instance name of the template: DEBIAN_HACK") GccImageName imageName,
+            @CliOption(key = "publicInAccount", mandatory = false, help = "flags if the template is public in the account") Boolean publicInAccount
+    ) {
+        if (volumeCount < VOLUME_COUNT_MIN || volumeCount > VOLUME_COUNT_MAX) {
+            return "volumeCount has to be between 1 and 8.";
+        }
+        if (volumeSize < VOLUME_SIZE_MIN || volumeSize > VOLUME_SIZE_MAX) {
+            return "VolumeSize has to be between 1 and 1024.";
+        }
+        if (imageName == null) {
+            imageName = GccImageName.DEBIAN_HACK;
+        }
+        try {
+            String id = cloudbreak.postGccTemplate(name,
+                    description,
+                    imageName.name(),
+                    instanceType.name(),
+                    volumeCount.toString(),
+                    volumeSize.toString(),
+                    location.name(),
+                    publicInAccount
+            );
+            context.addTemplate(id);
+            context.setHint(Hints.ADD_BLUEPRINT);
+            return "Template created, id: " + id;
+        } catch (HttpResponseException ex) {
+            return ex.getResponse().getData().toString();
+        } catch (Exception ex) {
+            return ex.toString();
+        }
+    }
+
 
     @CliCommand(value = "template show", help = "Shows the template by its id")
     public Object showTemlate(
