@@ -1,7 +1,14 @@
 package com.sequenceiq.cloudbreak.shell.configuration;
 
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.Map;
 
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.SSLContextBuilder;
+import org.apache.http.conn.ssl.TrustStrategy;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -12,6 +19,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.scheduling.concurrent.ThreadPoolExecutorFactoryBean;
 import org.springframework.shell.CommandLine;
 import org.springframework.shell.SimpleShellCommandLineOptions;
@@ -39,31 +47,25 @@ public class ShellConfiguration {
 
     public static final String CLIENT_ID = "cloudbreak_shell";
 
-    @Value("${cloudbreak.host:localhost}")
-    private String host;
+    @Value("${cloudbreak.address:https://cloudbreak-api.sequenceiq.com}")
+    private String cloudbreakAddress;
 
-    @Value("${cloudbreak.port:8080}")
-    private String port;
+    @Value("${identity.address:https://identity.sequenceiq.com}")
+    private String identityServerAddress;
 
-    @Value("${cloudbreak.user:user@seq.com}")
+    @Value("${sequenceiq.user:user@seq.com}")
     private String user;
 
-    @Value("${cloudbreak.password:test123}")
+    @Value("${sequenceiq.password:test123}")
     private String password;
-
-    @Value("${identity.host:localhost}")
-    private String identityServerHost;
-
-    @Value("${identity.port:8888}")
-    private String identityServerPort;
 
     @Value("${cmdfile:}")
     private String cmdFile;
 
     @Bean
-    CloudbreakClient createCloudbreakClient() {
-        String token = getToken(identityServerHost, identityServerPort, user, password);
-        return new CloudbreakClient(host, port, token);
+    CloudbreakClient createCloudbreakClient() throws Exception {
+        String token = getToken(identityServerAddress, user, password);
+        return new CloudbreakClient(cloudbreakAddress, token);
     }
 
     @Bean
@@ -117,9 +119,19 @@ public class ShellConfiguration {
         return new ScriptCommands();
     }
 
-    private String getToken(String identityServerHost, String identityServerPort, String user, String password) {
-        String identityServerUrl = String.format("http://%s:%s", identityServerHost, identityServerPort);
-        RestTemplate restTemplate = new RestTemplate();
+    private String getToken(String identityServerAddress, String user, String password) throws Exception {
+        HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
+        SSLContextBuilder sslContextBuilder = new SSLContextBuilder();
+        sslContextBuilder.loadTrustMaterial(null, new TrustStrategy() {
+            @Override
+            public boolean isTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+                return true;
+            }
+        });
+        SSLConnectionSocketFactory sslConnectionSocketFactory = new SSLConnectionSocketFactory(sslContextBuilder.build());
+        CloseableHttpClient httpClient = HttpClients.custom().setSSLSocketFactory(sslConnectionSocketFactory).build();
+        requestFactory.setHttpClient(httpClient);
+        RestTemplate restTemplate = new RestTemplate(requestFactory);
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Accept", "application/json");
@@ -130,7 +142,7 @@ public class ShellConfiguration {
         String token = null;
         try {
             ResponseEntity<String> authResponse = restTemplate.exchange(
-                    String.format("%s/oauth/authorize?response_type=token&client_id=%s", identityServerUrl, CLIENT_ID),
+                    String.format("%s/oauth/authorize?response_type=token&client_id=%s", identityServerAddress, CLIENT_ID),
                     HttpMethod.POST,
                     new HttpEntity<Map>(requestBody, headers),
                     String.class
@@ -148,7 +160,7 @@ public class ShellConfiguration {
             }
         } catch (ResourceAccessException e) {
             System.out.println("Error occurred while trying to connect to identity server: " + e.getMessage());
-            System.out.println("Check if your identity server is available and accepting requests on " + identityServerUrl);
+            System.out.println("Check if your identity server is available and accepting requests on " + identityServerAddress);
             throw new TokenUnavailableException("Error occurred while getting token from identity server", e);
         } catch (HttpClientErrorException e) {
             if (HttpStatus.UNAUTHORIZED == e.getStatusCode()) {

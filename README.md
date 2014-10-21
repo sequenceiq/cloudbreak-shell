@@ -34,23 +34,31 @@ In case you build your own Cloudbreak from the `master` branch you should use th
 
 <!--more-->
 
-## Connect to Cloudbreak
-In order to use the shell you will have to have a Cloudbreak account. You can get one by subscribing to our hosted and free [Cloudbreak](https://cloudbreak.sequenceiq.com/) instance. Alternatively you can build your own Cloudbreak and deploy it within your organization - for that just follow up with the steps in the Cloudbreak [documentation](http://sequenceiq.com/cloudbreak/#quickstart-and-installation). We suggest to try our hosted solution as in case you have any issues we can always help you with. Please feel free to create bugs, ask for enhancements or just give us feedback by either using our [GitHub repository](https://github.com/sequenceiq/cloudbreak) or the other channels highlighted in the product documentation (Google Groups, email or social channels).
+## Sign in and connect to Cloudbreak
+
+There are several different ways to use the shell. First of all you'll need a Cloudbreak instance you can connect to. The easiest way is to use our hosted solution - you can access it with your SequenceIQ credentials. If you don't have an account, you can subscribe [here](https://accounts.sequenceiq.com/register).
+
+Alternatively you can host your own Cloudbreak instance - for that just follow up with the steps in the Cloudbreak [documentation](http://sequenceiq.com/cloudbreak/#quickstart-and-installation). If you're hosting your own Cloudbreak server you can still use your SequenceIQ credentials and our identity server, but then you'll have to configure your Cloudbreak installation with proper client credentials that will be accepted by our identity server. It is currently not supported to register your Cloudbreak application through an API (but it is planned), so contact us if you'd like to use this solution.
+
+The third alternative is to deploy our whole stack locally in your organization along with [Cloudbreak](http://sequenceiq.com/cloudbreak/#quickstart-and-installation), our OAuth2 based [Identity Server](http://blog.sequenceiq.com/blog/2014/10/16/using-uaa-as-an-identity-server/), and our user management application, [Sultans](https://github.com/sequenceiq/sultans).
+
+We suggest to try our hosted solution as in case you have any issues we can always help you. Please feel free to create bugs, ask for enhancements or just give us feedback by either using our [GitHub repository](https://github.com/sequenceiq/cloudbreak) or the other channels highlighted in the product documentation (Google Groups, email or social channels).
+
 The shell is built as a single executable jar with the help of [Spring Boot](http://projects.spring.io/spring-boot/).
 
 ```
 Usage:
-  java -jar cloudbreak-shell-0.1-SNAPSHOT.jar                  : Starts Cloudbreak Shell in interactive mode.
-  java -jar cloudbreak-shell-0.1-SNAPSHOT.jar --cmdfile=<FILE> : Cloudbreak executes commands read from the file.
+  java -jar cloudbreak-shell-0.2-SNAPSHOT.jar                  : Starts Cloudbreak Shell in interactive mode.
+  java -jar cloudbreak-shell-0.2-SNAPSHOT.jar --cmdfile=<FILE> : Cloudbreak executes commands read from the file.
 
 Options:
-  --cloudbreak.host=<HOSTNAME>       Hostname of the Cloudbreak REST API Server [use:cloudbreak-api.sequenceiq.com].
-  --cloudbreak.port=<PORT>           Port of the Cloudbreak REST API Server [use:80].
-  --cloudbreak.user=<USER>           Username of the Cloudbreak user [use:your user name ].
-  --cloudbreak.password=<PASSWORD>   Password of the Cloudbreak admin [use: your password].
+  --cloudbreak.address=<http[s]://HOSTNAME:PORT>  Address of the Cloudbreak Server [default: https://cloudbreak-api.sequenceiq.com].
+  --identity.address=<http[s]://HOSTNAME:PORT>    Address of the SequenceIQ identity server [default: https://identity.sequenceiq.com].
+  --sequenceiq.user=<USER>                        Username of the SequenceIQ user [default: user@sequenceiq.com].
+  --sequenceiq.password=<PASSWORD>                Password of the SequenceIQ user [default: password].
 
 Note:
-  All options are mandatory.
+  You should specify at least your username and password.
 ```
 Once you are connected you can start to create a cluster. If you are lost and need guidance through the process you can use `hint`. You can always use `TAB` for completion. Note that all commands are `context aware` - they are available only when it makes sense - this way you are never confused and guided by the system on the right path.
 
@@ -73,23 +81,23 @@ credential select --id #ID of the credential
 A template gives developers and systems administrators an easy way to create and manage a collection of cloud infrastructure related resources, maintaining and updating them in an orderly and predictable fashion. A template can be used repeatedly to create identical copies of the same stack (or to use as a foundation to start a new stack).
 
 ```
-template createEC2 --description "awstemplate" --name "awstemplate" --region EU_WEST_1 --instanceType M3Large --sshLocation 0.0.0.0/0 
+template createEC2 --name awstemplate --description aws-template  --region EU_WEST_1 --instanceType M3Xlarge --volumeSize 100 --volumeCount 2
 ```
-You can check whether the template was created successfully by using the `template list` command. Check the template with or select if you are happy with:
+You can check whether the template was created successfully by using the `template list` command. Check the template and select it if you are happy with it:
 
 ```
 template show --id #ID of the template
 
 template select --id #ID of the template
 ```
-### Create a stack 
+### Create a stack
 
 Stacks are template `instances` - a running cloud infrastructure created based on a template. Use the following command to create a stack to be used with your Hadoop cluster:
 
 ```
-stack create --name “myStackName" --nodeCount 20 
+stack create --name “myStackName" --nodeCount 10
 ```
-### Select a blueprint 
+### Select a blueprint
 
 We ship default Hadoop cluster blueprints with Cloudbreak. You can use these blueprints or add yours. To see the available blueprints and use one of them please use:
 
@@ -98,7 +106,7 @@ blueprint list
 
 blueprint select --id #ID of the blueprint
 ```
-### Create a Hadoop cluster 
+### Create a Hadoop cluster
 You are almost done - one more command and this will create your Hadoop cluster on your favorite cloud provider. Same as the API, or UI this will use your `template`, and by using CloudFormation will launch a cloud `stack` - once the `stack` is up and running (cloud provisioning is done) it will use your selected `blueprint` and install your custom Hadoop cluster with the selected components and services. For the supported list of Hadoop components and services please check the [documentation](http://sequenceiq.com/cloudbreak/#supported-components).
 
 ```

@@ -65,14 +65,14 @@ public class CloudbreakShell implements CommandLineRunner, ShellStatusListener {
                             + "  java -jar cloudbreak-shell.jar                  : Starts Cloudbreak Shell in interactive mode.\n"
                             + "  java -jar cloudbreak-shell.jar --cmdfile=<FILE> : Cloudbreak Shell executes commands read from the file.\n\n"
                             + "Options:\n"
-                            + "  --cloudbreak.host=<HOSTNAME>       Hostname of the Cloudbreak Server [default: cloudbreak-api.sequenceiq.com].\n"
-                            + "  --cloudbreak.port=<PORT>           Port of the Cloudbreak Server [default: 80].\n"
-                            + "  --cloudbreak.user=<USER>           Username of the Cloudbreak user [default: user@sequenceiq.com].\n"
-                            + "  --cloudbreak.password=<PASSWORD>   Password of the Cloudbreak user [default: password].\n"
-                            + "  --identity.host=<HOSTNAME>         Hostname of the oauth identity server [default: localhost].\n"
-                            + "  --identity.port=<PORT>             Port of the oauth identity server [default: 8888].\n\n"
+                            + "  --cloudbreak.address=<http[s]://HOSTNAME:PORT>  Address of the Cloudbreak Server"
+                            + " [default: https://cloudbreak-api.sequenceiq.com].\n"
+                            + "  --identity.address=<http[s]://HOSTNAME:PORT>    Address of the SequenceIQ identity server"
+                            + " [default: https://identity.sequenceiq.com].\n"
+                            + "  --sequenceiq.user=<USER>                        Username of the SequenceIQ user [default: user@sequenceiq.com].\n"
+                            + "  --sequenceiq.password=<PASSWORD>                Password of the SequenceIQ user [default: password].\n"
                             + "Note:\n"
-                            + "  At least one option is mandatory."
+                            + "  Please specify the username and password of your SequenceIQ user."
             );
             return;
         }
