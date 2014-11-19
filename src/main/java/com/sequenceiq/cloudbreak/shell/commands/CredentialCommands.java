@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.CommandMarker;
@@ -158,9 +159,8 @@ public class CredentialCommands implements CommandMarker {
             @CliOption(key = "name", mandatory = true, help = "Name of the credential") String name,
             @CliOption(key = "projectId", mandatory = true, help = "projectId of the credential") String projectId,
             @CliOption(key = "serviceAccountId", mandatory = true, help = "serviceAccountId of the credential") String serviceAccountId,
-            @CliOption(key = "serviceAccountPrivatKeyUrl", mandatory = false, help = "URL of a serviceAccountPrivatKey url") String serviceAccountPrivatKeyUrl,
-            @CliOption(key = "serviceAccountPrivatKeyPath", mandatory = false, help = "path of a serviceAccountPrivatKey file")
-            String serviceAccountPrivatKeyPath,
+            @CliOption(key = "serviceAccountPrivateKeyPath", mandatory = true, help = "path of a service account private key (p12) file")
+            String serviceAccountPrivateKeyPath,
             @CliOption(key = "sshKeyPath", mandatory = false, help = "path of a public SSH key file") String sshKeyPath,
             @CliOption(key = "sshKeyUrl", mandatory = false, help = "URL of a public SSH key url") String sshKeyUrl,
             @CliOption(key = "publicInAccount", mandatory = false, help = "flags if the credential is public in the account") Boolean publicInAccount
@@ -182,27 +182,20 @@ public class CredentialCommands implements CommandMarker {
                 return "Url not found with ssh key.";
             }
         }
-        if ((serviceAccountPrivatKeyPath == null || serviceAccountPrivatKeyPath.isEmpty())
-                && (serviceAccountPrivatKeyUrl == null || serviceAccountPrivatKeyUrl.isEmpty())) {
-            return "A serviceAccountPrivatKey must be specified either with --serviceAccountPrivatKeyPath or --serviceAccountPrivatKeyUrl";
+        if (serviceAccountPrivateKeyPath == null || serviceAccountPrivateKeyPath.isEmpty()) {
+
+            return "A serviceAccountPrivateKey must be specified with --serviceAccountPrivateKeyPath";
         }
-        String serviceAccountPrivatKey;
-        if (serviceAccountPrivatKeyPath != null) {
-            try {
-                serviceAccountPrivatKey = new String(Files.readAllBytes(Paths.get(serviceAccountPrivatKeyPath))).replaceAll("\n", "");
-            } catch (IOException e) {
-                return "File not found with ssh key.";
-            }
-        } else {
-            try {
-                serviceAccountPrivatKey = readUrl(serviceAccountPrivatKeyUrl);
-            } catch (IOException e) {
-                return "Url not found with ssh key.";
-            }
+        String serviceAccountPrivateKey;
+
+        try {
+            serviceAccountPrivateKey = Base64.encodeBase64String(Files.readAllBytes(Paths.get(serviceAccountPrivateKeyPath))).replaceAll("\n", "");
+        } catch (IOException e) {
+            return "File not found with service account private key (p12) file.";
         }
 
         try {
-            String id = cloudbreak.postGccCredential(name, description, sshKey, publicInAccount, projectId, serviceAccountId, serviceAccountPrivatKey);
+            String id = cloudbreak.postGccCredential(name, description, sshKey, publicInAccount, projectId, serviceAccountId, serviceAccountPrivateKey);
             context.setCredential(id);
             context.setHint(Hints.CREATE_TEMPLATE);
             return "Credential created, id: " + id;
