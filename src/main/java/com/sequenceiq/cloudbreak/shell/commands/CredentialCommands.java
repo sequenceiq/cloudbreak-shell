@@ -160,7 +160,7 @@ public class CredentialCommands implements CommandMarker {
             @CliOption(key = "projectId", mandatory = true, help = "projectId of the credential") String projectId,
             @CliOption(key = "serviceAccountId", mandatory = true, help = "serviceAccountId of the credential") String serviceAccountId,
             @CliOption(key = "serviceAccountPrivateKeyPath", mandatory = true, help = "path of a service account private key (p12) file")
-            String serviceAccountPrivateKeyPath,
+            File serviceAccountPrivateKeyPath,
             @CliOption(key = "sshKeyPath", mandatory = false, help = "path of a public SSH key file") String sshKeyPath,
             @CliOption(key = "sshKeyUrl", mandatory = false, help = "URL of a public SSH key url") String sshKeyUrl,
             @CliOption(key = "publicInAccount", mandatory = false, help = "flags if the credential is public in the account") Boolean publicInAccount
@@ -182,14 +182,11 @@ public class CredentialCommands implements CommandMarker {
                 return "Url not found with ssh key.";
             }
         }
-        if (serviceAccountPrivateKeyPath == null || serviceAccountPrivateKeyPath.isEmpty()) {
 
-            return "A serviceAccountPrivateKey must be specified with --serviceAccountPrivateKeyPath";
-        }
         String serviceAccountPrivateKey;
 
         try {
-            serviceAccountPrivateKey = Base64.encodeBase64String(Files.readAllBytes(Paths.get(serviceAccountPrivateKeyPath))).replaceAll("\n", "");
+            serviceAccountPrivateKey = Base64.encodeBase64String(Files.readAllBytes(serviceAccountPrivateKeyPath.toPath())).replaceAll("\n", "");
         } catch (IOException e) {
             return "File not found with service account private key (p12) file.";
         }
