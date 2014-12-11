@@ -227,7 +227,6 @@ public class CredentialCommands implements CommandMarker {
             @CliOption(key = "description", mandatory = true, help = "Description of the credential") String description,
             @CliOption(key = "name", mandatory = true, help = "Name of the credential") String name,
             @CliOption(key = "subscriptionId", mandatory = true, help = "subscriptionId of the credential") String subscriptionId,
-            @CliOption(key = "jksPassword", mandatory = true, help = "jksPassword of the credential") String jksPassword,
             @CliOption(key = "sshKeyPath", mandatory = false, help = "sshKeyPath of the template") String sshKeyPath,
             @CliOption(key = "sshKeyUrl", mandatory = false, help = "sshKeyUrl of the template") String sshKeyUrl,
             @CliOption(key = "publicInAccount", mandatory = false, help = "flags if the credential is public in the account") Boolean publicInAccount
@@ -250,7 +249,7 @@ public class CredentialCommands implements CommandMarker {
             }
         }
         try {
-            String id = cloudbreak.postAzureCredential(name, description, subscriptionId, jksPassword, sshKey, publicInAccount);
+            String id = cloudbreak.postAzureCredential(name, description, subscriptionId, sshKey, publicInAccount);
             context.setCredential(id);
             context.setHint(Hints.CREATE_TEMPLATE);
             return "Credential created, id: " + id;
