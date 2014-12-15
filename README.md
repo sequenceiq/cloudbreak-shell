@@ -21,12 +21,11 @@ You have 3 options to give it a try:
 
 If want to use the code or extend it with new commands follow the steps below. You will need:
 - jdk 1.7
-- maven 3.x.x
 
 ```
 git clone https://github.com/sequenceiq/cloudbreak-shell.git
 cd cloudbreak-shell
-mvn clean package
+./gradlew clean build
 ```
 
 _Note: In case you use the hosted version of Cloudbreak you should use the `latest-release.sh` to get the right version of the CLI.
