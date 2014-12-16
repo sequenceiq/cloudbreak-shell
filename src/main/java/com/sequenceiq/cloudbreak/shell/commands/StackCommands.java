@@ -2,6 +2,7 @@ package com.sequenceiq.cloudbreak.shell.commands;
 
 import static com.sequenceiq.cloudbreak.shell.support.TableRenderer.renderSingleMap;
 
+import java.util.Map;
 import java.util.HashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -118,7 +119,9 @@ public class StackCommands implements CommandMarker {
     public Object showStack(
             @CliOption(key = "id", mandatory = true, help = "Id of the stack") String id) {
         try {
-            return renderSingleMap(cloudbreak.getStackMap(id), "FIELD", "VALUE");
+            Map<String, String> stackMap = cloudbreak.getStackMap(id);
+            stackMap.remove("description");
+            return renderSingleMap(stackMap, "FIELD", "VALUE");
         } catch (HttpResponseException ex) {
             return ex.getResponse().getData().toString();
         } catch (Exception ex) {
