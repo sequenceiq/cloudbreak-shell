@@ -73,8 +73,8 @@ public class TemplateCommands implements CommandMarker {
     }
 
     @CliAvailabilityIndicator(value = "template select")
-    public boolean isTemplateSelectCommandAvailable() {
-        return true;
+    public boolean isTemplateSelectCommandAvailable() throws Exception {
+        return !cloudbreak.getAccountTemplates().isEmpty();
     }
 
     @CliCommand(value = "template list", help = "Shows the currently available cloud templates")
@@ -159,7 +159,7 @@ public class TemplateCommands implements CommandMarker {
                 );
             }
             context.addTemplate(id);
-            context.setHint(Hints.ADD_BLUEPRINT);
+            createOrSelectBlueprintHint();
             return "Template created, id: " + id;
         } catch (HttpResponseException ex) {
             return ex.getResponse().getData().toString();
@@ -200,7 +200,7 @@ public class TemplateCommands implements CommandMarker {
                     publicInAccount
             );
             context.addTemplate(id);
-            context.setHint(Hints.ADD_BLUEPRINT);
+            createOrSelectBlueprintHint();
             return "Template created, id: " + id;
         } catch (HttpResponseException ex) {
             return ex.getResponse().getData().toString();
@@ -240,7 +240,7 @@ public class TemplateCommands implements CommandMarker {
                     publicInAccount
             );
             context.addTemplate(id);
-            context.setHint(Hints.ADD_BLUEPRINT);
+            createOrSelectBlueprintHint();
             return "Template created, id: " + id;
         } catch (HttpResponseException ex) {
             return ex.getResponse().getData().toString();
@@ -286,5 +286,13 @@ public class TemplateCommands implements CommandMarker {
         }
         reader.close();
         return fileData.toString();
+    }
+
+    private void createOrSelectBlueprintHint() throws Exception {
+        if (cloudbreak.getAccountBlueprints().isEmpty()) {
+            context.setHint(Hints.ADD_BLUEPRINT);
+        } else {
+            context.setHint(Hints.SELECT_BLUEPRINT);
+        }
     }
 }

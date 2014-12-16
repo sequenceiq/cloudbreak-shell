@@ -42,8 +42,8 @@ public class BlueprintCommands implements CommandMarker {
     }
 
     @CliAvailabilityIndicator(value = "blueprint select")
-    public boolean isBlueprintSelectCommandAvailable() {
-        return true;
+    public boolean isBlueprintSelectCommandAvailable() throws Exception {
+        return !cloudbreak.getAccountBlueprints().isEmpty();
     }
 
     @CliAvailabilityIndicator(value = "blueprint add")
@@ -160,7 +160,11 @@ public class BlueprintCommands implements CommandMarker {
             if (json != null) {
                 String id = cloudbreak.postBlueprint(name, description, json, publicInAccount);
                 context.addBlueprint(id);
-                context.setHint(Hints.CREATE_STACK);
+                if (cloudbreak.getAccountStacks().isEmpty()) {
+                    context.setHint(Hints.CREATE_STACK);
+                } else {
+                    context.setHint(Hints.SELECT_STACK);
+                }
                 message = String.format("Blueprint: '%s' has been added, id: %s", getBlueprintName(json), id);
             } else {
                 message = "No blueprint specified";

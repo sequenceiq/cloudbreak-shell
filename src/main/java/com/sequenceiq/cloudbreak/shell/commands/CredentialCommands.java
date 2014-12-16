@@ -55,8 +55,8 @@ public class CredentialCommands implements CommandMarker {
     }
 
     @CliAvailabilityIndicator(value = "credential select")
-    public boolean isCredentialSelectCommandAvailable() {
-        return true;
+    public boolean isCredentialSelectCommandAvailable() throws Exception {
+        return !cloudbreak.getAccountTemplates().isEmpty();
     }
 
     @CliAvailabilityIndicator(value = "credential createEC2")
@@ -105,7 +105,7 @@ public class CredentialCommands implements CommandMarker {
 
             if (cloudbreak.getCredential(id) != null) {
                 context.setCredential(id);
-                context.setHint(Hints.CREATE_TEMPLATE);
+                createOrSelectTemplateHint();
                 return "Credential selected, id: " + id;
             } else {
                 return "No credential specified";
@@ -144,7 +144,7 @@ public class CredentialCommands implements CommandMarker {
         try {
             String id = cloudbreak.postEc2Credential(name, description, roleArn, sshKey, publicInAccount);
             context.setCredential(id);
-            context.setHint(Hints.CREATE_TEMPLATE);
+            createOrSelectTemplateHint();
             return "Credential created, id: " + id;
         } catch (HttpResponseException ex) {
             return ex.getResponse().getData().toString();
@@ -194,7 +194,7 @@ public class CredentialCommands implements CommandMarker {
         try {
             String id = cloudbreak.postGccCredential(name, description, sshKey, publicInAccount, projectId, serviceAccountId, serviceAccountPrivateKey);
             context.setCredential(id);
-            context.setHint(Hints.CREATE_TEMPLATE);
+            createOrSelectTemplateHint();
             return "Credential created, id: " + id;
         } catch (HttpResponseException ex) {
             return ex.getResponse().getData().toString();
@@ -251,7 +251,7 @@ public class CredentialCommands implements CommandMarker {
         try {
             String id = cloudbreak.postAzureCredential(name, description, subscriptionId, sshKey, publicInAccount);
             context.setCredential(id);
-            context.setHint(Hints.CREATE_TEMPLATE);
+            createOrSelectTemplateHint();
             return "Credential created, id: " + id;
         } catch (HttpResponseException ex) {
             return ex.getResponse().getData().toString();
@@ -298,6 +298,14 @@ public class CredentialCommands implements CommandMarker {
             return ex.getResponse().getData().toString();
         } catch (Exception ex) {
             return ex.toString();
+        }
+    }
+
+    private void createOrSelectTemplateHint() throws Exception {
+        if (cloudbreak.getAccountTemplates().isEmpty()) {
+            context.setHint(Hints.CREATE_TEMPLATE);
+        } else {
+            context.setHint(Hints.SELECT_TEMPLATE);
         }
     }
 }
