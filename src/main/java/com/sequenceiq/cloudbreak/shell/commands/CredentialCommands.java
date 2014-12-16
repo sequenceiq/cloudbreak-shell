@@ -237,13 +237,13 @@ public class CredentialCommands implements CommandMarker {
         String sshKey;
         if (sshKeyPath != null) {
             try {
-                sshKey = new String(Files.readAllBytes(Paths.get(sshKeyPath))).replaceAll("\n", "");
+                sshKey = Base64.encodeBase64String(Files.readAllBytes(Paths.get(sshKeyPath)));
             } catch (IOException e) {
                 return "File not found with ssh key.";
             }
         } else {
             try {
-                sshKey = readUrl(sshKeyUrl);
+                sshKey = Base64.encodeBase64String(readUrl(sshKeyUrl).getBytes());
             } catch (IOException e) {
                 return "Url not found with ssh key.";
             }
