@@ -1,5 +1,6 @@
 package com.sequenceiq.cloudbreak.shell.customization;
 
+import java.io.IOException;
 import org.springframework.shell.plugin.BannerProvider;
 import org.springframework.stereotype.Component;
 
@@ -18,7 +19,12 @@ public class CloudbreakBanner implements BannerProvider {
 
     @Override
     public String getBanner() {
-        return FigletFont.convertOneLine("CloudbreakShell");
+        String text = "CloudbreakShell";
+        try {
+            return FigletFont.convertOneLine(text);
+        } catch (IOException e) {
+            return text;
+        }
     }
 
     @Override

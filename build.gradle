@@ -108,7 +108,7 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-starter:1.0.0.RELEASE'
     compile 'org.springframework.boot:spring-boot-starter-test:1.0.0.RELEASE'
     compile 'org.springframework:spring-web:4.1.0.RELEASE'
-    compile 'com.github.lalyos:jfiglet:0.0.3'
+    compile 'com.github.lalyos:jfiglet:0.0.7'
     testCompile 'org.mockito:mockito-core:1.9.5'
     testCompile 'junit:junit:4.10'
     compile 'org.codehaus.jackson:jackson-mapper-asl:1.9.13'
