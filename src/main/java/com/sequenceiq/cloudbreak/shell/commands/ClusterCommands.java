@@ -26,7 +26,7 @@ public class ClusterCommands implements CommandMarker {
 
     @CliAvailabilityIndicator(value = "cluster create")
     public boolean isClusterCreateCommandAvailable() {
-        return context.isBlueprintAvailable() && context.isStackAvailable();
+        return context.isBlueprintAvailable() || context.isRecipeAvailable() && context.isStackAvailable();
     }
 
     @CliAvailabilityIndicator(value = "cluster show")
@@ -49,9 +49,21 @@ public class ClusterCommands implements CommandMarker {
 
     @CliCommand(value = "cluster create", help = "Create a new cluster based on a blueprint and template")
     public String createCluster(
-            @CliOption(key = "description", mandatory = false, help = "Description of the blueprint") String description) {
+            @CliOption(key = "description", mandatory = false, help = "Description of the blueprint") String description,
+            @CliOption(key = "fromRecipe", mandatory = false, unspecifiedDefaultValue = "false",
+                    help = "True if the cluster should be created from a recipe instead of a blueprint") boolean fromRecipe) {
         try {
-            cloudbreak.postCluster(context.getStackName(), parseInt(context.getBlueprintId()), description, parseInt(context.getStackId()));
+            if (!fromRecipe) {
+                if (!context.isBlueprintAvailable()) {
+                    return "No blueprint in context, cannot create cluster!";
+                }
+                cloudbreak.postCluster(context.getStackName(), parseInt(context.getBlueprintId()), null, description, parseInt(context.getStackId()));
+            } else {
+                if (!context.isRecipeAvailable()) {
+                    return "No recipe in context, cannot create cluster!";
+                }
+                cloudbreak.postCluster(context.getStackName(), null, parseInt(context.getRecipeId()), description, parseInt(context.getStackId()));
+            }
             context.setHint(Hints.NONE);
             return "Cluster created";
         } catch (HttpResponseException ex) {

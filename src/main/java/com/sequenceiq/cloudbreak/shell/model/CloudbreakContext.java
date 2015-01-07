@@ -82,6 +82,14 @@ public class CloudbreakContext {
         setBlueprintAccessible();
     }
 
+    public boolean isRecipeAvailable() {
+        return isPropertyAvailable(PropertyKey.RECIPE_ID);
+    }
+
+    public void addRecipe(String id) {
+        addProperty(PropertyKey.RECIPE_ID, id);
+    }
+
     public boolean isCredentialAvailable() {
         return isPropertyAvailable(PropertyKey.CREDENTIAL_ID);
     }
@@ -133,6 +141,10 @@ public class CloudbreakContext {
 
     public String getBlueprintId() {
         return getLastPropertyValue(PropertyKey.BLUEPRINT_ID);
+    }
+
+    public String getRecipeId() {
+        return getLastPropertyValue(PropertyKey.RECIPE_ID);
     }
 
     public String getCredentialId() {
@@ -205,7 +217,7 @@ public class CloudbreakContext {
     }
 
     private boolean isPropertyAvailable(PropertyKey key) {
-        return !properties.get(key).isEmpty();
+        return properties.get(key) != null && !properties.get(key).isEmpty();
     }
 
     private void addProperty(PropertyKey key, String value) {
@@ -226,7 +238,7 @@ public class CloudbreakContext {
     }
 
     private enum PropertyKey {
-        CREDENTIAL_ID, BLUEPRINT_ID, TEMPLATE_ID, STACK_ID, STACK_NAME,
+        CREDENTIAL_ID, BLUEPRINT_ID, RECIPE_ID, TEMPLATE_ID, STACK_ID, STACK_NAME,
         CREDENTIAL_ACCESSIBLE, BLUEPRINT_ACCESSIBLE, TEMPLATE_ACCESSIBLE, STACK_ACCESSIBLE
     }
 }

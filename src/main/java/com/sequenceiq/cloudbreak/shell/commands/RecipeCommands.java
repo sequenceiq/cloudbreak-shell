@@ -1,9 +1,12 @@
 package com.sequenceiq.cloudbreak.shell.commands;
 
+import static com.sequenceiq.cloudbreak.shell.support.TableRenderer.renderSingleMap;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -16,6 +19,7 @@ import org.springframework.stereotype.Component;
 
 import com.sequenceiq.cloudbreak.client.CloudbreakClient;
 import com.sequenceiq.cloudbreak.shell.model.CloudbreakContext;
+import com.sequenceiq.cloudbreak.shell.model.Hints;
 
 import groovyx.net.http.HttpResponseException;
 
@@ -48,6 +52,40 @@ public class RecipeCommands implements CommandMarker {
         } catch (Exception ex) {
             return ex.toString();
         }
+    }
+
+    @CliCommand(value = "recipe select", help = "Select the recipe by its id")
+    public String selectRecipe(
+            @CliOption(key = "id", mandatory = true, help = "Id of the recipe") String id) {
+        String message;
+        try {
+            if (cloudbreak.getRecipe(id) != null) {
+                context.addRecipe(id);
+                context.setHint(Hints.CREATE_STACK);
+                message = String.format("Recipe has been selected, id: %s", id);
+            } else {
+                message = String.format("Recipe '%s' cannot be found.", id);
+            }
+            return message;
+        } catch (HttpResponseException ex) {
+            return ex.getResponse().getData().toString();
+        } catch (Exception ex) {
+            return ex.toString();
+        }
+    }
+
+    @CliCommand(value = "recipe show", help = "Shows the properties of the specified recipe")
+    public Object showRecipe(
+            @CliOption(key = "id", mandatory = true, help = "Id of the recipe") String id) {
+        try {
+            Map<String, String> recipeMap = cloudbreak.getRecipeMap(id);
+            return renderSingleMap(recipeMap, "FIELD", "VALUE");
+        } catch (HttpResponseException ex) {
+            return ex.getResponse().getData().toString();
+        } catch (Exception ex) {
+            return ex.toString();
+        }
+
     }
 
     private String getRecipeName(String json) throws IOException {
