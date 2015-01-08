@@ -1,7 +1,7 @@
 package com.sequenceiq.cloudbreak.shell.customization;
 
-import java.io.IOException;
 import org.springframework.shell.plugin.BannerProvider;
+import org.springframework.shell.support.util.FileUtils;
 import org.springframework.stereotype.Component;
 
 import com.sequenceiq.cloudbreak.shell.CloudbreakShell;
