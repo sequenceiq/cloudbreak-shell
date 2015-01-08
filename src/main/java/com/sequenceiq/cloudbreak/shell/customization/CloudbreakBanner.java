@@ -4,7 +4,7 @@ import java.io.IOException;
 import org.springframework.shell.plugin.BannerProvider;
 import org.springframework.stereotype.Component;
 
-import com.github.lalyos.jfiglet.FigletFont;
+import com.sequenceiq.cloudbreak.shell.CloudbreakShell;
 
 /**
  * Prints the banner when the user starts the shell.
@@ -19,12 +19,7 @@ public class CloudbreakBanner implements BannerProvider {
 
     @Override
     public String getBanner() {
-        String text = "CloudbreakShell";
-        try {
-            return FigletFont.convertOneLine(text);
-        } catch (IOException e) {
-            return text;
-        }
+        return FileUtils.readBanner(CloudbreakShell.class, "banner.txt");
     }
 
     @Override
