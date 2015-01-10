@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class CloudbreakContext {
 
+    private static final String ACCESSIBLE = "accessible";
     private Focus focus;
     private Hints hint;
     private Map<PropertyKey, String> properties = new HashMap<>();
@@ -27,6 +28,7 @@ public class CloudbreakContext {
     public void addStack(String id, String name) {
         addProperty(PropertyKey.STACK_ID, id);
         addProperty(PropertyKey.STACK_NAME, name);
+        setStackAccessible();
     }
 
     public void removeStack(String id) {
@@ -39,6 +41,7 @@ public class CloudbreakContext {
 
     public void addTemplate(String id) {
         addProperty(PropertyKey.TEMPLATE_ID, id);
+        setTemplateAccessible();
     }
 
     public boolean isBlueprintAvailable() {
@@ -47,6 +50,7 @@ public class CloudbreakContext {
 
     public void addBlueprint(String id) {
         addProperty(PropertyKey.BLUEPRINT_ID, id);
+        setBlueprintAccessible();
     }
 
     public boolean isCredentialAvailable() {
@@ -55,6 +59,39 @@ public class CloudbreakContext {
 
     public void setCredential(String id) {
         addProperty(PropertyKey.CREDENTIAL_ID, id);
+        setCredentialAccessible();
+    }
+
+    public void setBlueprintAccessible() {
+        addProperty(PropertyKey.BLUEPRINT_ACCESSIBLE, ACCESSIBLE);
+    }
+
+    public boolean isBlueprintAccessible() {
+        return isPropertyAvailable(PropertyKey.BLUEPRINT_ACCESSIBLE);
+    }
+
+    public void setCredentialAccessible() {
+        addProperty(PropertyKey.CREDENTIAL_ACCESSIBLE, ACCESSIBLE);
+    }
+
+    public boolean isCredentialAccessible() {
+        return isPropertyAvailable(PropertyKey.CREDENTIAL_ACCESSIBLE);
+    }
+
+    public void setTemplateAccessible() {
+        addProperty(PropertyKey.TEMPLATE_ACCESSIBLE, ACCESSIBLE);
+    }
+
+    public boolean isTemplateAccessible() {
+        return isPropertyAvailable(PropertyKey.TEMPLATE_ACCESSIBLE);
+    }
+
+    public void setStackAccessible() {
+        addProperty(PropertyKey.STACK_ACCESSIBLE, ACCESSIBLE);
+    }
+
+    public boolean isStackAccessible() {
+        return isPropertyAvailable(PropertyKey.STACK_ACCESSIBLE);
     }
 
     public String getStackId() {
@@ -164,6 +201,7 @@ public class CloudbreakContext {
     }
 
     private enum PropertyKey {
-        CREDENTIAL_ID, BLUEPRINT_ID, TEMPLATE_ID, STACK_ID, STACK_NAME
+        CREDENTIAL_ID, BLUEPRINT_ID, TEMPLATE_ID, STACK_ID, STACK_NAME,
+        CREDENTIAL_ACCESSIBLE, BLUEPRINT_ACCESSIBLE, TEMPLATE_ACCESSIBLE, STACK_ACCESSIBLE
     }
 }

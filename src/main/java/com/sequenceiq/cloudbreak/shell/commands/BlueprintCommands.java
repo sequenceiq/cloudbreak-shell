@@ -43,7 +43,7 @@ public class BlueprintCommands implements CommandMarker {
 
     @CliAvailabilityIndicator(value = "blueprint select")
     public boolean isBlueprintSelectCommandAvailable() throws Exception {
-        return !cloudbreak.getAccountBlueprints().isEmpty();
+        return context.isBlueprintAccessible();
     }
 
     @CliAvailabilityIndicator(value = "blueprint add")

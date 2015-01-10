@@ -48,7 +48,7 @@ public class StackCommands implements CommandMarker {
 
     @CliAvailabilityIndicator(value = "stack select")
     public boolean isStackSelectCommandAvailable() throws Exception {
-        return !cloudbreak.getAccountStacks().isEmpty();
+        return context.isStackAccessible();
     }
 
     @CliCommand(value = "stack create", help = "Create a new stack based on a template")

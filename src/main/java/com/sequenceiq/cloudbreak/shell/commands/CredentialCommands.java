@@ -56,7 +56,7 @@ public class CredentialCommands implements CommandMarker {
 
     @CliAvailabilityIndicator(value = "credential select")
     public boolean isCredentialSelectCommandAvailable() throws Exception {
-        return !cloudbreak.getAccountTemplates().isEmpty();
+        return context.isCredentialAccessible();
     }
 
     @CliAvailabilityIndicator(value = "credential createEC2")

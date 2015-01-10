@@ -49,7 +49,8 @@ public class CloudbreakShell implements CommandLineRunner, ShellStatusListener {
         if (newStatus.getStatus() == ShellStatus.Status.STARTED) {
             try {
                 cloudbreak.health();
-                if (cloudbreak.getAccountCredentials().isEmpty()) {
+                initResourceAccessibility();
+                if (!context.isCredentialAccessible()) {
                     context.setHint(Hints.CREATE_CREDENTIAL);
                 } else {
                     context.setHint(Hints.SELECT_CREDENTIAL);
@@ -84,6 +85,21 @@ public class CloudbreakShell implements CommandLineRunner, ShellStatusListener {
             new SpringApplicationBuilder(CloudbreakShell.class).showBanner(false).run(args);
         } catch (Exception e) {
             System.out.println("Cloudbreak shell cannot be started.");
+        }
+    }
+
+    private void initResourceAccessibility() throws Exception {
+        if (!cloudbreak.getAccountCredentials().isEmpty()) {
+            context.setCredentialAccessible();
+        }
+        if (!cloudbreak.getAccountBlueprints().isEmpty()) {
+            context.setBlueprintAccessible();
+        }
+        if (!cloudbreak.getAccountTemplates().isEmpty()) {
+            context.setTemplateAccessible();
+        }
+        if (!cloudbreak.getAccountStacks().isEmpty()) {
+            context.setStackAccessible();
         }
     }
 }

@@ -74,7 +74,7 @@ public class TemplateCommands implements CommandMarker {
 
     @CliAvailabilityIndicator(value = "template select")
     public boolean isTemplateSelectCommandAvailable() throws Exception {
-        return !cloudbreak.getAccountTemplates().isEmpty();
+        return context.isTemplateAccessible();
     }
 
     @CliCommand(value = "template list", help = "Shows the currently available cloud templates")
