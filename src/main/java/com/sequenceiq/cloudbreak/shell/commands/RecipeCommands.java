@@ -38,6 +38,17 @@ public class RecipeCommands implements CommandMarker {
         return true;
     }
 
+    @CliCommand(value = "recipe list", help = "Shows the currently available recipes")
+    public String listRecipes() {
+        try {
+            return renderSingleMap(cloudbreak.getAccountRecipesMap(), "ID", "INFO");
+        } catch (HttpResponseException ex) {
+            return ex.getResponse().getData().toString();
+        } catch (Exception ex) {
+            return ex.toString();
+        }
+    }
+
     @CliCommand(value = "recipe add", help = "Add a new recipe with either --url or --file")
     public String addRecipe(
             @CliOption(key = "url", mandatory = false, help = "URL of the blueprint to download from") String url,
