@@ -36,8 +36,28 @@ public class RecipeCommands implements CommandMarker {
     @Autowired
     private CloudbreakClient cloudbreak;
 
+    @CliAvailabilityIndicator(value = "recipe list")
+    public boolean isRecipeListCommandAvailable() {
+        return true;
+    }
+
+    @CliAvailabilityIndicator(value = "recipe select")
+    public boolean isRecipeSelectCommandAvailable() throws Exception {
+        return context.isRecipeAccessible();
+    }
+
     @CliAvailabilityIndicator(value = "recipe add")
     public boolean isRecipeAddCommandAvailable() {
+        return true;
+    }
+
+    @CliAvailabilityIndicator(value = "recipe show")
+    public boolean isRecipeShowCommandAvailable() {
+        return true;
+    }
+
+    @CliAvailabilityIndicator(value = "recipe delete")
+    public boolean isRecipeDeleteCommandAvailable() {
         return true;
     }
 

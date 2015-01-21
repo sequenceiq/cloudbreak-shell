@@ -88,6 +88,7 @@ public class CloudbreakContext {
 
     public void addRecipe(String id) {
         addProperty(PropertyKey.RECIPE_ID, id);
+        setRecipeAccessible();
     }
 
     public boolean isCredentialAvailable() {
@@ -129,6 +130,14 @@ public class CloudbreakContext {
 
     public boolean isStackAccessible() {
         return isPropertyAvailable(PropertyKey.STACK_ACCESSIBLE);
+    }
+
+    public void setRecipeAccessible() {
+        addProperty(PropertyKey.RECIPE_ACCESSIBLE, ACCESSIBLE);
+    }
+
+    public boolean isRecipeAccessible() {
+        return isPropertyAvailable(PropertyKey.RECIPE_ACCESSIBLE);
     }
 
     public String getStackId() {
@@ -239,6 +248,6 @@ public class CloudbreakContext {
 
     private enum PropertyKey {
         CREDENTIAL_ID, BLUEPRINT_ID, RECIPE_ID, TEMPLATE_ID, STACK_ID, STACK_NAME,
-        CREDENTIAL_ACCESSIBLE, BLUEPRINT_ACCESSIBLE, TEMPLATE_ACCESSIBLE, STACK_ACCESSIBLE
+        CREDENTIAL_ACCESSIBLE, BLUEPRINT_ACCESSIBLE, TEMPLATE_ACCESSIBLE, STACK_ACCESSIBLE, RECIPE_ACCESSIBLE
     }
 }
