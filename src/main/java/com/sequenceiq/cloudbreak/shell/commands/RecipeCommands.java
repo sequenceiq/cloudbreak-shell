@@ -119,7 +119,18 @@ public class RecipeCommands implements CommandMarker {
         } catch (Exception ex) {
             return ex.toString();
         }
+    }
 
+    @CliCommand(value = "recipe delete", help = "Delete the recipe by its id")
+    public Object deleteRecipe(
+            @CliOption(key = "id", mandatory = true, help = "Id of the recipe") String id) {
+        try {
+            return cloudbreak.deleteRecipe(id);
+        } catch (HttpResponseException ex) {
+            return ex.getResponse().getData().toString();
+        } catch (Exception ex) {
+            return ex.toString();
+        }
     }
 
     private String getRecipeName(String json) throws IOException {
