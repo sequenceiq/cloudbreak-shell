@@ -113,6 +113,7 @@ public class TemplateCommands implements CommandMarker {
             @CliOption(key = "name", mandatory = true, help = "Name of the template") String name,
             @CliOption(key = "description", mandatory = true, help = "Description of the template") String description,
             @CliOption(key = "region", mandatory = true, help = "region of the template") Region region,
+            @CliOption(key = "ami", mandatory = false, unspecifiedDefaultValue = "default", help = "alternative ami id to use for instances") String ami,
             @CliOption(key = "instanceType", mandatory = true, help = "instanceType of the template") InstanceType instanceType,
             @CliOption(key = "volumeCount", mandatory = true, help = "volumeCount of the template") Integer volumeCount,
             @CliOption(key = "volumeSize", mandatory = true, help = "volumeSize(GB) of the template") Integer volumeSize,
@@ -131,12 +132,15 @@ public class TemplateCommands implements CommandMarker {
             if (volumeType == null) {
                 volumeType = VolumeType.Gp2;
             }
+            if ("default".equals(ami)) {
+                ami = region.getAmi();
+            }
             String id;
             if (spotPrice == null) {
                 id = cloudbreak.postEc2Template(name,
                         description,
                         region.name(),
-                        region.getAmi(),
+                        ami,
                         sshLocation == null ? "0.0.0.0/0" : sshLocation,
                         instanceType.toString(),
                         volumeCount.toString(),
@@ -148,7 +152,7 @@ public class TemplateCommands implements CommandMarker {
                 id = cloudbreak.postSpotEc2Template(name,
                         description,
                         region.name(),
-                        region.getAmi(),
+                        ami,
                         sshLocation == null ? "0.0.0.0/0" : sshLocation,
                         instanceType.toString(),
                         volumeCount.toString(),
