@@ -95,9 +95,6 @@ public class CloudbreakShell implements CommandLineRunner, ShellStatusListener {
         if (!cloudbreak.getAccountBlueprints().isEmpty()) {
             context.setBlueprintAccessible();
         }
-        if (!cloudbreak.getAccountTemplates().isEmpty()) {
-            context.setTemplateAccessible();
-        }
         if (!cloudbreak.getAccountStacks().isEmpty()) {
             context.setStackAccessible();
         }

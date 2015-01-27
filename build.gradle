@@ -95,6 +95,7 @@ sonarRunner {
 }
 
 repositories {
+    mavenLocal()
     mavenCentral()
     maven { url "http://maven.sequenceiq.com/snapshots" }
     maven { url "http://maven.sequenceiq.com/release" }
@@ -111,7 +112,7 @@ dependencies {
     testCompile 'org.mockito:mockito-core:1.9.5'
     testCompile 'junit:junit:4.10'
     compile 'org.codehaus.jackson:jackson-mapper-asl:1.9.13'
-    compile 'com.sequenceiq:cloudbreak-rest-client:0.2.23'
+    compile 'com.sequenceiq:cloudbreak-rest-client:0.2.25'
     compile 'org.apache.httpcomponents:httpclient:4.3.5'
     compile 'com.github.lalyos:jfiglet:0.0.3'
 

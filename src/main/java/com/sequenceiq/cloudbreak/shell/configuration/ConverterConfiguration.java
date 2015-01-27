@@ -1,5 +1,6 @@
 package com.sequenceiq.cloudbreak.shell.configuration;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.shell.converters.AvailableCommandsConverter;
@@ -20,11 +21,19 @@ import org.springframework.shell.converters.StaticFieldConverterImpl;
 import org.springframework.shell.converters.StringConverter;
 import org.springframework.shell.core.Converter;
 
+import com.sequenceiq.cloudbreak.client.CloudbreakClient;
+import com.sequenceiq.cloudbreak.shell.converter.HostGroupConverter;
+import com.sequenceiq.cloudbreak.shell.converter.InstanceGroupTemplateIdConverter;
+import com.sequenceiq.cloudbreak.shell.converter.StackRegionConverter;
+
 /**
  * Configures the converters used by the shell.
  */
 @Configuration
 public class ConverterConfiguration {
+
+    @Autowired
+    private CloudbreakClient client;
 
     @Bean
     Converter simpleFileConverter() {
@@ -99,6 +108,21 @@ public class ConverterConfiguration {
     @Bean
     Converter shortConverter() {
         return new ShortConverter();
+    }
+
+    @Bean
+    Converter hostGroupConverter() {
+        return new HostGroupConverter(client);
+    }
+
+    @Bean
+    Converter templateIdConverter() {
+        return new InstanceGroupTemplateIdConverter(client);
+    }
+
+    @Bean
+    Converter stackRegionConverter() {
+        return new StackRegionConverter(client);
     }
 
     @Bean

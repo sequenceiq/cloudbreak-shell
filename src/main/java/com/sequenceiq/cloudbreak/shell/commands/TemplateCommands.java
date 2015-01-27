@@ -15,16 +15,12 @@ import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.stereotype.Component;
 
 import com.sequenceiq.cloudbreak.client.CloudbreakClient;
+import com.sequenceiq.cloudbreak.shell.model.AwsInstanceType;
 import com.sequenceiq.cloudbreak.shell.model.AzureInstanceName;
-import com.sequenceiq.cloudbreak.shell.model.AzureLocation;
-import com.sequenceiq.cloudbreak.shell.model.AzureVmType;
+import com.sequenceiq.cloudbreak.shell.model.AzureInstanceType;
 import com.sequenceiq.cloudbreak.shell.model.CloudbreakContext;
-import com.sequenceiq.cloudbreak.shell.model.GccImageName;
 import com.sequenceiq.cloudbreak.shell.model.GccInstanceType;
-import com.sequenceiq.cloudbreak.shell.model.GccZone;
 import com.sequenceiq.cloudbreak.shell.model.Hints;
-import com.sequenceiq.cloudbreak.shell.model.InstanceType;
-import com.sequenceiq.cloudbreak.shell.model.Region;
 import com.sequenceiq.cloudbreak.shell.model.VolumeType;
 
 import groovyx.net.http.HttpResponseException;
@@ -72,11 +68,6 @@ public class TemplateCommands implements CommandMarker {
         return true;
     }
 
-    @CliAvailabilityIndicator(value = "template select")
-    public boolean isTemplateSelectCommandAvailable() throws Exception {
-        return context.isTemplateAccessible();
-    }
-
     @CliCommand(value = "template list", help = "Shows the currently available cloud templates")
     public String listTemplates() {
         try {
@@ -89,31 +80,11 @@ public class TemplateCommands implements CommandMarker {
         }
     }
 
-    @CliCommand(value = "template select", help = "Select the template by its id")
-    public String selectTemplate(
-            @CliOption(key = "id", mandatory = true, help = "Id of the template") String id) {
-        try {
-            Object template = cloudbreak.getTemplate(id);
-            if (template != null) {
-                context.addTemplate(id);
-                context.setHint(Hints.ADD_BLUEPRINT);
-                return "Template selected, id: " + id;
-            } else {
-                return "No template specified";
-            }
-        } catch (HttpResponseException ex) {
-            return ex.getResponse().getData().toString();
-        } catch (Exception ex) {
-            return ex.toString();
-        }
-    }
-
     @CliCommand(value = "template createEC2", help = "Create a new EC2 template")
     public String createEc2Template(
             @CliOption(key = "name", mandatory = true, help = "Name of the template") String name,
             @CliOption(key = "description", mandatory = true, help = "Description of the template") String description,
-            @CliOption(key = "region", mandatory = true, help = "region of the template") Region region,
-            @CliOption(key = "instanceType", mandatory = true, help = "instanceType of the template") InstanceType instanceType,
+            @CliOption(key = "instanceType", mandatory = true, help = "instanceType of the template") AwsInstanceType instanceType,
             @CliOption(key = "volumeCount", mandatory = true, help = "volumeCount of the template") Integer volumeCount,
             @CliOption(key = "volumeSize", mandatory = true, help = "volumeSize(GB) of the template") Integer volumeSize,
             @CliOption(key = "volumeType", mandatory = false, help = "volumeType of the template", specifiedDefaultValue = "Gp2") VolumeType volumeType,
@@ -135,8 +106,6 @@ public class TemplateCommands implements CommandMarker {
             if (spotPrice == null) {
                 id = cloudbreak.postEc2Template(name,
                         description,
-                        region.name(),
-                        region.getAmi(),
                         sshLocation == null ? "0.0.0.0/0" : sshLocation,
                         instanceType.toString(),
                         volumeCount.toString(),
@@ -147,8 +116,6 @@ public class TemplateCommands implements CommandMarker {
             } else {
                 id = cloudbreak.postSpotEc2Template(name,
                         description,
-                        region.name(),
-                        region.getAmi(),
                         sshLocation == null ? "0.0.0.0/0" : sshLocation,
                         instanceType.toString(),
                         volumeCount.toString(),
@@ -158,7 +125,6 @@ public class TemplateCommands implements CommandMarker {
                         publicInAccount
                 );
             }
-            context.addTemplate(id);
             createOrSelectBlueprintHint();
             return "Template created, id: " + id;
         } catch (HttpResponseException ex) {
@@ -173,8 +139,7 @@ public class TemplateCommands implements CommandMarker {
     public String createAzureTemplate(
             @CliOption(key = "name", mandatory = true, help = "Name of the template") String name,
             @CliOption(key = "description", mandatory = true, help = "Description of the template") String description,
-            @CliOption(key = "location", mandatory = true, help = "location of the template") AzureLocation location,
-            @CliOption(key = "instanceType", mandatory = true, help = "type of the VM") AzureVmType vmType,
+            @CliOption(key = "instanceType", mandatory = true, help = "type of the VM") AzureInstanceType vmType,
             @CliOption(key = "volumeCount", mandatory = true, help = "volumeCount of the template") Integer volumeCount,
             @CliOption(key = "volumeSize", mandatory = true, help = "volumeSize(GB) of the template") Integer volumeSize,
             @CliOption(key = "imageName", mandatory = false, help = "instance name of the template: AMBARI_DOCKER_V1") AzureInstanceName imageName,
@@ -192,14 +157,11 @@ public class TemplateCommands implements CommandMarker {
         try {
             String id = cloudbreak.postAzureTemplate(name,
                     description,
-                    location.name(),
-                    imageName.name(),
                     vmType.name(),
                     volumeCount.toString(),
                     volumeSize.toString(),
                     publicInAccount
             );
-            context.addTemplate(id);
             createOrSelectBlueprintHint();
             return "Template created, id: " + id;
         } catch (HttpResponseException ex) {
@@ -213,11 +175,9 @@ public class TemplateCommands implements CommandMarker {
     public String createGccTemplate(
             @CliOption(key = "name", mandatory = true, help = "Name of the template") String name,
             @CliOption(key = "description", mandatory = true, help = "Description of the template") String description,
-            @CliOption(key = "location", mandatory = true, help = "location of the template") GccZone location,
             @CliOption(key = "instanceType", mandatory = true, help = "type of the VM") GccInstanceType instanceType,
             @CliOption(key = "volumeCount", mandatory = true, help = "volumeCount of the template") Integer volumeCount,
             @CliOption(key = "volumeSize", mandatory = true, help = "volumeSize(GB) of the template") Integer volumeSize,
-            @CliOption(key = "imageName", mandatory = false, help = "instance name of the template: DEBIAN_HACK") GccImageName imageName,
             @CliOption(key = "publicInAccount", mandatory = false, help = "flags if the template is public in the account") Boolean publicInAccount
     ) {
         if (volumeCount < VOLUME_COUNT_MIN || volumeCount > VOLUME_COUNT_MAX) {
@@ -226,20 +186,14 @@ public class TemplateCommands implements CommandMarker {
         if (volumeSize < VOLUME_SIZE_MIN || volumeSize > VOLUME_SIZE_MAX) {
             return "VolumeSize has to be between 1 and 1024.";
         }
-        if (imageName == null) {
-            imageName = GccImageName.DEBIAN_HACK;
-        }
         try {
             String id = cloudbreak.postGccTemplate(name,
                     description,
-                    imageName.name(),
                     instanceType.name(),
                     volumeCount.toString(),
                     volumeSize.toString(),
-                    location.name(),
                     publicInAccount
             );
-            context.addTemplate(id);
             createOrSelectBlueprintHint();
             return "Template created, id: " + id;
         } catch (HttpResponseException ex) {
