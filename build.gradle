@@ -32,6 +32,10 @@ allprojects {
 
 jar {
     baseName = 'cloudbreak-shell'
+    manifest {
+        attributes("Implementation-Title": "Gradle",
+                   "Implementation-Version": version)
+    }
 }
 
 configurations {
