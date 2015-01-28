@@ -1,6 +1,6 @@
 package com.sequenceiq.cloudbreak.shell.model;
 
-public enum GccInstanceType {
+public enum GcpInstanceType {
     N1_STANDARD_1,
     N1_STANDARD_2,
     N1_STANDARD_4,

@@ -64,8 +64,8 @@ public class CredentialCommands implements CommandMarker {
         return true;
     }
 
-    @CliAvailabilityIndicator(value = "credential createGcc")
-    public boolean isCredentialGccCreateCommandAvailable() {
+    @CliAvailabilityIndicator(value = "credential createGcp")
+    public boolean isCredentialGcpCreateCommandAvailable() {
         return true;
     }
 
@@ -117,7 +117,7 @@ public class CredentialCommands implements CommandMarker {
 
     @CliCommand(value = "credential createEC2", help = "Create a new EC2 credential")
     public String createEc2Credential(
-            @CliOption(key = "description", mandatory = true, help = "Description of the credential") String description,
+            @CliOption(key = "description", mandatory = false, help = "Description of the credential") String description,
             @CliOption(key = "name", mandatory = true, help = "Name of the credential") String name,
             @CliOption(key = "roleArn", mandatory = true, help = "roleArn of the credential") String roleArn,
             @CliOption(key = "sshKeyPath", mandatory = false, help = "path of a public SSH key file") String sshKeyPath,
@@ -142,7 +142,13 @@ public class CredentialCommands implements CommandMarker {
             }
         }
         try {
-            String id = cloudbreak.postEc2Credential(name, description, roleArn, sshKey, publicInAccount);
+            String id = cloudbreak.postEc2Credential(
+                    name,
+                    description == null ? "Aws credential was created by the cloudbreak-shell" : description,
+                    roleArn,
+                    sshKey,
+                    publicInAccount == null ?  false : publicInAccount
+            );
             context.setCredential(id);
             createOrSelectTemplateHint();
             return "Credential created, id: " + id;
@@ -153,9 +159,9 @@ public class CredentialCommands implements CommandMarker {
         }
     }
 
-    @CliCommand(value = "credential createGcc", help = "Create a new Gcc credential")
-    public String createGccCredential(
-            @CliOption(key = "description", mandatory = true, help = "Description of the credential") String description,
+    @CliCommand(value = "credential createGcp", help = "Create a new Gcp credential")
+    public String createGcpCredential(
+            @CliOption(key = "description", mandatory = false, help = "Description of the credential") String description,
             @CliOption(key = "name", mandatory = true, help = "Name of the credential") String name,
             @CliOption(key = "projectId", mandatory = true, help = "projectId of the credential") String projectId,
             @CliOption(key = "serviceAccountId", mandatory = true, help = "serviceAccountId of the credential") String serviceAccountId,
@@ -192,7 +198,15 @@ public class CredentialCommands implements CommandMarker {
         }
 
         try {
-            String id = cloudbreak.postGccCredential(name, description, sshKey, publicInAccount, projectId, serviceAccountId, serviceAccountPrivateKey);
+            String id = cloudbreak.postGccCredential(
+                    name,
+                    description == null ? "Gcp credential was created by the cloudbreak-shell" : description,
+                    sshKey,
+                    publicInAccount == null ? false : publicInAccount,
+                    projectId,
+                    serviceAccountId,
+                    serviceAccountPrivateKey
+            );
             context.setCredential(id);
             createOrSelectTemplateHint();
             return "Credential created, id: " + id;
@@ -224,7 +238,7 @@ public class CredentialCommands implements CommandMarker {
 
     @CliCommand(value = "credential createAZURE", help = "Create a new AZURE credential")
     public String createAzureCredential(
-            @CliOption(key = "description", mandatory = true, help = "Description of the credential") String description,
+            @CliOption(key = "description", mandatory = false, help = "Description of the credential") String description,
             @CliOption(key = "name", mandatory = true, help = "Name of the credential") String name,
             @CliOption(key = "subscriptionId", mandatory = true, help = "subscriptionId of the credential") String subscriptionId,
             @CliOption(key = "sshKeyPath", mandatory = false, help = "sshKeyPath of the template") String sshKeyPath,
@@ -249,7 +263,13 @@ public class CredentialCommands implements CommandMarker {
             }
         }
         try {
-            String id = cloudbreak.postAzureCredential(name, description, subscriptionId, sshKey, publicInAccount);
+            String id = cloudbreak.postAzureCredential(
+                    name,
+                    description == null ? "Azure credential was created by the cloudbreak-shell" : description,
+                    subscriptionId,
+                    sshKey,
+                    publicInAccount == null ? false : publicInAccount
+            );
             context.setCredential(id);
             createOrSelectTemplateHint();
             return "Credential created, id: " + id;

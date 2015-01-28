@@ -16,10 +16,9 @@ import org.springframework.stereotype.Component;
 
 import com.sequenceiq.cloudbreak.client.CloudbreakClient;
 import com.sequenceiq.cloudbreak.shell.model.AwsInstanceType;
-import com.sequenceiq.cloudbreak.shell.model.AzureInstanceName;
 import com.sequenceiq.cloudbreak.shell.model.AzureInstanceType;
 import com.sequenceiq.cloudbreak.shell.model.CloudbreakContext;
-import com.sequenceiq.cloudbreak.shell.model.GccInstanceType;
+import com.sequenceiq.cloudbreak.shell.model.GcpInstanceType;
 import com.sequenceiq.cloudbreak.shell.model.Hints;
 import com.sequenceiq.cloudbreak.shell.model.VolumeType;
 
@@ -58,8 +57,8 @@ public class TemplateCommands implements CommandMarker {
         return true;
     }
 
-    @CliAvailabilityIndicator(value = "template createGcc")
-    public boolean isTemplateGccCreateCommandAvailable() {
+    @CliAvailabilityIndicator(value = "template createGcp")
+    public boolean isTemplateGcpCreateCommandAvailable() {
         return true;
     }
 
@@ -83,7 +82,7 @@ public class TemplateCommands implements CommandMarker {
     @CliCommand(value = "template createEC2", help = "Create a new EC2 template")
     public String createEc2Template(
             @CliOption(key = "name", mandatory = true, help = "Name of the template") String name,
-            @CliOption(key = "description", mandatory = true, help = "Description of the template") String description,
+            @CliOption(key = "description", mandatory = false, help = "Description of the template") String description,
             @CliOption(key = "instanceType", mandatory = true, help = "instanceType of the template") AwsInstanceType instanceType,
             @CliOption(key = "volumeCount", mandatory = true, help = "volumeCount of the template") Integer volumeCount,
             @CliOption(key = "volumeSize", mandatory = true, help = "volumeSize(GB) of the template") Integer volumeSize,
@@ -99,30 +98,27 @@ public class TemplateCommands implements CommandMarker {
             if (volumeSize < VOLUME_SIZE_MIN || volumeSize > VOLUME_SIZE_MAX) {
                 return "VolumeSize has to be between 1 and 1024.";
             }
-            if (volumeType == null) {
-                volumeType = VolumeType.Gp2;
-            }
             String id;
             if (spotPrice == null) {
                 id = cloudbreak.postEc2Template(name,
-                        description,
+                        getDescription(description, "Aws"),
                         sshLocation == null ? "0.0.0.0/0" : sshLocation,
                         instanceType.toString(),
                         volumeCount.toString(),
                         volumeSize.toString(),
-                        volumeType.name(),
-                        publicInAccount
+                        volumeType == null ? VolumeType.Gp2.name() : volumeType.name(),
+                        publicInAccount(publicInAccount)
                 );
             } else {
                 id = cloudbreak.postSpotEc2Template(name,
-                        description,
+                        getDescription(description, "Aws"),
                         sshLocation == null ? "0.0.0.0/0" : sshLocation,
                         instanceType.toString(),
                         volumeCount.toString(),
                         volumeSize.toString(),
-                        volumeType.name(),
+                        volumeType == null ? VolumeType.Gp2.name() : volumeType.name(),
                         spotPrice.toString(),
-                        publicInAccount
+                        publicInAccount(publicInAccount)
                 );
             }
             createOrSelectBlueprintHint();
@@ -134,15 +130,18 @@ public class TemplateCommands implements CommandMarker {
         }
     }
 
+    private String getDescription(String description, String cloudPlatform) {
+        return description == null ? cloudPlatform + " template was created by the cloudbreak-shell" : description;
+    }
+
 
     @CliCommand(value = "template createAZURE", help = "Create a new AZURE template")
     public String createAzureTemplate(
             @CliOption(key = "name", mandatory = true, help = "Name of the template") String name,
-            @CliOption(key = "description", mandatory = true, help = "Description of the template") String description,
+            @CliOption(key = "description", mandatory = false, help = "Description of the template") String description,
             @CliOption(key = "instanceType", mandatory = true, help = "type of the VM") AzureInstanceType vmType,
             @CliOption(key = "volumeCount", mandatory = true, help = "volumeCount of the template") Integer volumeCount,
             @CliOption(key = "volumeSize", mandatory = true, help = "volumeSize(GB) of the template") Integer volumeSize,
-            @CliOption(key = "imageName", mandatory = false, help = "instance name of the template: AMBARI_DOCKER_V1") AzureInstanceName imageName,
             @CliOption(key = "publicInAccount", mandatory = false, help = "flags if the template is public in the account") Boolean publicInAccount
     ) {
         if (volumeCount < VOLUME_COUNT_MIN || volumeCount > VOLUME_COUNT_MAX) {
@@ -151,16 +150,13 @@ public class TemplateCommands implements CommandMarker {
         if (volumeSize < VOLUME_SIZE_MIN || volumeSize > VOLUME_SIZE_MAX) {
             return "VolumeSize has to be between 1 and 1024.";
         }
-        if (imageName == null) {
-            imageName = AzureInstanceName.AMBARI_DOCKER_V1;
-        }
         try {
             String id = cloudbreak.postAzureTemplate(name,
-                    description,
+                    getDescription(description, "Azure"),
                     vmType.name(),
                     volumeCount.toString(),
                     volumeSize.toString(),
-                    publicInAccount
+                    publicInAccount(publicInAccount)
             );
             createOrSelectBlueprintHint();
             return "Template created, id: " + id;
@@ -171,11 +167,11 @@ public class TemplateCommands implements CommandMarker {
         }
     }
 
-    @CliCommand(value = "template createGcc", help = "Create a new GCC template")
-    public String createGccTemplate(
+    @CliCommand(value = "template createGcp", help = "Create a new GCP template")
+    public String createGcpTemplate(
             @CliOption(key = "name", mandatory = true, help = "Name of the template") String name,
-            @CliOption(key = "description", mandatory = true, help = "Description of the template") String description,
-            @CliOption(key = "instanceType", mandatory = true, help = "type of the VM") GccInstanceType instanceType,
+            @CliOption(key = "description", mandatory = false, help = "Description of the template") String description,
+            @CliOption(key = "instanceType", mandatory = true, help = "type of the VM") GcpInstanceType instanceType,
             @CliOption(key = "volumeCount", mandatory = true, help = "volumeCount of the template") Integer volumeCount,
             @CliOption(key = "volumeSize", mandatory = true, help = "volumeSize(GB) of the template") Integer volumeSize,
             @CliOption(key = "publicInAccount", mandatory = false, help = "flags if the template is public in the account") Boolean publicInAccount
@@ -188,11 +184,11 @@ public class TemplateCommands implements CommandMarker {
         }
         try {
             String id = cloudbreak.postGccTemplate(name,
-                    description,
+                    getDescription(description, "Gcp"),
                     instanceType.name(),
                     volumeCount.toString(),
                     volumeSize.toString(),
-                    publicInAccount
+                    publicInAccount(publicInAccount)
             );
             createOrSelectBlueprintHint();
             return "Template created, id: " + id;
@@ -201,6 +197,10 @@ public class TemplateCommands implements CommandMarker {
         } catch (Exception ex) {
             return ex.toString();
         }
+    }
+
+    private boolean publicInAccount(Boolean publicInAccount) {
+        return publicInAccount == null ? false : publicInAccount;
     }
 
 
