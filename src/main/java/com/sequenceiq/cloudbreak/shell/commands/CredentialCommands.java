@@ -59,13 +59,18 @@ public class CredentialCommands implements CommandMarker {
         return context.isCredentialAccessible();
     }
 
-    @CliAvailabilityIndicator(value = "credential createEC2")
+    @CliAvailabilityIndicator(value = "credential create --EC2")
     public boolean isCredentialEc2CreateCommandAvailable() {
         return true;
     }
 
-    @CliAvailabilityIndicator(value = "credential createGcp")
+    @CliAvailabilityIndicator(value = "credential create --GCP")
     public boolean isCredentialGcpCreateCommandAvailable() {
+        return true;
+    }
+
+    @CliAvailabilityIndicator(value = "credential create --AZURE")
+    public boolean isCredentialAzureCreateCommandAvailable() {
         return true;
     }
 
@@ -115,22 +120,22 @@ public class CredentialCommands implements CommandMarker {
         }
     }
 
-    @CliCommand(value = "credential createEC2", help = "Create a new EC2 credential")
+    @CliCommand(value = "credential create --EC2", help = "Create a new EC2 credential")
     public String createEc2Credential(
-            @CliOption(key = "description", mandatory = false, help = "Description of the credential") String description,
             @CliOption(key = "name", mandatory = true, help = "Name of the credential") String name,
             @CliOption(key = "roleArn", mandatory = true, help = "roleArn of the credential") String roleArn,
-            @CliOption(key = "sshKeyPath", mandatory = false, help = "path of a public SSH key file") String sshKeyPath,
+            @CliOption(key = "sshKeyPath", mandatory = false, help = "path of a public SSH key file") File sshKeyPath,
             @CliOption(key = "sshKeyUrl", mandatory = false, help = "URL of a public SSH key file") String sshKeyUrl,
-            @CliOption(key = "publicInAccount", mandatory = false, help = "flags if the credential is public in the account") Boolean publicInAccount
-    ) {
-        if ((sshKeyPath == null || sshKeyPath.isEmpty()) && (sshKeyUrl == null || sshKeyUrl.isEmpty())) {
+            @CliOption(key = "publicInAccount", mandatory = false, help = "flags if the credential is public in the account") Boolean publicInAccount,
+            @CliOption(key = "description", mandatory = false, help = "Description of the template") String description
+            ) {
+        if ((sshKeyPath == null) && (sshKeyUrl == null || sshKeyUrl.isEmpty())) {
             return "An SSH public key must be specified either with --sshKeyPath or --sshKeyUrl";
         }
         String sshKey;
         if (sshKeyPath != null) {
             try {
-                sshKey = new String(Files.readAllBytes(Paths.get(sshKeyPath))).replaceAll("\n", "");
+                sshKey = new String(Files.readAllBytes(Paths.get(sshKeyPath.getPath()))).replaceAll("\n", "");
             } catch (IOException e) {
                 return "File not found with ssh key.";
             }
@@ -159,25 +164,25 @@ public class CredentialCommands implements CommandMarker {
         }
     }
 
-    @CliCommand(value = "credential createGcp", help = "Create a new Gcp credential")
+    @CliCommand(value = "credential create --GCP", help = "Create a new Gcp credential")
     public String createGcpCredential(
-            @CliOption(key = "description", mandatory = false, help = "Description of the credential") String description,
             @CliOption(key = "name", mandatory = true, help = "Name of the credential") String name,
             @CliOption(key = "projectId", mandatory = true, help = "projectId of the credential") String projectId,
             @CliOption(key = "serviceAccountId", mandatory = true, help = "serviceAccountId of the credential") String serviceAccountId,
             @CliOption(key = "serviceAccountPrivateKeyPath", mandatory = true, help = "path of a service account private key (p12) file")
             File serviceAccountPrivateKeyPath,
-            @CliOption(key = "sshKeyPath", mandatory = false, help = "path of a public SSH key file") String sshKeyPath,
+            @CliOption(key = "sshKeyPath", mandatory = false, help = "path of a public SSH key file") File sshKeyPath,
             @CliOption(key = "sshKeyUrl", mandatory = false, help = "URL of a public SSH key url") String sshKeyUrl,
-            @CliOption(key = "publicInAccount", mandatory = false, help = "flags if the credential is public in the account") Boolean publicInAccount
-    ) {
-        if ((sshKeyPath == null || sshKeyPath.isEmpty()) && (sshKeyUrl == null || sshKeyUrl.isEmpty())) {
+            @CliOption(key = "publicInAccount", mandatory = false, help = "flags if the credential is public in the account") Boolean publicInAccount,
+            @CliOption(key = "description", mandatory = false, help = "Description of the credential") String description
+            ) {
+        if ((sshKeyPath == null) && (sshKeyUrl == null || sshKeyUrl.isEmpty())) {
             return "An SSH public key must be specified either with --sshKeyPath or --sshKeyUrl";
         }
         String sshKey;
         if (sshKeyPath != null) {
             try {
-                sshKey = new String(Files.readAllBytes(Paths.get(sshKeyPath))).replaceAll("\n", "");
+                sshKey = new String(Files.readAllBytes(Paths.get(sshKeyPath.getPath()))).replaceAll("\n", "");
             } catch (IOException e) {
                 return "File not found with ssh key.";
             }
@@ -217,11 +222,6 @@ public class CredentialCommands implements CommandMarker {
         }
     }
 
-    @CliAvailabilityIndicator(value = "credential createAZURE")
-    public boolean isCredentialAzureCreateCommandAvailable() {
-        return true;
-    }
-
     private String readUrl(String url) throws IOException {
         if (!url.startsWith("http://") && !url.startsWith("https://")) {
             url = "http://" + url;
@@ -236,22 +236,22 @@ public class CredentialCommands implements CommandMarker {
         return sb.toString();
     }
 
-    @CliCommand(value = "credential createAZURE", help = "Create a new AZURE credential")
+    @CliCommand(value = "credential create --AZURE", help = "Create a new AZURE credential")
     public String createAzureCredential(
-            @CliOption(key = "description", mandatory = false, help = "Description of the credential") String description,
             @CliOption(key = "name", mandatory = true, help = "Name of the credential") String name,
             @CliOption(key = "subscriptionId", mandatory = true, help = "subscriptionId of the credential") String subscriptionId,
-            @CliOption(key = "sshKeyPath", mandatory = false, help = "sshKeyPath of the template") String sshKeyPath,
+            @CliOption(key = "sshKeyPath", mandatory = false, help = "sshKeyPath of the template") File sshKeyPath,
             @CliOption(key = "sshKeyUrl", mandatory = false, help = "sshKeyUrl of the template") String sshKeyUrl,
-            @CliOption(key = "publicInAccount", mandatory = false, help = "flags if the credential is public in the account") Boolean publicInAccount
-    ) {
-        if ((sshKeyPath == null || sshKeyPath.isEmpty()) && (sshKeyUrl == null || sshKeyUrl.isEmpty())) {
+            @CliOption(key = "publicInAccount", mandatory = false, help = "flags if the credential is public in the account") Boolean publicInAccount,
+            @CliOption(key = "description", mandatory = false, help = "Description of the credential") String description
+            ) {
+        if ((sshKeyPath == null) && (sshKeyUrl == null || sshKeyUrl.isEmpty())) {
             return "SshKey cannot be null if password null";
         }
         String sshKey;
         if (sshKeyPath != null) {
             try {
-                sshKey = Base64.encodeBase64String(Files.readAllBytes(Paths.get(sshKeyPath)));
+                sshKey = Base64.encodeBase64String(Files.readAllBytes(Paths.get(sshKeyPath.getPath())));
             } catch (IOException e) {
                 return "File not found with ssh key.";
             }

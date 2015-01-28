@@ -52,17 +52,17 @@ public class TemplateCommands implements CommandMarker {
         return true;
     }
 
-    @CliAvailabilityIndicator(value = "template createEC2")
+    @CliAvailabilityIndicator(value = "template create --EC2")
     public boolean isTemplateEc2CreateCommandAvailable() {
         return true;
     }
 
-    @CliAvailabilityIndicator(value = "template createGcp")
+    @CliAvailabilityIndicator(value = "template create --GCP")
     public boolean isTemplateGcpCreateCommandAvailable() {
         return true;
     }
 
-    @CliAvailabilityIndicator(value = "template createAZURE")
+    @CliAvailabilityIndicator(value = "template create --AZURE")
     public boolean isTemplateAzureCreateCommandAvailable() {
         return true;
     }
@@ -79,18 +79,18 @@ public class TemplateCommands implements CommandMarker {
         }
     }
 
-    @CliCommand(value = "template createEC2", help = "Create a new EC2 template")
+    @CliCommand(value = "template create --EC2", help = "Create a new EC2 template")
     public String createEc2Template(
             @CliOption(key = "name", mandatory = true, help = "Name of the template") String name,
-            @CliOption(key = "description", mandatory = false, help = "Description of the template") String description,
             @CliOption(key = "instanceType", mandatory = true, help = "instanceType of the template") AwsInstanceType instanceType,
             @CliOption(key = "volumeCount", mandatory = true, help = "volumeCount of the template") Integer volumeCount,
             @CliOption(key = "volumeSize", mandatory = true, help = "volumeSize(GB) of the template") Integer volumeSize,
             @CliOption(key = "volumeType", mandatory = false, help = "volumeType of the template", specifiedDefaultValue = "Gp2") VolumeType volumeType,
             @CliOption(key = "spotPrice", mandatory = false, help = "spotPrice of the template") Double spotPrice,
             @CliOption(key = "sshLocation", mandatory = false, specifiedDefaultValue = "0.0.0.0/0", help = "sshLocation of the template") String sshLocation,
-            @CliOption(key = "publicInAccount", mandatory = false, help = "flags if the template is public in the account") Boolean publicInAccount
-    ) {
+            @CliOption(key = "publicInAccount", mandatory = false, help = "flags if the template is public in the account") Boolean publicInAccount,
+            @CliOption(key = "description", mandatory = false, help = "Description of the template") String description
+            ) {
         try {
             if (volumeCount < VOLUME_COUNT_MIN || volumeCount > VOLUME_COUNT_MAX) {
                 return "volumeCount has to be between 1 and 8.";
@@ -135,15 +135,15 @@ public class TemplateCommands implements CommandMarker {
     }
 
 
-    @CliCommand(value = "template createAZURE", help = "Create a new AZURE template")
+    @CliCommand(value = "template create --AZURE", help = "Create a new AZURE template")
     public String createAzureTemplate(
             @CliOption(key = "name", mandatory = true, help = "Name of the template") String name,
-            @CliOption(key = "description", mandatory = false, help = "Description of the template") String description,
             @CliOption(key = "instanceType", mandatory = true, help = "type of the VM") AzureInstanceType vmType,
             @CliOption(key = "volumeCount", mandatory = true, help = "volumeCount of the template") Integer volumeCount,
             @CliOption(key = "volumeSize", mandatory = true, help = "volumeSize(GB) of the template") Integer volumeSize,
-            @CliOption(key = "publicInAccount", mandatory = false, help = "flags if the template is public in the account") Boolean publicInAccount
-    ) {
+            @CliOption(key = "publicInAccount", mandatory = false, help = "flags if the template is public in the account") Boolean publicInAccount,
+            @CliOption(key = "description", mandatory = false, help = "Description of the template") String description
+            ) {
         if (volumeCount < VOLUME_COUNT_MIN || volumeCount > VOLUME_COUNT_MAX) {
             return "volumeCount has to be between 1 and 8.";
         }
@@ -167,15 +167,15 @@ public class TemplateCommands implements CommandMarker {
         }
     }
 
-    @CliCommand(value = "template createGcp", help = "Create a new GCP template")
+    @CliCommand(value = "template create --GCP", help = "Create a new GCP template")
     public String createGcpTemplate(
             @CliOption(key = "name", mandatory = true, help = "Name of the template") String name,
-            @CliOption(key = "description", mandatory = false, help = "Description of the template") String description,
             @CliOption(key = "instanceType", mandatory = true, help = "type of the VM") GcpInstanceType instanceType,
             @CliOption(key = "volumeCount", mandatory = true, help = "volumeCount of the template") Integer volumeCount,
             @CliOption(key = "volumeSize", mandatory = true, help = "volumeSize(GB) of the template") Integer volumeSize,
-            @CliOption(key = "publicInAccount", mandatory = false, help = "flags if the template is public in the account") Boolean publicInAccount
-    ) {
+            @CliOption(key = "publicInAccount", mandatory = false, help = "flags if the template is public in the account") Boolean publicInAccount,
+            @CliOption(key = "description", mandatory = false, help = "Description of the template") String description
+            ) {
         if (volumeCount < VOLUME_COUNT_MIN || volumeCount > VOLUME_COUNT_MAX) {
             return "volumeCount has to be between 1 and 8.";
         }
