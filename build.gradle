@@ -95,7 +95,6 @@ sonarRunner {
 }
 
 repositories {
-    mavenLocal()
     mavenCentral()
     maven { url "http://maven.sequenceiq.com/snapshots" }
     maven { url "http://maven.sequenceiq.com/release" }
