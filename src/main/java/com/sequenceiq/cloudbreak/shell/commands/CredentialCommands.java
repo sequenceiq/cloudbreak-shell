@@ -322,10 +322,10 @@ public class CredentialCommands implements CommandMarker {
     }
 
     private void createOrSelectTemplateHint() throws Exception {
-        if (cloudbreak.getAccountTemplates().isEmpty()) {
-            context.setHint(Hints.CREATE_TEMPLATE);
+        if (cloudbreak.getAccountBlueprints().isEmpty()) {
+            context.setHint(Hints.ADD_BLUEPRINT);
         } else {
-            context.setHint(Hints.SELECT_TEMPLATE);
+            context.setHint(Hints.SELECT_BLUEPRINT);
         }
     }
 }

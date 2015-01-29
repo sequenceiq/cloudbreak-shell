@@ -16,6 +16,7 @@ import com.sequenceiq.cloudbreak.client.CloudbreakClient;
 import com.sequenceiq.cloudbreak.shell.completion.HostGroup;
 import com.sequenceiq.cloudbreak.shell.completion.InstanceGroupTemplateId;
 import com.sequenceiq.cloudbreak.shell.model.CloudbreakContext;
+import com.sequenceiq.cloudbreak.shell.model.Hints;
 
 @Component
 public class InstanceGroupCommands implements CommandMarker {
@@ -45,6 +46,11 @@ public class InstanceGroupCommands implements CommandMarker {
         Map<Long, Integer> map = new HashMap<>();
         map.put(Long.parseLong(instanceGroupTemplateId.getName()), nodeCount);
         context.putInstanceGroup(hostgroup.getName(), map);
+        if ((context.getActiveHostgoups().size() == context.getInstanceGroups().size() && context.getActiveHostgoups().size() != 0)) {
+            context.setHint(Hints.CREATE_STACK);
+        } else {
+            context.setHint(Hints.CONFIGURE_INSTANCEGROUP);
+        }
         return renderObjectMapValueMap(context.getInstanceGroups(), "hostgroup", "templateId", "nodeCount");
     }
 

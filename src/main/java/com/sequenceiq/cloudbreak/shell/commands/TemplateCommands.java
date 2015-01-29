@@ -243,10 +243,20 @@ public class TemplateCommands implements CommandMarker {
     }
 
     private void createOrSelectBlueprintHint() throws Exception {
-        if (cloudbreak.getAccountBlueprints().isEmpty()) {
-            context.setHint(Hints.ADD_BLUEPRINT);
-        } else {
+        if (context.isCredentialAccessible() && context.isBlueprintAccessible()) {
+            context.setHint(Hints.CONFIGURE_INSTANCEGROUP);
+        } else if (!context.isBlueprintAccessible()) {
             context.setHint(Hints.SELECT_BLUEPRINT);
+        } else if (!context.isCredentialAccessible()) {
+            context.setHint(Hints.SELECT_CREDENTIAL);
+        } else if (context.isCredentialAvailable()
+                && (context.getActiveHostgoups().size() == context.getInstanceGroups().size()
+                && context.getActiveHostgoups().size() != 0)) {
+            context.setHint(Hints.CREATE_STACK);
+        } else if (context.isStackAccessible()) {
+            context.setHint(Hints.CREATE_STACK);
+        } else {
+            context.setHint(Hints.NONE);
         }
     }
 }
