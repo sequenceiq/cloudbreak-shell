@@ -76,6 +76,21 @@ public final class TableRenderer {
         return format(table);
     }
 
+    public static <E extends Object, F extends Object> String renderObjectMapValueMap(Map<String, Map<E, F>> rows, String... headers) {
+        Table table = createTable(headers);
+        if (rows != null) {
+            for (String key1 : rows.keySet()) {
+                Map<E, F> values = rows.get(key1);
+                if (values != null) {
+                    for (Object key2 : values.keySet()) {
+                        table.addRow(key1, key2.toString(), values.get(key2).toString());
+                    }
+                }
+            }
+        }
+        return format(table);
+    }
+
     private static Table createTable(String... headers) {
         Table table = new Table();
         if (headers != null) {

@@ -1,9 +1,15 @@
 package com.sequenceiq.cloudbreak.shell.model;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import com.sequenceiq.cloudbreak.client.CloudbreakClient;
 
 /**
  * Holds information about the connected Cloudbreak server.
@@ -15,10 +21,19 @@ public class CloudbreakContext {
     private Focus focus;
     private Hints hint;
     private Map<PropertyKey, String> properties = new HashMap<>();
+    private Map<String, Map<Long, Integer>> instanceGroups = new HashMap<>();
+    private Set<String> activeHostgoups = new HashSet<>();
+    private Set<String> activeTemplates = new HashSet<>();
+    private String activeCloudPlatform;
+
+    @Autowired
+    private CloudbreakClient client;
 
     public CloudbreakContext() {
         this.focus = getRootFocus();
         this.hint = Hints.NONE;
+        this.instanceGroups = new HashMap<>();
+        this.activeHostgoups = new HashSet<>();
     }
 
     public boolean isStackAvailable() {
@@ -31,24 +46,38 @@ public class CloudbreakContext {
         setStackAccessible();
     }
 
+    public String getActiveCloudPlatform() {
+        return this.activeCloudPlatform == null ? "" : this.activeCloudPlatform;
+    }
+
     public void removeStack(String id) {
         removeProperty(PropertyKey.STACK_ID, id);
     }
 
-    public boolean isTemplateAvailable() {
-        return isPropertyAvailable(PropertyKey.TEMPLATE_ID);
+    public void setInstanceGroups(Map<String, Map<Long, Integer>> instanceGroups) {
+        this.instanceGroups = instanceGroups;
     }
 
-    public void addTemplate(String id) {
-        addProperty(PropertyKey.TEMPLATE_ID, id);
-        setTemplateAccessible();
+    public Map<String, Map<Long, Integer>> getInstanceGroups() {
+        return this.instanceGroups;
+    }
+
+    public Map<String, Map<Long, Integer>> putInstanceGroup(String name, Map<Long, Integer> value) {
+        this.instanceGroups.put(name, value);
+        return this.instanceGroups;
+    }
+
+    public Set<String> getActiveTemplates() {
+        return activeTemplates;
     }
 
     public boolean isBlueprintAvailable() {
         return isPropertyAvailable(PropertyKey.BLUEPRINT_ID);
     }
 
-    public void addBlueprint(String id) {
+    public void addBlueprint(String id) throws Exception {
+        Map<String, Object> blueprintMap = client.getBlueprintMap(id);
+        this.activeHostgoups = ((LinkedHashMap) blueprintMap.get("ambariBlueprint")).keySet();
         addProperty(PropertyKey.BLUEPRINT_ID, id);
         setBlueprintAccessible();
     }
@@ -57,9 +86,17 @@ public class CloudbreakContext {
         return isPropertyAvailable(PropertyKey.CREDENTIAL_ID);
     }
 
-    public void setCredential(String id) {
+    public void setCredential(String id) throws Exception {
+        Map<String, String> credential = (Map<String, String>) client.getCredential(id);
+        this.activeCloudPlatform = credential.get("cloudPlatform");
+        Map<String, Map<String, String>> templateList = client.getAccountTemplatesWithCloudPlatformMap(this.activeCloudPlatform);
+        this.activeTemplates = templateList.keySet();
         addProperty(PropertyKey.CREDENTIAL_ID, id);
         setCredentialAccessible();
+    }
+
+    public Set<String> getActiveHostgoups() {
+        return activeHostgoups;
     }
 
     public void setBlueprintAccessible() {
@@ -78,14 +115,6 @@ public class CloudbreakContext {
         return isPropertyAvailable(PropertyKey.CREDENTIAL_ACCESSIBLE);
     }
 
-    public void setTemplateAccessible() {
-        addProperty(PropertyKey.TEMPLATE_ACCESSIBLE, ACCESSIBLE);
-    }
-
-    public boolean isTemplateAccessible() {
-        return isPropertyAvailable(PropertyKey.TEMPLATE_ACCESSIBLE);
-    }
-
     public void setStackAccessible() {
         addProperty(PropertyKey.STACK_ACCESSIBLE, ACCESSIBLE);
     }
@@ -100,10 +129,6 @@ public class CloudbreakContext {
 
     public String getStackName() {
         return getLastPropertyValue(PropertyKey.STACK_NAME);
-    }
-
-    public String getTemplateId() {
-        return getLastPropertyValue(PropertyKey.TEMPLATE_ID);
     }
 
     public String getBlueprintId() {

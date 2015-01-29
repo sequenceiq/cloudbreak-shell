@@ -50,7 +50,6 @@ public class BasicCommands implements CommandMarker {
         sb.append(getRow("credentialId", context.getCredentialId()));
         sb.append(getRow("stackId", context.getStackId()));
         sb.append(getRow("stackName", context.getStackName()));
-        sb.append(getRow("templateId", context.getTemplateId()));
         return sb.toString();
     }
 

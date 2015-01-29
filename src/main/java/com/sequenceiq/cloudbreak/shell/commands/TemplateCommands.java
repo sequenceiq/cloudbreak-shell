@@ -15,16 +15,11 @@ import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.stereotype.Component;
 
 import com.sequenceiq.cloudbreak.client.CloudbreakClient;
-import com.sequenceiq.cloudbreak.shell.model.AzureInstanceName;
-import com.sequenceiq.cloudbreak.shell.model.AzureLocation;
-import com.sequenceiq.cloudbreak.shell.model.AzureVmType;
+import com.sequenceiq.cloudbreak.shell.model.AwsInstanceType;
+import com.sequenceiq.cloudbreak.shell.model.AzureInstanceType;
 import com.sequenceiq.cloudbreak.shell.model.CloudbreakContext;
-import com.sequenceiq.cloudbreak.shell.model.GccImageName;
-import com.sequenceiq.cloudbreak.shell.model.GccInstanceType;
-import com.sequenceiq.cloudbreak.shell.model.GccZone;
+import com.sequenceiq.cloudbreak.shell.model.GcpInstanceType;
 import com.sequenceiq.cloudbreak.shell.model.Hints;
-import com.sequenceiq.cloudbreak.shell.model.InstanceType;
-import com.sequenceiq.cloudbreak.shell.model.Region;
 import com.sequenceiq.cloudbreak.shell.model.VolumeType;
 
 import groovyx.net.http.HttpResponseException;
@@ -57,24 +52,19 @@ public class TemplateCommands implements CommandMarker {
         return true;
     }
 
-    @CliAvailabilityIndicator(value = "template createEC2")
+    @CliAvailabilityIndicator(value = "template create --EC2")
     public boolean isTemplateEc2CreateCommandAvailable() {
         return true;
     }
 
-    @CliAvailabilityIndicator(value = "template createGcc")
-    public boolean isTemplateGccCreateCommandAvailable() {
+    @CliAvailabilityIndicator(value = "template create --GCP")
+    public boolean isTemplateGcpCreateCommandAvailable() {
         return true;
     }
 
-    @CliAvailabilityIndicator(value = "template createAZURE")
+    @CliAvailabilityIndicator(value = "template create --AZURE")
     public boolean isTemplateAzureCreateCommandAvailable() {
         return true;
-    }
-
-    @CliAvailabilityIndicator(value = "template select")
-    public boolean isTemplateSelectCommandAvailable() throws Exception {
-        return context.isTemplateAccessible();
     }
 
     @CliCommand(value = "template list", help = "Shows the currently available cloud templates")
@@ -89,38 +79,18 @@ public class TemplateCommands implements CommandMarker {
         }
     }
 
-    @CliCommand(value = "template select", help = "Select the template by its id")
-    public String selectTemplate(
-            @CliOption(key = "id", mandatory = true, help = "Id of the template") String id) {
-        try {
-            Object template = cloudbreak.getTemplate(id);
-            if (template != null) {
-                context.addTemplate(id);
-                context.setHint(Hints.ADD_BLUEPRINT);
-                return "Template selected, id: " + id;
-            } else {
-                return "No template specified";
-            }
-        } catch (HttpResponseException ex) {
-            return ex.getResponse().getData().toString();
-        } catch (Exception ex) {
-            return ex.toString();
-        }
-    }
-
-    @CliCommand(value = "template createEC2", help = "Create a new EC2 template")
+    @CliCommand(value = "template create --EC2", help = "Create a new EC2 template")
     public String createEc2Template(
             @CliOption(key = "name", mandatory = true, help = "Name of the template") String name,
-            @CliOption(key = "description", mandatory = true, help = "Description of the template") String description,
-            @CliOption(key = "region", mandatory = true, help = "region of the template") Region region,
-            @CliOption(key = "instanceType", mandatory = true, help = "instanceType of the template") InstanceType instanceType,
+            @CliOption(key = "instanceType", mandatory = true, help = "instanceType of the template") AwsInstanceType instanceType,
             @CliOption(key = "volumeCount", mandatory = true, help = "volumeCount of the template") Integer volumeCount,
             @CliOption(key = "volumeSize", mandatory = true, help = "volumeSize(GB) of the template") Integer volumeSize,
             @CliOption(key = "volumeType", mandatory = false, help = "volumeType of the template", specifiedDefaultValue = "Gp2") VolumeType volumeType,
             @CliOption(key = "spotPrice", mandatory = false, help = "spotPrice of the template") Double spotPrice,
             @CliOption(key = "sshLocation", mandatory = false, specifiedDefaultValue = "0.0.0.0/0", help = "sshLocation of the template") String sshLocation,
-            @CliOption(key = "publicInAccount", mandatory = false, help = "flags if the template is public in the account") Boolean publicInAccount
-    ) {
+            @CliOption(key = "publicInAccount", mandatory = false, help = "flags if the template is public in the account") Boolean publicInAccount,
+            @CliOption(key = "description", mandatory = false, help = "Description of the template") String description
+            ) {
         try {
             if (volumeCount < VOLUME_COUNT_MIN || volumeCount > VOLUME_COUNT_MAX) {
                 return "volumeCount has to be between 1 and 8.";
@@ -128,37 +98,29 @@ public class TemplateCommands implements CommandMarker {
             if (volumeSize < VOLUME_SIZE_MIN || volumeSize > VOLUME_SIZE_MAX) {
                 return "VolumeSize has to be between 1 and 1024.";
             }
-            if (volumeType == null) {
-                volumeType = VolumeType.Gp2;
-            }
             String id;
             if (spotPrice == null) {
                 id = cloudbreak.postEc2Template(name,
-                        description,
-                        region.name(),
-                        region.getAmi(),
+                        getDescription(description, "Aws"),
                         sshLocation == null ? "0.0.0.0/0" : sshLocation,
                         instanceType.toString(),
                         volumeCount.toString(),
                         volumeSize.toString(),
-                        volumeType.name(),
-                        publicInAccount
+                        volumeType == null ? VolumeType.Gp2.name() : volumeType.name(),
+                        publicInAccount(publicInAccount)
                 );
             } else {
                 id = cloudbreak.postSpotEc2Template(name,
-                        description,
-                        region.name(),
-                        region.getAmi(),
+                        getDescription(description, "Aws"),
                         sshLocation == null ? "0.0.0.0/0" : sshLocation,
                         instanceType.toString(),
                         volumeCount.toString(),
                         volumeSize.toString(),
-                        volumeType.name(),
+                        volumeType == null ? VolumeType.Gp2.name() : volumeType.name(),
                         spotPrice.toString(),
-                        publicInAccount
+                        publicInAccount(publicInAccount)
                 );
             }
-            context.addTemplate(id);
             createOrSelectBlueprintHint();
             return "Template created, id: " + id;
         } catch (HttpResponseException ex) {
@@ -168,38 +130,34 @@ public class TemplateCommands implements CommandMarker {
         }
     }
 
+    private String getDescription(String description, String cloudPlatform) {
+        return description == null ? cloudPlatform + " template was created by the cloudbreak-shell" : description;
+    }
 
-    @CliCommand(value = "template createAZURE", help = "Create a new AZURE template")
+
+    @CliCommand(value = "template create --AZURE", help = "Create a new AZURE template")
     public String createAzureTemplate(
             @CliOption(key = "name", mandatory = true, help = "Name of the template") String name,
-            @CliOption(key = "description", mandatory = true, help = "Description of the template") String description,
-            @CliOption(key = "location", mandatory = true, help = "location of the template") AzureLocation location,
-            @CliOption(key = "instanceType", mandatory = true, help = "type of the VM") AzureVmType vmType,
+            @CliOption(key = "instanceType", mandatory = true, help = "type of the VM") AzureInstanceType vmType,
             @CliOption(key = "volumeCount", mandatory = true, help = "volumeCount of the template") Integer volumeCount,
             @CliOption(key = "volumeSize", mandatory = true, help = "volumeSize(GB) of the template") Integer volumeSize,
-            @CliOption(key = "imageName", mandatory = false, help = "instance name of the template: AMBARI_DOCKER_V1") AzureInstanceName imageName,
-            @CliOption(key = "publicInAccount", mandatory = false, help = "flags if the template is public in the account") Boolean publicInAccount
-    ) {
+            @CliOption(key = "publicInAccount", mandatory = false, help = "flags if the template is public in the account") Boolean publicInAccount,
+            @CliOption(key = "description", mandatory = false, help = "Description of the template") String description
+            ) {
         if (volumeCount < VOLUME_COUNT_MIN || volumeCount > VOLUME_COUNT_MAX) {
             return "volumeCount has to be between 1 and 8.";
         }
         if (volumeSize < VOLUME_SIZE_MIN || volumeSize > VOLUME_SIZE_MAX) {
             return "VolumeSize has to be between 1 and 1024.";
-        }
-        if (imageName == null) {
-            imageName = AzureInstanceName.AMBARI_DOCKER_V1;
         }
         try {
             String id = cloudbreak.postAzureTemplate(name,
-                    description,
-                    location.name(),
-                    imageName.name(),
+                    getDescription(description, "Azure"),
                     vmType.name(),
                     volumeCount.toString(),
                     volumeSize.toString(),
-                    publicInAccount
+                    publicInAccount(publicInAccount)
             );
-            context.addTemplate(id);
             createOrSelectBlueprintHint();
             return "Template created, id: " + id;
         } catch (HttpResponseException ex) {
@@ -209,37 +167,29 @@ public class TemplateCommands implements CommandMarker {
         }
     }
 
-    @CliCommand(value = "template createGcc", help = "Create a new GCC template")
-    public String createGccTemplate(
+    @CliCommand(value = "template create --GCP", help = "Create a new GCP template")
+    public String createGcpTemplate(
             @CliOption(key = "name", mandatory = true, help = "Name of the template") String name,
-            @CliOption(key = "description", mandatory = true, help = "Description of the template") String description,
-            @CliOption(key = "location", mandatory = true, help = "location of the template") GccZone location,
-            @CliOption(key = "instanceType", mandatory = true, help = "type of the VM") GccInstanceType instanceType,
+            @CliOption(key = "instanceType", mandatory = true, help = "type of the VM") GcpInstanceType instanceType,
             @CliOption(key = "volumeCount", mandatory = true, help = "volumeCount of the template") Integer volumeCount,
             @CliOption(key = "volumeSize", mandatory = true, help = "volumeSize(GB) of the template") Integer volumeSize,
-            @CliOption(key = "imageName", mandatory = false, help = "instance name of the template: DEBIAN_HACK") GccImageName imageName,
-            @CliOption(key = "publicInAccount", mandatory = false, help = "flags if the template is public in the account") Boolean publicInAccount
-    ) {
+            @CliOption(key = "publicInAccount", mandatory = false, help = "flags if the template is public in the account") Boolean publicInAccount,
+            @CliOption(key = "description", mandatory = false, help = "Description of the template") String description
+            ) {
         if (volumeCount < VOLUME_COUNT_MIN || volumeCount > VOLUME_COUNT_MAX) {
             return "volumeCount has to be between 1 and 8.";
         }
         if (volumeSize < VOLUME_SIZE_MIN || volumeSize > VOLUME_SIZE_MAX) {
             return "VolumeSize has to be between 1 and 1024.";
         }
-        if (imageName == null) {
-            imageName = GccImageName.DEBIAN_HACK;
-        }
         try {
             String id = cloudbreak.postGccTemplate(name,
-                    description,
-                    imageName.name(),
+                    getDescription(description, "Gcp"),
                     instanceType.name(),
                     volumeCount.toString(),
                     volumeSize.toString(),
-                    location.name(),
-                    publicInAccount
+                    publicInAccount(publicInAccount)
             );
-            context.addTemplate(id);
             createOrSelectBlueprintHint();
             return "Template created, id: " + id;
         } catch (HttpResponseException ex) {
@@ -247,6 +197,10 @@ public class TemplateCommands implements CommandMarker {
         } catch (Exception ex) {
             return ex.toString();
         }
+    }
+
+    private boolean publicInAccount(Boolean publicInAccount) {
+        return publicInAccount == null ? false : publicInAccount;
     }
 
 
@@ -289,10 +243,20 @@ public class TemplateCommands implements CommandMarker {
     }
 
     private void createOrSelectBlueprintHint() throws Exception {
-        if (cloudbreak.getAccountBlueprints().isEmpty()) {
-            context.setHint(Hints.ADD_BLUEPRINT);
-        } else {
+        if (context.isCredentialAccessible() && context.isBlueprintAccessible()) {
+            context.setHint(Hints.CONFIGURE_INSTANCEGROUP);
+        } else if (!context.isBlueprintAccessible()) {
             context.setHint(Hints.SELECT_BLUEPRINT);
+        } else if (!context.isCredentialAccessible()) {
+            context.setHint(Hints.SELECT_CREDENTIAL);
+        } else if (context.isCredentialAvailable()
+                && (context.getActiveHostgoups().size() == context.getInstanceGroups().size()
+                && context.getActiveHostgoups().size() != 0)) {
+            context.setHint(Hints.CREATE_STACK);
+        } else if (context.isStackAccessible()) {
+            context.setHint(Hints.CREATE_STACK);
+        } else {
+            context.setHint(Hints.NONE);
         }
     }
 }

@@ -13,6 +13,7 @@ import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.stereotype.Component;
 
 import com.sequenceiq.cloudbreak.client.CloudbreakClient;
+import com.sequenceiq.cloudbreak.shell.completion.StackRegion;
 import com.sequenceiq.cloudbreak.shell.model.CloudbreakContext;
 import com.sequenceiq.cloudbreak.shell.model.Hints;
 
@@ -38,7 +39,9 @@ public class StackCommands implements CommandMarker {
 
     @CliAvailabilityIndicator(value = "stack create")
     public boolean isStackCreateCommandAvailable() {
-        return context.isTemplateAvailable() && context.isCredentialAvailable();
+        return context.isCredentialAvailable()
+                && (context.getActiveHostgoups().size() == context.getInstanceGroups().size()
+                && context.getActiveHostgoups().size() != 0);
     }
 
     @CliAvailabilityIndicator(value = "stack show")
@@ -53,13 +56,24 @@ public class StackCommands implements CommandMarker {
 
     @CliCommand(value = "stack create", help = "Create a new stack based on a template")
     public String createStack(
-            @CliOption(key = "nodeCount", mandatory = true, help = "Number of nodes to create") String count,
             @CliOption(key = "name", mandatory = true, help = "Name of the stack") String name,
-            @CliOption(key = "userName", mandatory = true, help = "Username of the Ambari server") String userName,
-            @CliOption(key = "password", mandatory = true, help = "Password of the Ambari server") String password,
-            @CliOption(key = "publicInAccount", mandatory = false, help = "flags if the stack is public in the account") Boolean publicInAccount) {
+            @CliOption(key = "userName", mandatory = true, specifiedDefaultValue = "admin", help = "Username of the Ambari server") String userName,
+            @CliOption(key = "region", mandatory = true, help = "region of the stack") StackRegion region,
+            @CliOption(key = "password", mandatory = true, specifiedDefaultValue = "admin", help = "Password of the Ambari server") String password,
+            @CliOption(key = "image", mandatory = false, specifiedDefaultValue = "image-name", help = "Specific image name") String image,
+            @CliOption(key = "publicInAccount", mandatory = false, help = "flags if the stack is public in the account")
+            Boolean publicInAccount) {
         try {
-            String id = cloudbreak.postStack(name, userName, password, count, context.getCredentialId(), context.getTemplateId(), publicInAccount);
+            String id =
+                    cloudbreak.postStack(
+                            name,
+                            userName,
+                            password,
+                            context.getCredentialId(),
+                            region.getName(),
+                            publicInAccount == null ? false : publicInAccount,
+                            context.getInstanceGroups(),
+                            image);
             context.addStack(id, name);
             context.setHint(Hints.CREATE_CLUSTER);
             return "Stack created, id: " + id;

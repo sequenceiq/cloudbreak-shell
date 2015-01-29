@@ -49,7 +49,7 @@ public class ClusterCommands implements CommandMarker {
 
     @CliCommand(value = "cluster create", help = "Create a new cluster based on a blueprint and template")
     public String createCluster(
-            @CliOption(key = "description", mandatory = true, help = "Description of the blueprint") String description) {
+            @CliOption(key = "description", mandatory = false, help = "Description of the blueprint") String description) {
         try {
             cloudbreak.postCluster(context.getStackName(), parseInt(context.getBlueprintId()), description, parseInt(context.getStackId()));
             context.setHint(Hints.NONE);
