@@ -60,14 +60,20 @@ public class StackCommands implements CommandMarker {
             @CliOption(key = "userName", mandatory = true, specifiedDefaultValue = "admin", help = "Username of the Ambari server") String userName,
             @CliOption(key = "region", mandatory = true, help = "region of the stack") StackRegion region,
             @CliOption(key = "password", mandatory = true, specifiedDefaultValue = "admin", help = "Password of the Ambari server") String password,
+            @CliOption(key = "image", mandatory = false, specifiedDefaultValue = "image-name", help = "Specific image name") String image,
             @CliOption(key = "publicInAccount", mandatory = false, help = "flags if the stack is public in the account")
             Boolean publicInAccount) {
         try {
-            if (publicInAccount == null) {
-                publicInAccount = false;
-            }
             String id =
-                    cloudbreak.postStack(name, userName, password, context.getCredentialId(), region.getName(), publicInAccount, context.getInstanceGroups());
+                    cloudbreak.postStack(
+                            name,
+                            userName,
+                            password,
+                            context.getCredentialId(),
+                            region.getName(),
+                            publicInAccount == null ? false : publicInAccount,
+                            context.getInstanceGroups(),
+                            image);
             context.addStack(id, name);
             context.setHint(Hints.CREATE_CLUSTER);
             return "Stack created, id: " + id;
