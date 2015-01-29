@@ -46,7 +46,7 @@ public class InstanceGroupCommands implements CommandMarker {
         Map<Long, Integer> map = new HashMap<>();
         map.put(Long.parseLong(instanceGroupTemplateId.getName()), nodeCount);
         context.putInstanceGroup(hostgroup.getName(), map);
-        if ((context.getActiveHostgoups().size() == context.getInstanceGroups().size() && context.getActiveHostgoups().size() != 0)) {
+        if (context.getActiveHostgoups().size() == context.getInstanceGroups().size() && context.getActiveHostgoups().size() != 0) {
             context.setHint(Hints.CREATE_STACK);
         } else {
             context.setHint(Hints.CONFIGURE_INSTANCEGROUP);
