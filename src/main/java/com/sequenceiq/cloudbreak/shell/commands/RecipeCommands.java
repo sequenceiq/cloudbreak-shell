@@ -1,12 +1,12 @@
 package com.sequenceiq.cloudbreak.shell.commands;
 
-import static com.sequenceiq.cloudbreak.shell.support.TableRenderer.renderMultiValueMap;
 import static com.sequenceiq.cloudbreak.shell.support.TableRenderer.renderSingleMap;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -113,27 +113,22 @@ public class RecipeCommands implements CommandMarker {
             @CliOption(key = "id", mandatory = true, help = "Id of the recipe") String id) {
         try {
             Map<String, String> map = new HashMap<>();
-            Map<String, List<String>> plugins = new HashMap<>();
-            Map<String, String> keyvalues = new HashMap<>();
-            Map<String, List<String>> hostGroups = new HashMap<>();
+            List<String> plugins = new ArrayList<>();
+            Map<String, String> properties = new HashMap<>();
             Map<String, Object> recipeMap = cloudbreak.getRecipeMap(id);
 
             for (Map.Entry<String, Object> propertyEntry : recipeMap.entrySet()) {
                 if ("plugins".equals(propertyEntry.getKey().toString())) {
-                    plugins = (Map<String, List<String>>) propertyEntry.getValue();
-                } else if ("keyvalues".equals(propertyEntry.getKey().toString())) {
-                    keyvalues = (Map<String, String>) propertyEntry.getValue();
-                } else if ("blueprint".equals(propertyEntry.getKey().toString())) {
-                    hostGroups = (Map<String, List<String>>) propertyEntry.getValue();
+                    plugins = (List<String>) propertyEntry.getValue();
+                    map.put(propertyEntry.getKey(), plugins.toString());
+                } else if ("properties".equals(propertyEntry.getKey().toString())) {
+                    properties = (Map<String, String>) propertyEntry.getValue();
                 } else {
                     map.put(propertyEntry.getKey(), propertyEntry.getValue().toString());
                 }
             }
 
-            return renderSingleMap(map, "FIELD", "INFO") + "\n\n"
-                    + renderMultiValueMap(plugins, "PLUGIN", "PARAMETER") + "\n\n"
-                    + renderSingleMap(keyvalues, "CONSUL-KEY", "VALUE") + "\n\n"
-                    + renderMultiValueMap(hostGroups, "HOSTGROUP", "COMPONENT");
+            return renderSingleMap(map, "FIELD", "INFO") + "\n\n" + renderSingleMap(properties, "CONSUL-KEY", "VALUE") + "\n\n";
         } catch (HttpResponseException ex) {
             return ex.getResponse().getData().toString();
         } catch (Exception ex) {
