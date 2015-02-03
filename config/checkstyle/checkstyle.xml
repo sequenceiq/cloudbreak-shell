@@ -216,12 +216,12 @@
         <property name="message" value="Do not mess with JVM." />
         <property name="fileExtensions" value="java" />
     </module>
-    <module name="RegexpMultiline">
+<!--     <module name="RegexpMultiline">
         <property name="format" value="\.printStackTrace\(\)" />
         <property name="message" value="Avoid printing exception stack-trace onto console. Use logger or re-throw (in a wrapper)." />
         <property name="fileExtensions" value="java" />
     </module>
-    <module name="RegexpMultiline">
+ -->    <module name="RegexpMultiline">
         <property name="format" value="catch \(\w+ \w+\) \{\s*(Assert\s*\.)?\s*(fail\(|assertNotNull\(\w+\))" />
         <property name="message" value="Unnecessary catch. Add &quot;throws&quot; to test method." />
         <property name="fileExtensions" value="java" />
