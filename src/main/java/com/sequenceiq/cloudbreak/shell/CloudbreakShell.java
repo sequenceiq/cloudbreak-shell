@@ -98,5 +98,8 @@ public class CloudbreakShell implements CommandLineRunner, ShellStatusListener {
         if (!cloudbreak.getAccountStacks().isEmpty()) {
             context.setStackAccessible();
         }
+        if (!cloudbreak.getAccountRecipes().isEmpty()) {
+            context.setRecipeAccessible();
+        }
     }
 }

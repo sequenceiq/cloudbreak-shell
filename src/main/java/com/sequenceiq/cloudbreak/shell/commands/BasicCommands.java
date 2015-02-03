@@ -47,6 +47,7 @@ public class BasicCommands implements CommandMarker {
     public String context() {
         StringBuilder sb = new StringBuilder();
         sb.append(getRow("blueprintId", context.getBlueprintId()));
+        sb.append(getRow("recipeId", context.getRecipeId()));
         sb.append(getRow("credentialId", context.getCredentialId()));
         sb.append(getRow("stackId", context.getStackId()));
         sb.append(getRow("stackName", context.getStackName()));

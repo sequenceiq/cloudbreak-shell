@@ -47,13 +47,17 @@ public class ClusterCommands implements CommandMarker {
         }
     }
 
-    @CliCommand(value = "cluster create", help = "Create a new cluster based on a blueprint and template")
+    @CliCommand(value = "cluster create", help = "Create a new cluster based on a blueprint and optionally a recipe")
     public String createCluster(
             @CliOption(key = "description", mandatory = false, help = "Description of the blueprint") String description) {
         try {
-            cloudbreak.postCluster(context.getStackName(), parseInt(context.getBlueprintId()), description, parseInt(context.getStackId()));
+            Integer recipeId = null;
+            if (context.isRecipeAvailable()) {
+                recipeId = parseInt(context.getRecipeId());
+            }
+            cloudbreak.postCluster(context.getStackName(), parseInt(context.getBlueprintId()), recipeId, description, parseInt(context.getStackId()));
             context.setHint(Hints.NONE);
-            return "Cluster created";
+            return "Cluster creation started";
         } catch (HttpResponseException ex) {
             return ex.getResponse().getData().toString();
         } catch (Exception ex) {

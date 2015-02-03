@@ -154,9 +154,9 @@ public class BlueprintCommands implements CommandMarker {
             @CliOption(key = "url", mandatory = false, help = "URL of the blueprint to download from") String url,
             @CliOption(key = "file", mandatory = false, help = "File which contains the blueprint") File file,
             @CliOption(key = "publicInAccount", mandatory = false, help = "flags if the blueprint is public in the account") Boolean publicInAccount) {
-        String message;
         try {
-            String json = file == null ? readContent(url) : readContent(file);
+            String message;
+            String json = file == null ? IOUtils.toString(new URL(url)) : IOUtils.toString(new FileInputStream(file));
             if (json != null) {
                 String id = cloudbreak.postBlueprint(name, description, json, publicInAccount);
                 context.addBlueprint(id);
@@ -175,26 +175,6 @@ public class BlueprintCommands implements CommandMarker {
         } catch (Exception ex) {
             return ex.toString();
         }
-    }
-
-    private String readContent(File file) {
-        String content = null;
-        try {
-            content = IOUtils.toString(new FileInputStream(file));
-        } catch (IOException e) {
-            e.toString();
-        }
-        return content;
-    }
-
-    private String readContent(String url) {
-        String content = null;
-        try {
-            content = IOUtils.toString(new URL(url));
-        } catch (IOException e) {
-            e.toString();
-        }
-        return content;
     }
 
     private String getBlueprintName(String json) {
