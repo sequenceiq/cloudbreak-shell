@@ -57,6 +57,7 @@ public class CloudbreakShell implements CommandLineRunner, ShellStatusListener {
                 }
             } catch (Exception e) {
                 System.out.println("Can't connect to Cloudbreak");
+                e.printStackTrace();
                 shell.executeCommand("quit");
             }
         }
@@ -84,6 +85,7 @@ public class CloudbreakShell implements CommandLineRunner, ShellStatusListener {
         try {
             new SpringApplicationBuilder(CloudbreakShell.class).showBanner(false).run(args);
         } catch (Exception e) {
+            e.printStackTrace();
             System.out.println("Cloudbreak shell cannot be started.");
         }
     }
