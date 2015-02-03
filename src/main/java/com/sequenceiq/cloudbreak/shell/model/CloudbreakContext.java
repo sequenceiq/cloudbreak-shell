@@ -77,6 +77,7 @@ public class CloudbreakContext {
 
     public void addBlueprint(String id) throws Exception {
         Map<String, Object> blueprintMap = client.getBlueprintMap(id);
+        this.instanceGroups = new HashMap<>();
         this.activeHostgoups = ((LinkedHashMap) blueprintMap.get("ambariBlueprint")).keySet();
         addProperty(PropertyKey.BLUEPRINT_ID, id);
         setBlueprintAccessible();
