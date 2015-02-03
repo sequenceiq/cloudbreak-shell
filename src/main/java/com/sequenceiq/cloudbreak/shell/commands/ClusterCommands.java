@@ -26,7 +26,7 @@ public class ClusterCommands implements CommandMarker {
 
     @CliAvailabilityIndicator(value = "cluster create")
     public boolean isClusterCreateCommandAvailable() {
-        return context.isBlueprintAvailable() || context.isRecipeAvailable() && context.isStackAvailable();
+        return context.isBlueprintAvailable() && context.isStackAvailable();
     }
 
     @CliAvailabilityIndicator(value = "cluster show")
