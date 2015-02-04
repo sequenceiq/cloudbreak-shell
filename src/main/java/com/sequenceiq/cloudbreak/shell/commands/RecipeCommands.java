@@ -80,6 +80,7 @@ public class RecipeCommands implements CommandMarker {
         try {
             String json = file == null ? IOUtils.toString(new URL(url)) : IOUtils.toString(new FileInputStream(file));
             String id = cloudbreak.postRecipe(json, publicInAccount);
+            context.addRecipe(id);
             return String.format("Recipe '%s' has been added with id: %s", getRecipeName(json), id);
         } catch (HttpResponseException ex) {
             return ex.getResponse().getData().toString();
