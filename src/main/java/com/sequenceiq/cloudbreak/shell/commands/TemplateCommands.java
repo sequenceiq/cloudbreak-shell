@@ -52,18 +52,8 @@ public class TemplateCommands implements CommandMarker {
         return true;
     }
 
-    @CliAvailabilityIndicator(value = "template create --EC2")
+    @CliAvailabilityIndicator(value = "template create")
     public boolean isTemplateEc2CreateCommandAvailable() {
-        return true;
-    }
-
-    @CliAvailabilityIndicator(value = "template create --GCP")
-    public boolean isTemplateGcpCreateCommandAvailable() {
-        return true;
-    }
-
-    @CliAvailabilityIndicator(value = "template create --AZURE")
-    public boolean isTemplateAzureCreateCommandAvailable() {
         return true;
     }
 

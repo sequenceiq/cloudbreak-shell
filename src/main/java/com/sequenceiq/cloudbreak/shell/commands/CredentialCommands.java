@@ -59,18 +59,8 @@ public class CredentialCommands implements CommandMarker {
         return context.isCredentialAccessible();
     }
 
-    @CliAvailabilityIndicator(value = "credential create --EC2")
+    @CliAvailabilityIndicator(value = "credential create")
     public boolean isCredentialEc2CreateCommandAvailable() {
-        return true;
-    }
-
-    @CliAvailabilityIndicator(value = "credential create --GCP")
-    public boolean isCredentialGcpCreateCommandAvailable() {
-        return true;
-    }
-
-    @CliAvailabilityIndicator(value = "credential create --AZURE")
-    public boolean isCredentialAzureCreateCommandAvailable() {
         return true;
     }
 
