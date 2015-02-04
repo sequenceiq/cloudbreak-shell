@@ -52,7 +52,7 @@ public class TemplateCommands implements CommandMarker {
         return true;
     }
 
-    @CliAvailabilityIndicator(value = "template create")
+    @CliAvailabilityIndicator({ "template create --GCP", "template create --EC2", "template create --AZURE" })
     public boolean isTemplateEc2CreateCommandAvailable() {
         return true;
     }

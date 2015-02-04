@@ -44,7 +44,7 @@ public class StackCommands implements CommandMarker {
                 && context.getActiveHostgoups().size() != 0);
     }
 
-    @CliAvailabilityIndicator(value = "stack node")
+    @CliAvailabilityIndicator({ "stack node --ADD", "stack node --REMOVE" })
     public boolean isStackNodeCommandAvailable() {
         return context.isStackAvailable();
     }

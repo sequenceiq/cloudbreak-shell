@@ -34,7 +34,7 @@ public class ClusterCommands implements CommandMarker {
         return true;
     }
 
-    @CliAvailabilityIndicator(value = "cluster node")
+    @CliAvailabilityIndicator({ "cluster node --ADD", "cluster node --REMOVE" })
     public boolean isClusterNodeCommandAvailable() {
         return context.isStackAvailable();
     }
