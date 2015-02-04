@@ -76,7 +76,7 @@ public class StackCommands implements CommandMarker {
         }
     }
 
-    @CliCommand(value = "stack node --REMOVE", help = "Remove nodes to the cluster")
+    @CliCommand(value = "stack node --REMOVE", help = "Remove nodes from the cluster")
     public String removeNodeToStack(
             @CliOption(key = "instanceGroup", mandatory = true, help = "Name of the instanceGroup") String instanceGroup,
             @CliOption(key = "adjustment", mandatory = true, help = "Count of the nodes which will be removed to the stack") Integer adjustment) {

@@ -56,7 +56,7 @@ public class ClusterCommands implements CommandMarker {
         }
     }
 
-    @CliCommand(value = "cluster node --REMOVE", help = "Remove nodes to the cluster")
+    @CliCommand(value = "cluster node --REMOVE", help = "Remove nodes from the cluster")
     public String removeNodeToCluster(
             @CliOption(key = "hostgroup", mandatory = true, help = "Name of the hostgroup") String hostGroup,
             @CliOption(key = "adjustment", mandatory = true, help = "Count of the nodes which will be removed to the cluster") Integer adjustment) {
