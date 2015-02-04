@@ -44,12 +44,12 @@ public class StackCommands implements CommandMarker {
                 && context.getActiveHostgoups().size() != 0);
     }
 
-    @CliAvailabilityIndicator(value = "stack node --add")
+    @CliAvailabilityIndicator(value = "stack node --ADD")
     public boolean isStackAddNodeCommandAvailable() {
         return context.isStackAvailable();
     }
 
-    @CliAvailabilityIndicator(value = "stack node --remove")
+    @CliAvailabilityIndicator(value = "stack node --REMOVE")
     public boolean isStackRemoveNodeCommandAvailable() {
         return context.isStackAvailable();
     }
@@ -64,25 +64,25 @@ public class StackCommands implements CommandMarker {
         return context.isStackAccessible();
     }
 
-    @CliCommand(value = "stack node --add", help = "Add new nodes to the cluster")
+    @CliCommand(value = "stack node --ADD", help = "Add new nodes to the cluster")
     public String addNodeToStack(
-            @CliOption(key = "hostgroup", mandatory = true, help = "Hostgroup name") String hostGroup,
-            @CliOption(key = "nodeCount", mandatory = true, help = "NodeCount") Integer nodeCount) {
+            @CliOption(key = "instanceGroup", mandatory = true, help = "Name of the instanceGroup") String instanceGroup,
+            @CliOption(key = "adjustment", mandatory = true, help = "Count of the nodes which will be added to the stack") Integer adjustment) {
         try {
-            cloudbreak.putStack(Integer.valueOf(context.getStackId()), hostGroup, nodeCount);
-            return "OK";
+            cloudbreak.putStack(Integer.valueOf(context.getStackId()), instanceGroup, adjustment);
+            return context.getStackId();
         } catch (Exception ex) {
             return ex.toString();
         }
     }
 
-    @CliCommand(value = "stack node --remove", help = "Remove nodes to the cluster")
+    @CliCommand(value = "stack node --REMOVE", help = "Remove nodes to the cluster")
     public String removeNodeToStack(
-            @CliOption(key = "hostgroup", mandatory = true, help = "Hostgroup name") String hostGroup,
-            @CliOption(key = "nodeCount", mandatory = true, help = "NodeCount") Integer nodeCount) {
+            @CliOption(key = "instanceGroup", mandatory = true, help = "Name of the instanceGroup") String instanceGroup,
+            @CliOption(key = "adjustment", mandatory = true, help = "Count of the nodes which will be removed to the stack") Integer adjustment) {
         try {
-            cloudbreak.putStack(Integer.valueOf(context.getStackId()), hostGroup, nodeCount);
-            return "OK";
+            cloudbreak.putStack(Integer.valueOf(context.getStackId()), instanceGroup, adjustment * (-1));
+            return context.getStackId();
         } catch (Exception ex) {
             return ex.toString();
         }

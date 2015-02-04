@@ -34,35 +34,35 @@ public class ClusterCommands implements CommandMarker {
         return true;
     }
 
-    @CliAvailabilityIndicator(value = "cluster node --add")
+    @CliAvailabilityIndicator(value = "cluster node --ADD")
     public boolean isClusterAddNodeCommandAvailable() {
         return context.isStackAvailable();
     }
 
-    @CliAvailabilityIndicator(value = "cluster node --remove")
+    @CliAvailabilityIndicator(value = "cluster node --REMOVE")
     public boolean isClusterRemoveNodeCommandAvailable() {
         return context.isStackAvailable();
     }
 
-    @CliCommand(value = "cluster node --add", help = "Add new nodes to the cluster")
+    @CliCommand(value = "cluster node --ADD", help = "Add new nodes to the cluster")
     public String addNodeToCluster(
-            @CliOption(key = "hostgroup", mandatory = true, help = "Hostgroup name") String hostGroup,
-            @CliOption(key = "nodeCount", mandatory = true, help = "NodeCount") Integer nodeCount) {
+            @CliOption(key = "hostgroup", mandatory = true, help = "Name of the hostgroup") String hostGroup,
+            @CliOption(key = "adjustment", mandatory = true, help = "Count of the nodes which will be added to the cluster") Integer adjustment) {
         try {
-            cloudbreak.putCluster(Integer.valueOf(context.getStackId()), hostGroup, nodeCount);
-            return "OK";
+            cloudbreak.putCluster(Integer.valueOf(context.getStackId()), hostGroup, adjustment);
+            return context.getStackId();
         } catch (Exception ex) {
             return ex.toString();
         }
     }
 
-    @CliCommand(value = "cluster node --remove", help = "Remove nodes to the cluster")
+    @CliCommand(value = "cluster node --REMOVE", help = "Remove nodes to the cluster")
     public String removeNodeToCluster(
-            @CliOption(key = "hostgroup", mandatory = true, help = "Hostgroup name") String hostGroup,
-            @CliOption(key = "nodeCount", mandatory = true, help = "NodeCount") Integer nodeCount) {
+            @CliOption(key = "hostgroup", mandatory = true, help = "Name of the hostgroup") String hostGroup,
+            @CliOption(key = "adjustment", mandatory = true, help = "Count of the nodes which will be removed to the cluster") Integer adjustment) {
         try {
-            cloudbreak.putCluster(Integer.valueOf(context.getStackId()), hostGroup, nodeCount);
-            return "OK";
+            cloudbreak.putCluster(Integer.valueOf(context.getStackId()), hostGroup, adjustment * (-1));
+            return context.getStackId();
         } catch (Exception ex) {
             return ex.toString();
         }
