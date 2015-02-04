@@ -34,6 +34,40 @@ public class ClusterCommands implements CommandMarker {
         return true;
     }
 
+    @CliAvailabilityIndicator(value = "cluster node --add")
+    public boolean isClusterAddNodeCommandAvailable() {
+        return context.isStackAvailable();
+    }
+
+    @CliAvailabilityIndicator(value = "cluster node --remove")
+    public boolean isClusterRemoveNodeCommandAvailable() {
+        return context.isStackAvailable();
+    }
+
+    @CliCommand(value = "cluster node --add", help = "Add new nodes to the cluster")
+    public String addNodeToCluster(
+            @CliOption(key = "hostgroup", mandatory = true, help = "Hostgroup name") String hostGroup,
+            @CliOption(key = "nodeCount", mandatory = true, help = "NodeCount") Integer nodeCount) {
+        try {
+            cloudbreak.putCluster(Integer.valueOf(context.getStackId()), hostGroup, nodeCount);
+            return "OK";
+        } catch (Exception ex) {
+            return ex.toString();
+        }
+    }
+
+    @CliCommand(value = "cluster node --remove", help = "Remove nodes to the cluster")
+    public String removeNodeToCluster(
+            @CliOption(key = "hostgroup", mandatory = true, help = "Hostgroup name") String hostGroup,
+            @CliOption(key = "nodeCount", mandatory = true, help = "NodeCount") Integer nodeCount) {
+        try {
+            cloudbreak.putCluster(Integer.valueOf(context.getStackId()), hostGroup, nodeCount);
+            return "OK";
+        } catch (Exception ex) {
+            return ex.toString();
+        }
+    }
+
     @CliCommand(value = "cluster show", help = "Shows the cluster by stack id")
     public Object showCluster() {
         try {

@@ -44,6 +44,16 @@ public class StackCommands implements CommandMarker {
                 && context.getActiveHostgoups().size() != 0);
     }
 
+    @CliAvailabilityIndicator(value = "stack node --add")
+    public boolean isStackAddNodeCommandAvailable() {
+        return context.isStackAvailable();
+    }
+
+    @CliAvailabilityIndicator(value = "stack node --remove")
+    public boolean isStackRemoveNodeCommandAvailable() {
+        return context.isStackAvailable();
+    }
+
     @CliAvailabilityIndicator(value = "stack show")
     public boolean isStackShowCommandAvailable() {
         return true;
@@ -52,6 +62,30 @@ public class StackCommands implements CommandMarker {
     @CliAvailabilityIndicator(value = "stack select")
     public boolean isStackSelectCommandAvailable() throws Exception {
         return context.isStackAccessible();
+    }
+
+    @CliCommand(value = "stack node --add", help = "Add new nodes to the cluster")
+    public String addNodeToStack(
+            @CliOption(key = "hostgroup", mandatory = true, help = "Hostgroup name") String hostGroup,
+            @CliOption(key = "nodeCount", mandatory = true, help = "NodeCount") Integer nodeCount) {
+        try {
+            cloudbreak.putStack(Integer.valueOf(context.getStackId()), hostGroup, nodeCount);
+            return "OK";
+        } catch (Exception ex) {
+            return ex.toString();
+        }
+    }
+
+    @CliCommand(value = "stack node --remove", help = "Remove nodes to the cluster")
+    public String removeNodeToStack(
+            @CliOption(key = "hostgroup", mandatory = true, help = "Hostgroup name") String hostGroup,
+            @CliOption(key = "nodeCount", mandatory = true, help = "NodeCount") Integer nodeCount) {
+        try {
+            cloudbreak.putStack(Integer.valueOf(context.getStackId()), hostGroup, nodeCount);
+            return "OK";
+        } catch (Exception ex) {
+            return ex.toString();
+        }
     }
 
     @CliCommand(value = "stack create", help = "Create a new stack based on a template")
