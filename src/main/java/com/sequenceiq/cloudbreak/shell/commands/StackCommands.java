@@ -44,6 +44,11 @@ public class StackCommands implements CommandMarker {
                 && context.getActiveHostgoups().size() != 0);
     }
 
+    @CliAvailabilityIndicator({ "stack node --ADD", "stack node --REMOVE" })
+    public boolean isStackNodeCommandAvailable() {
+        return context.isStackAvailable();
+    }
+
     @CliAvailabilityIndicator(value = "stack show")
     public boolean isStackShowCommandAvailable() {
         return true;
@@ -52,6 +57,30 @@ public class StackCommands implements CommandMarker {
     @CliAvailabilityIndicator(value = "stack select")
     public boolean isStackSelectCommandAvailable() throws Exception {
         return context.isStackAccessible();
+    }
+
+    @CliCommand(value = "stack node --ADD", help = "Add new nodes to the cluster")
+    public String addNodeToStack(
+            @CliOption(key = "instanceGroup", mandatory = true, help = "Name of the instanceGroup") String instanceGroup,
+            @CliOption(key = "adjustment", mandatory = true, help = "Count of the nodes which will be added to the stack") Integer adjustment) {
+        try {
+            cloudbreak.putStack(Integer.valueOf(context.getStackId()), instanceGroup, adjustment);
+            return context.getStackId();
+        } catch (Exception ex) {
+            return ex.toString();
+        }
+    }
+
+    @CliCommand(value = "stack node --REMOVE", help = "Remove nodes from the cluster")
+    public String removeNodeToStack(
+            @CliOption(key = "instanceGroup", mandatory = true, help = "Name of the instanceGroup") String instanceGroup,
+            @CliOption(key = "adjustment", mandatory = true, help = "Count of the nodes which will be removed to the stack") Integer adjustment) {
+        try {
+            cloudbreak.putStack(Integer.valueOf(context.getStackId()), instanceGroup, adjustment * (-1));
+            return context.getStackId();
+        } catch (Exception ex) {
+            return ex.toString();
+        }
     }
 
     @CliCommand(value = "stack create", help = "Create a new stack based on a template")
