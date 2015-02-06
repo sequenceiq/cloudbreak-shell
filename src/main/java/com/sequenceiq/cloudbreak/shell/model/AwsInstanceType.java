@@ -2,7 +2,6 @@ package com.sequenceiq.cloudbreak.shell.model;
 
 public enum AwsInstanceType {
 
-    M1Small,
     M1Medium,
     M1Large,
     M1Xlarge,
