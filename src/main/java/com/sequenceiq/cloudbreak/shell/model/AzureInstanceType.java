@@ -1,11 +1,6 @@
 package com.sequenceiq.cloudbreak.shell.model;
 
 public enum AzureInstanceType {
-    EXTRA_SMALL,
-    SMALL,
-    MEDIUM,
-    LARGE,
-    EXTRA_LARGE,
     A5,
     A6,
     A7,
