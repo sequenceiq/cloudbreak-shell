@@ -138,6 +138,8 @@ For the full list of available commands please check below. Please note that all
     * help - List all commands usage
     * hint - Shows some hints
     * quit - Exits the shell
+    * recipe add - Adds a recipe
+    * recipe select - Selects a recipe
     * script - Parses the specified resource file and executes its commands
     * stack create - Create a new stack based on a template
     * stack list - Shows all of your stack
