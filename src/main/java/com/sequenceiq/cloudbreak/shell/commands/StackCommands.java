@@ -67,7 +67,7 @@ public class StackCommands implements CommandMarker {
             @CliOption(key = "adjustment", mandatory = true, help = "Count of the nodes which will be added to the stack") Integer adjustment) {
         try {
             if (adjustment < 1) {
-                return "Adjustment can not be less than 1.";
+                return "The adjustment value in case of node addition should be at least 1.";
             }
             cloudbreak.putStack(Integer.valueOf(context.getStackId()), instanceGroup, adjustment);
             return context.getStackId();
@@ -82,7 +82,7 @@ public class StackCommands implements CommandMarker {
             @CliOption(key = "adjustment", mandatory = true, help = "Count of the nodes which will be removed to the stack") Integer adjustment) {
         try {
             if (adjustment > -1) {
-                return "Adjustment can not be higher than -1.";
+                return "The adjustment value in case of node removal should be negative.";
             }
             cloudbreak.putStack(Integer.valueOf(context.getStackId()), instanceGroup, adjustment * (-1));
             return context.getStackId();
@@ -98,7 +98,7 @@ public class StackCommands implements CommandMarker {
             @CliOption(key = "region", mandatory = true, help = "region of the stack") StackRegion region,
             @CliOption(key = "password", mandatory = true, specifiedDefaultValue = "admin", help = "Password of the Ambari server") String password,
             @CliOption(key = "image", mandatory = false, specifiedDefaultValue = "image-name", help = "Specific image name") String image,
-            @CliOption(key = "publicInAccount", mandatory = false, help = "flags if the stack is public in the account") Boolean publicInAccount,
+            @CliOption(key = "publicInAccount", mandatory = false, help = "marks the stack as visible for all members of the account") Boolean publicInAccount,
             @CliOption(key = "onFailureAction", mandatory = false, help = "onFailureAction which is ROLLBACK or DO_NOTHING.") OnFailureAction onFailureAction,
             @CliOption(key = "adjustmentType", mandatory = false, help = "adjustmentType which is EXACT or PERCENTAGE.") AdjustmentType adjustmentType,
             @CliOption(key = "threshold", mandatory = false, help = "threshold of failure") Long threshold) {
