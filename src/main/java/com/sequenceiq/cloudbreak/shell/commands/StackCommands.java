@@ -2,8 +2,8 @@ package com.sequenceiq.cloudbreak.shell.commands;
 
 import static com.sequenceiq.cloudbreak.shell.support.TableRenderer.renderSingleMap;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.CommandMarker;
@@ -14,8 +14,10 @@ import org.springframework.stereotype.Component;
 
 import com.sequenceiq.cloudbreak.client.CloudbreakClient;
 import com.sequenceiq.cloudbreak.shell.completion.StackRegion;
+import com.sequenceiq.cloudbreak.shell.model.AdjustmentType;
 import com.sequenceiq.cloudbreak.shell.model.CloudbreakContext;
 import com.sequenceiq.cloudbreak.shell.model.Hints;
+import com.sequenceiq.cloudbreak.shell.model.OnFailureAction;
 
 import groovyx.net.http.HttpResponseException;
 
@@ -64,6 +66,9 @@ public class StackCommands implements CommandMarker {
             @CliOption(key = "instanceGroup", mandatory = true, help = "Name of the instanceGroup") String instanceGroup,
             @CliOption(key = "adjustment", mandatory = true, help = "Count of the nodes which will be added to the stack") Integer adjustment) {
         try {
+            if (adjustment < 1) {
+                return "Adjustment can not be less than 1.";
+            }
             cloudbreak.putStack(Integer.valueOf(context.getStackId()), instanceGroup, adjustment);
             return context.getStackId();
         } catch (Exception ex) {
@@ -76,6 +81,9 @@ public class StackCommands implements CommandMarker {
             @CliOption(key = "instanceGroup", mandatory = true, help = "Name of the instanceGroup") String instanceGroup,
             @CliOption(key = "adjustment", mandatory = true, help = "Count of the nodes which will be removed to the stack") Integer adjustment) {
         try {
+            if (adjustment > -1) {
+                return "Adjustment can not be higher than -1.";
+            }
             cloudbreak.putStack(Integer.valueOf(context.getStackId()), instanceGroup, adjustment * (-1));
             return context.getStackId();
         } catch (Exception ex) {
@@ -90,8 +98,10 @@ public class StackCommands implements CommandMarker {
             @CliOption(key = "region", mandatory = true, help = "region of the stack") StackRegion region,
             @CliOption(key = "password", mandatory = true, specifiedDefaultValue = "admin", help = "Password of the Ambari server") String password,
             @CliOption(key = "image", mandatory = false, specifiedDefaultValue = "image-name", help = "Specific image name") String image,
-            @CliOption(key = "publicInAccount", mandatory = false, help = "flags if the stack is public in the account")
-            Boolean publicInAccount) {
+            @CliOption(key = "publicInAccount", mandatory = false, help = "flags if the stack is public in the account") Boolean publicInAccount,
+            @CliOption(key = "onFailureAction", mandatory = false, help = "onFailureAction which is ROLLBACK or DO_NOTHING.") OnFailureAction onFailureAction,
+            @CliOption(key = "adjustmentType", mandatory = false, help = "adjustmentType which is EXACT or PERCENTAGE.") AdjustmentType adjustmentType,
+            @CliOption(key = "threshold", mandatory = false, help = "threshold of failure") Long threshold) {
         try {
             String id =
                     cloudbreak.postStack(
@@ -102,6 +112,9 @@ public class StackCommands implements CommandMarker {
                             region.getName(),
                             publicInAccount == null ? false : publicInAccount,
                             context.getInstanceGroups(),
+                            onFailureAction == null ? OnFailureAction.ROLLBACK.name() : onFailureAction.name(),
+                            threshold == null ? 1L : threshold,
+                            adjustmentType == null ? AdjustmentType.EXACT.name() : adjustmentType.name(),
                             image);
             context.addStack(id, name);
             context.setHint(Hints.CREATE_CLUSTER);

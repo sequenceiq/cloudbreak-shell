@@ -44,6 +44,9 @@ public class ClusterCommands implements CommandMarker {
             @CliOption(key = "hostgroup", mandatory = true, help = "Name of the hostgroup") String hostGroup,
             @CliOption(key = "adjustment", mandatory = true, help = "Count of the nodes which will be added to the cluster") Integer adjustment) {
         try {
+            if (adjustment < 1) {
+                return "Adjustment can not be less than 1.";
+            }
             cloudbreak.putCluster(Integer.valueOf(context.getStackId()), hostGroup, adjustment);
             return context.getStackId();
         } catch (Exception ex) {
@@ -56,6 +59,9 @@ public class ClusterCommands implements CommandMarker {
             @CliOption(key = "hostgroup", mandatory = true, help = "Name of the hostgroup") String hostGroup,
             @CliOption(key = "adjustment", mandatory = true, help = "Count of the nodes which will be removed to the cluster") Integer adjustment) {
         try {
+            if (adjustment > -1) {
+                return "Adjustment can not be higher than -1.";
+            }
             cloudbreak.putCluster(Integer.valueOf(context.getStackId()), hostGroup, adjustment * (-1));
             return context.getStackId();
         } catch (Exception ex) {
