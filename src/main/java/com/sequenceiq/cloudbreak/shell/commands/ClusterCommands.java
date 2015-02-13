@@ -44,6 +44,9 @@ public class ClusterCommands implements CommandMarker {
             @CliOption(key = "hostgroup", mandatory = true, help = "Name of the hostgroup") String hostGroup,
             @CliOption(key = "adjustment", mandatory = true, help = "Count of the nodes which will be added to the cluster") Integer adjustment) {
         try {
+            if (adjustment < 1) {
+                return "The adjustment value in case of node addition should be at least 1.";
+            }
             cloudbreak.putCluster(Integer.valueOf(context.getStackId()), hostGroup, adjustment);
             return context.getStackId();
         } catch (Exception ex) {
@@ -54,8 +57,11 @@ public class ClusterCommands implements CommandMarker {
     @CliCommand(value = "cluster node --REMOVE", help = "Remove nodes from the cluster")
     public String removeNodeToCluster(
             @CliOption(key = "hostgroup", mandatory = true, help = "Name of the hostgroup") String hostGroup,
-            @CliOption(key = "adjustment", mandatory = true, help = "Count of the nodes which will be removed to the cluster") Integer adjustment) {
+            @CliOption(key = "adjustment", mandatory = true, help = "The number of the nodes to be removed from the cluster.") Integer adjustment) {
         try {
+            if (adjustment > -1) {
+                return "The adjustment value in case of node removal should be negative.";
+            }
             cloudbreak.putCluster(Integer.valueOf(context.getStackId()), hostGroup, adjustment * (-1));
             return context.getStackId();
         } catch (Exception ex) {
