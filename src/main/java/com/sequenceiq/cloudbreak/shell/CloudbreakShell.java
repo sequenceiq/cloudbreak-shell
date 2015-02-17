@@ -1,10 +1,15 @@
 package com.sequenceiq.cloudbreak.shell;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.shell.CommandLine;
 import org.springframework.shell.core.JLineShellComponent;
 import org.springframework.shell.event.ShellStatus;
@@ -63,7 +68,7 @@ public class CloudbreakShell implements CommandLineRunner, ShellStatusListener {
         }
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         if (args.length == 0) {
             System.out.println(
                     "\nCloudbreak Shell: Interactive command line tool for managing Cloudbreak.\n\n"
@@ -82,12 +87,26 @@ public class CloudbreakShell implements CommandLineRunner, ShellStatusListener {
             );
             return;
         }
+        if (args.length == 1 && ("--version".equals(args[0]) || "-v".equals(args[0]))) {
+            System.out.println("Cloudbreak shell version is: \n" + readFileFromClasspath("application.properties"));
+            return;
+        }
         try {
             new SpringApplicationBuilder(CloudbreakShell.class).showBanner(false).run(args);
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("Cloudbreak shell cannot be started.");
         }
+    }
+
+    public static final String readFileFromClasspath(String fileName) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        BufferedReader br;
+        br = new BufferedReader(new InputStreamReader(new ClassPathResource(fileName).getInputStream(), "UTF-8"));
+        for (int c = br.read(); c != -1; c = br.read()) {
+            sb.append((char) c);
+        }
+        return sb.toString();
     }
 
     private void initResourceAccessibility() throws Exception {
