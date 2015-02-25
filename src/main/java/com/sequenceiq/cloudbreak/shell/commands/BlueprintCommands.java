@@ -129,17 +129,25 @@ public class BlueprintCommands implements CommandMarker {
 
     @CliCommand(value = "blueprint select", help = "Select the blueprint by its id")
     public String selectBlueprint(
-            @CliOption(key = "id", mandatory = true, help = "Id of the blueprint") String id) {
-        String message;
+            @CliOption(key = "id", mandatory = false, help = "Id of the blueprint") String id,
+            @CliOption(key = "name", mandatory = false, help = "Name of the blueprint") String name) {
         try {
-            if (cloudbreak.getBlueprint(id) != null) {
-                context.addBlueprint(id);
-                context.setHint(Hints.CONFIGURE_INSTANCEGROUP);
-                message = String.format("Blueprint has been selected, id: %s", id);
-            } else {
-                message = "No blueprint specified";
+            if (id != null) {
+                if (cloudbreak.getBlueprint(id) != null) {
+                    context.addBlueprint(id);
+                    context.setHint(Hints.CONFIGURE_INSTANCEGROUP);
+                    return String.format("Blueprint has been selected, id: %s", id);
+                }
+            } else if (name != null) {
+                Object blueprint = cloudbreak.getBlueprintByName(name);
+                if (blueprint != null) {
+                    Map<String, Object> blueprintMap = (Map<String, Object>) blueprint;
+                    context.addBlueprint(blueprintMap.get("id").toString());
+                    context.setHint(Hints.CONFIGURE_INSTANCEGROUP);
+                    return String.format("Blueprint has been selected, name: %s", name);
+                }
             }
-            return message;
+            return "No blueprint specified (select a blueprint by --id or --name)";
         } catch (HttpResponseException ex) {
             return ex.getResponse().getData().toString();
         } catch (Exception ex) {

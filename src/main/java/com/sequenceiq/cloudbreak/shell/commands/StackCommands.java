@@ -128,16 +128,25 @@ public class StackCommands implements CommandMarker {
 
     @CliCommand(value = "stack select", help = "Select the stack by its id")
     public String selectStack(
-            @CliOption(key = "id", mandatory = true, help = "Id of the stack") String id) {
+            @CliOption(key = "id", mandatory = false, help = "Id of the stack") String id,
+            @CliOption(key = "id", mandatory = false, help = "Name of the stack") String name) {
         try {
-            Object stack = cloudbreak.getStack(id);
-            if (stack != null) {
-                context.addStack(id, ((HashMap) stack).get("name").toString());
-                context.setHint(Hints.CREATE_CLUSTER);
-                return "Stack selected, id: " + id;
-            } else {
-                return "No stack specified";
+            if (id != null) {
+                Object stack = cloudbreak.getStack(id);
+                if (stack != null) {
+                    context.addStack(id, ((HashMap) stack).get("name").toString());
+                    context.setHint(Hints.CREATE_CLUSTER);
+                    return "Stack selected, id: " + id;
+                }
+            } else if (name != null) {
+                Object stack = cloudbreak.getStackByName(name);
+                if (stack != null) {
+                    context.addStack(((HashMap) stack).get("id").toString(), name);
+                    context.setHint(Hints.CREATE_CLUSTER);
+                    return "Stack selected, name: " + name;
+                }
             }
+            return "No stack specified (select by using --id or --name)";
         } catch (HttpResponseException ex) {
             return ex.getResponse().getData().toString();
         } catch (Exception ex) {

@@ -91,17 +91,26 @@ public class RecipeCommands implements CommandMarker {
 
     @CliCommand(value = "recipe select", help = "Select the recipe by its id")
     public String selectRecipe(
-            @CliOption(key = "id", mandatory = true, help = "Id of the recipe") String id) {
+            @CliOption(key = "id", mandatory = false, help = "Id of the recipe") String id,
+            @CliOption(key = "name", mandatory = false, help = "Name of the recipe") String name) {
         String message;
         try {
-            if (cloudbreak.getRecipe(id) != null) {
-                context.addRecipe(id);
-                context.setHint(Hints.CREATE_STACK);
-                message = String.format("Recipe has been selected, id: %s", id);
-            } else {
-                message = String.format("Recipe '%s' cannot be found.", id);
+            if (id != null) {
+                if (cloudbreak.getRecipe(id) != null) {
+                    context.addRecipe(id);
+                    context.setHint(Hints.CREATE_STACK);
+                    return String.format("Recipe has been selected, id: %s", id);
+                }
+            } else if (name != null) {
+                Object recipe = cloudbreak.getRecipeByName(name);
+                if (recipe != null) {
+                    Map<String, Object> recipeMap = (Map<String, Object>) recipe;
+                    context.addRecipe(recipeMap.get("id").toString());
+                    context.setHint(Hints.CREATE_STACK);
+                    return String.format("Recipe has been selected, name: %s", name);
+                }
             }
-            return message;
+            return String.format("Recipe '%s' cannot be found.", id);
         } catch (HttpResponseException ex) {
             return ex.getResponse().getData().toString();
         } catch (Exception ex) {

@@ -93,18 +93,28 @@ public class CredentialCommands implements CommandMarker {
         }
     }
 
-    @CliCommand(value = "credential select", help = "Select the credential by its id")
+    @CliCommand(value = "credential select", help = "Select the credential by its id or name")
     public String selectCredential(
-            @CliOption(key = "id", mandatory = true, help = "Id of the credential") String id) {
+            @CliOption(key = "id", mandatory = false, help = "Id of the credential") String id,
+            @CliOption(key = "name", mandatory = false, help = "Name of the credential") String name) {
         try {
 
-            if (cloudbreak.getCredential(id) != null) {
-                context.setCredential(id);
-                createOrSelectTemplateHint();
-                return "Credential selected, id: " + id;
-            } else {
-                return "No credential specified";
+            if (id != null) {
+                if (cloudbreak.getCredential(id) != null) {
+                    context.setCredential(id);
+                    createOrSelectTemplateHint();
+                    return "Credential selected, id: " + id;
+                }
+            } else if (name != null) {
+                Object credential = cloudbreak.getCredentialByName(name);
+                if (credential != null) {
+                    Map<String, Object> credMap = (Map<String, Object>) credential;
+                    context.setCredential(credMap.get("id").toString());
+                    createOrSelectTemplateHint();
+                    return "Credential selected, name: " + name;
+                }
             }
+            return "No credential specified (select a credential by --id or --name)";
         } catch (Exception ex) {
             return ex.toString();
         }

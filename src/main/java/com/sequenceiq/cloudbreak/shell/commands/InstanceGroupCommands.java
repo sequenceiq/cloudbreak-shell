@@ -41,10 +41,25 @@ public class InstanceGroupCommands implements CommandMarker {
     public String createInstanceGroup(
             @CliOption(key = "hostgroup", mandatory = true, help = "Name of the hostgroup") HostGroup hostgroup,
             @CliOption(key = "nodecount", mandatory = true, help = "Nodecount for hostgroup") Integer nodeCount,
-            @CliOption(key = "templateId", mandatory = true, help = "TemplateId of the hostgroup") InstanceGroupTemplateId instanceGroupTemplateId)
+            @CliOption(key = "templateId", mandatory = false, help = "TemplateId of the hostgroup") InstanceGroupTemplateId instanceGroupTemplateId,
+            @CliOption(key = "templateName", mandatory = false, help = "TemplateName of the hostgroup") String instanceGroupTemplateName)
             throws Exception {
+        String templateId = null;
+        if (instanceGroupTemplateId != null) {
+            templateId = instanceGroupTemplateId.getName();
+        } else if (instanceGroupTemplateName != null) {
+            Object template = cloudbreak.getTemplateByName(instanceGroupTemplateName);
+            if (template != null) {
+                Map<String, Object> templateMap = (Map<String, Object>) template;
+                templateId = templateMap.get("id").toString();
+            } else {
+                return String.format("Template not found by name: %s", instanceGroupTemplateName);
+            }
+        } else {
+            return "Template name or id is not defined for host group (use --templateName or --templateId)";
+        }
         Map<Long, Integer> map = new HashMap<>();
-        map.put(Long.parseLong(instanceGroupTemplateId.getName()), nodeCount);
+        map.put(Long.parseLong(templateId), nodeCount);
         context.putInstanceGroup(hostgroup.getName(), map);
         if (context.getActiveHostgoups().size() == context.getInstanceGroups().size() && context.getActiveHostgoups().size() != 0) {
             context.setHint(Hints.CREATE_STACK);
@@ -52,6 +67,7 @@ public class InstanceGroupCommands implements CommandMarker {
             context.setHint(Hints.CONFIGURE_INSTANCEGROUP);
         }
         return renderObjectMapValueMap(context.getInstanceGroups(), "hostgroup", "templateId", "nodeCount");
+
     }
 
     @CliCommand(value = "instancegroup show", help = "Configure instance groups")
