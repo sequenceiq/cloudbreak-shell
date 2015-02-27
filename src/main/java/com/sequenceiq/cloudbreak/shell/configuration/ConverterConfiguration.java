@@ -1,5 +1,6 @@
 package com.sequenceiq.cloudbreak.shell.configuration;
 
+import com.sequenceiq.cloudbreak.shell.converter.InstanceGroupTemplateNameConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -118,6 +119,11 @@ public class ConverterConfiguration {
     @Bean
     Converter templateIdConverter() {
         return new InstanceGroupTemplateIdConverter(client);
+    }
+
+    @Bean
+    Converter templateNameConverter() {
+        return new InstanceGroupTemplateNameConverter(client);
     }
 
     @Bean

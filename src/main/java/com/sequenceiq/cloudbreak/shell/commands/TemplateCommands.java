@@ -194,11 +194,22 @@ public class TemplateCommands implements CommandMarker {
     }
 
 
-    @CliCommand(value = "template show", help = "Shows the template by its id")
-    public Object showTemlate(
-            @CliOption(key = "id", mandatory = true, help = "Id of the template") String id) {
+    @CliCommand(value = "template show", help = "Shows the template by its id or name")
+    public Object showTemplate(
+            @CliOption(key = "id", mandatory = false, help = "Id of the template") String id,
+            @CliOption(key = "name", mandatory = false, help = "Name of the template") String name) {
         try {
-            return renderSingleMap(cloudbreak.getTemplateMap(id), "FIELD", "VALUE");
+            if (id != null) {
+                return renderSingleMap(cloudbreak.getTemplateMap(id), "FIELD", "VALUE");
+            } else if (name != null) {
+                Object template = cloudbreak.getTemplateByName(name);
+                if (template != null) {
+                    Map<String, Object> mTemp = (Map<String, Object>) template;
+                    String tempId = mTemp.get("id").toString();
+                    return renderSingleMap(cloudbreak.getTemplateMap(tempId), "FIELD", "VALUE");
+                }
+            }
+            return "No template specified.";
         } catch (HttpResponseException ex) {
             return ex.getResponse().getData().toString();
         } catch (Exception ex) {
@@ -206,11 +217,17 @@ public class TemplateCommands implements CommandMarker {
         }
     }
 
-    @CliCommand(value = "template delete", help = "Shows the template by its id")
-    public Object deleteTemlate(
-            @CliOption(key = "id", mandatory = true, help = "Id of the template") String id) {
+    @CliCommand(value = "template delete", help = "Shows the template by its id or name")
+    public Object deleteTemplate(
+            @CliOption(key = "id", mandatory = false, help = "Id of the template") String id,
+            @CliOption(key = "name", mandatory = false, help = "Name of the template") String name) {
         try {
-            return cloudbreak.deleteTemplate(id);
+            if (id != null) {
+                return cloudbreak.deleteTemplate(id);
+            } else if (name != null) {
+                return cloudbreak.deleteTemplateByName(name);
+            }
+            return "No template specified.";
         } catch (HttpResponseException ex) {
             return ex.getResponse().getData().toString();
         } catch (Exception ex) {

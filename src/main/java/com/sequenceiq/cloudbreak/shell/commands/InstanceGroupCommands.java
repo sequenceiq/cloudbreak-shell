@@ -5,6 +5,9 @@ import static com.sequenceiq.cloudbreak.shell.support.TableRenderer.renderObject
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.common.primitives.Longs;
+import com.sequenceiq.cloudbreak.shell.completion.InstanceGroupTemplateName;
+import groovyx.net.http.HttpResponseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.CommandMarker;
 import org.springframework.shell.core.annotation.CliAvailabilityIndicator;
@@ -42,32 +45,42 @@ public class InstanceGroupCommands implements CommandMarker {
             @CliOption(key = "hostgroup", mandatory = true, help = "Name of the hostgroup") HostGroup hostgroup,
             @CliOption(key = "nodecount", mandatory = true, help = "Nodecount for hostgroup") Integer nodeCount,
             @CliOption(key = "templateId", mandatory = false, help = "TemplateId of the hostgroup") InstanceGroupTemplateId instanceGroupTemplateId,
-            @CliOption(key = "templateName", mandatory = false, help = "TemplateName of the hostgroup") String instanceGroupTemplateName)
+            @CliOption(key = "templateName", mandatory = false, help = "TemplateName of the hostgroup") InstanceGroupTemplateName instanceGroupTemplateName)
             throws Exception {
-        String templateId = null;
-        if (instanceGroupTemplateId != null) {
-            templateId = instanceGroupTemplateId.getName();
-        } else if (instanceGroupTemplateName != null) {
-            Object template = cloudbreak.getTemplateByName(instanceGroupTemplateName);
-            if (template != null) {
-                Map<String, Object> templateMap = (Map<String, Object>) template;
-                templateId = templateMap.get("id").toString();
+        try {
+            String templateId = null;
+            if (instanceGroupTemplateId != null) {
+                templateId = instanceGroupTemplateId.getName();
+            } else if (instanceGroupTemplateName != null) {
+                Object template = cloudbreak.getTemplateByName(instanceGroupTemplateName.getName());
+                if (template != null) {
+                    Map<String, Object> templateMap = (Map<String, Object>) template;
+                    templateId = templateMap.get("id").toString();
+                } else {
+                    return String.format("Template not found by name: %s", instanceGroupTemplateName.getName());
+                }
             } else {
-                return String.format("Template not found by name: %s", instanceGroupTemplateName);
+                return "Template name or id is not defined for host group (use --templateName or --templateId)";
             }
-        } else {
-            return "Template name or id is not defined for host group (use --templateName or --templateId)";
+            Long parsedTemplateId = Longs.tryParse(templateId);
+            if (parsedTemplateId != null) {
+                Map<Long, Integer> map = new HashMap<>();
+                map.put(parsedTemplateId, nodeCount);
+                context.putInstanceGroup(hostgroup.getName(), map);
+                if (context.getActiveHostgoups().size() == context.getInstanceGroups().size() && context.getActiveHostgoups().size() != 0) {
+                    context.setHint(Hints.CREATE_STACK);
+                } else {
+                    context.setHint(Hints.CONFIGURE_INSTANCEGROUP);
+                }
+                return renderObjectMapValueMap(context.getInstanceGroups(), "hostgroup", "templateId", "nodeCount");
+            } else {
+                return "TemplateId is not a number.";
+            }
+        } catch (HttpResponseException ex) {
+            return ex.getResponse().getData().toString();
+        } catch (Exception ex) {
+            return ex.toString();
         }
-        Map<Long, Integer> map = new HashMap<>();
-        map.put(Long.parseLong(templateId), nodeCount);
-        context.putInstanceGroup(hostgroup.getName(), map);
-        if (context.getActiveHostgoups().size() == context.getInstanceGroups().size() && context.getActiveHostgoups().size() != 0) {
-            context.setHint(Hints.CREATE_STACK);
-        } else {
-            context.setHint(Hints.CONFIGURE_INSTANCEGROUP);
-        }
-        return renderObjectMapValueMap(context.getInstanceGroups(), "hostgroup", "templateId", "nodeCount");
-
     }
 
     @CliCommand(value = "instancegroup show", help = "Configure instance groups")
