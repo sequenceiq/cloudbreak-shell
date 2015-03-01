@@ -79,11 +79,18 @@ public class BlueprintCommands implements CommandMarker {
         return message;
     }
 
-    @CliCommand(value = "blueprint delete", help = "Delete the blueprint by its id")
+    @CliCommand(value = "blueprint delete", help = "Delete the blueprint by its id or name")
     public Object deleteBlueprint(
-            @CliOption(key = "id", mandatory = true, help = "Id of the blueprint") String id) {
+            @CliOption(key = "id", mandatory = false, help = "Id of the blueprint") String id,
+            @CliOption(key = "name", mandatory = false, help = "Name of the blueprint") String name) {
         try {
-            return cloudbreak.deleteBlueprint(id);
+            if (id != null) {
+                return cloudbreak.deleteBlueprint(id);
+            } else if (name != null) {
+                return cloudbreak.deleteBlueprintByName(name);
+            } else {
+                return "No blueprint specified (select a blueprint by --id or --name)";
+            }
         } catch (HttpResponseException ex) {
             return ex.getResponse().getData().toString();
         } catch (Exception ex) {
@@ -102,13 +109,28 @@ public class BlueprintCommands implements CommandMarker {
         }
     }
 
-    @CliCommand(value = "blueprint show", help = "Shows the blueprint by its id")
+    @CliCommand(value = "blueprint show", help = "Shows the blueprint by its id or name")
     public Object showBlueprint(
-            @CliOption(key = "id", mandatory = true, help = "Id of the blueprint") String id) {
+            @CliOption(key = "id", mandatory = false, help = "Id of the blueprint") String id,
+            @CliOption(key = "name", mandatory = false, help = "Name of the blueprint") String name) {
         try {
+            Map<String, Object> blueprintMap = null;
+            if (id != null) {
+                blueprintMap = cloudbreak.getBlueprintMap(id);
+            } else if (name != null) {
+                Object blueprint = cloudbreak.getBlueprintByName(name);
+                if (blueprint != null) {
+                    Map<String, Object> blMap = (Map<String, Object>) blueprint;
+                    String blueprintId = blMap.get("id").toString();
+                    blueprintMap = cloudbreak.getBlueprintMap(blueprintId);
+                } else {
+                    return "No blueprints specified.";
+                }
+            } else {
+                return "No blueprints specified.";
+            }
             Map<String, String> map = new HashMap<>();
             Map<String, List<String>> hosts = new HashMap<>();
-            Map<String, Object> blueprintMap = cloudbreak.getBlueprintMap(id);
 
             for (Map.Entry<String, Object> stringStringEntry : blueprintMap.entrySet()) {
                 if ("ambariBlueprint".equals(stringStringEntry.getKey().toString())) {
@@ -127,19 +149,27 @@ public class BlueprintCommands implements CommandMarker {
 
     }
 
-    @CliCommand(value = "blueprint select", help = "Select the blueprint by its id")
+    @CliCommand(value = "blueprint select", help = "Select the blueprint by its id or name")
     public String selectBlueprint(
-            @CliOption(key = "id", mandatory = true, help = "Id of the blueprint") String id) {
-        String message;
+            @CliOption(key = "id", mandatory = false, help = "Id of the blueprint") String id,
+            @CliOption(key = "name", mandatory = false, help = "Name of the blueprint") String name) {
         try {
-            if (cloudbreak.getBlueprint(id) != null) {
-                context.addBlueprint(id);
-                context.setHint(Hints.CONFIGURE_INSTANCEGROUP);
-                message = String.format("Blueprint has been selected, id: %s", id);
-            } else {
-                message = "No blueprint specified";
+            if (id != null) {
+                if (cloudbreak.getBlueprint(id) != null) {
+                    context.addBlueprint(id);
+                    context.setHint(Hints.CONFIGURE_INSTANCEGROUP);
+                    return String.format("Blueprint has been selected, id: %s", id);
+                }
+            } else if (name != null) {
+                Object blueprint = cloudbreak.getBlueprintByName(name);
+                if (blueprint != null) {
+                    Map<String, Object> blueprintMap = (Map<String, Object>) blueprint;
+                    context.addBlueprint(blueprintMap.get("id").toString());
+                    context.setHint(Hints.CONFIGURE_INSTANCEGROUP);
+                    return String.format("Blueprint has been selected, name: %s", name);
+                }
             }
-            return message;
+            return "No blueprint specified (select a blueprint by --id or --name)";
         } catch (HttpResponseException ex) {
             return ex.getResponse().getData().toString();
         } catch (Exception ex) {

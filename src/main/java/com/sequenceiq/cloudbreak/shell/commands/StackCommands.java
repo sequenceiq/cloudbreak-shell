@@ -94,9 +94,9 @@ public class StackCommands implements CommandMarker {
     @CliCommand(value = "stack create", help = "Create a new stack based on a template")
     public String createStack(
             @CliOption(key = "name", mandatory = true, help = "Name of the stack") String name,
-            @CliOption(key = "userName", mandatory = true, specifiedDefaultValue = "admin", help = "Username of the Ambari server") String userName,
+            @CliOption(key = "userName", mandatory = false, unspecifiedDefaultValue = "admin", help = "Username of the Ambari server") String userName,
             @CliOption(key = "region", mandatory = true, help = "region of the stack") StackRegion region,
-            @CliOption(key = "password", mandatory = true, specifiedDefaultValue = "admin", help = "Password of the Ambari server") String password,
+            @CliOption(key = "password", mandatory = false, unspecifiedDefaultValue = "admin", help = "Password of the Ambari server") String password,
             @CliOption(key = "image", mandatory = false, specifiedDefaultValue = "image-name", help = "Specific image name") String image,
             @CliOption(key = "publicInAccount", mandatory = false, help = "marks the stack as visible for all members of the account") Boolean publicInAccount,
             @CliOption(key = "onFailureAction", mandatory = false, help = "onFailureAction which is ROLLBACK or DO_NOTHING.") OnFailureAction onFailureAction,
@@ -128,16 +128,25 @@ public class StackCommands implements CommandMarker {
 
     @CliCommand(value = "stack select", help = "Select the stack by its id")
     public String selectStack(
-            @CliOption(key = "id", mandatory = true, help = "Id of the stack") String id) {
+            @CliOption(key = "id", mandatory = false, help = "Id of the stack") String id,
+            @CliOption(key = "name", mandatory = false, help = "Name of the stack") String name) {
         try {
-            Object stack = cloudbreak.getStack(id);
-            if (stack != null) {
-                context.addStack(id, ((HashMap) stack).get("name").toString());
-                context.setHint(Hints.CREATE_CLUSTER);
-                return "Stack selected, id: " + id;
-            } else {
-                return "No stack specified";
+            if (id != null) {
+                Object stack = cloudbreak.getStack(id);
+                if (stack != null) {
+                    context.addStack(id, ((HashMap) stack).get("name").toString());
+                    context.setHint(Hints.CREATE_CLUSTER);
+                    return "Stack selected, id: " + id;
+                }
+            } else if (name != null) {
+                Object stack = cloudbreak.getStackByName(name);
+                if (stack != null) {
+                    context.addStack(((HashMap) stack).get("id").toString(), name);
+                    context.setHint(Hints.CREATE_CLUSTER);
+                    return "Stack selected, name: " + name;
+                }
             }
+            return "No stack specified. (select by using --id or --name)";
         } catch (HttpResponseException ex) {
             return ex.getResponse().getData().toString();
         } catch (Exception ex) {
@@ -147,12 +156,26 @@ public class StackCommands implements CommandMarker {
 
     @CliCommand(value = "stack terminate", help = "Terminate the stack by its id")
     public String terminateStack(
-            @CliOption(key = "id", mandatory = true, help = "Id of the stack") String id) {
+            @CliOption(key = "id", mandatory = false, help = "Id of the stack") String id,
+            @CliOption(key = "name", mandatory = false, help = "Name of the stack") String name) {
         try {
-            cloudbreak.terminateStack(id);
-            context.setHint(Hints.CREATE_CLUSTER);
-            context.removeStack(id);
-            return "Stack terminated with id:" + id;
+            if (id != null) {
+                cloudbreak.terminateStack(id);
+                context.setHint(Hints.CREATE_CLUSTER);
+                context.removeStack(id);
+                return "Stack terminated with id: " + id;
+            } else if (name != null) {
+                Object stack = cloudbreak.getStackByName(name);
+                if (stack != null) {
+                    Map<String, Object> sMap = (Map<String, Object>) stack;
+                    String stackId = sMap.get("id").toString();
+                    cloudbreak.terminateStack(stackId);
+                    context.setHint(Hints.CREATE_CLUSTER);
+                    context.removeStack(stackId);
+                    return "Stack terminated with name: " + name;
+                }
+            }
+            return "Stack not specified. (select by using --id or --name)";
         } catch (HttpResponseException ex) {
             return ex.getResponse().getData().toString();
         } catch (Exception ex) {
@@ -173,11 +196,24 @@ public class StackCommands implements CommandMarker {
 
     @CliCommand(value = "stack show", help = "Shows the stack by its id")
     public Object showStack(
-            @CliOption(key = "id", mandatory = true, help = "Id of the stack") String id) {
+            @CliOption(key = "id", mandatory = false, help = "Id of the stack") String id,
+            @CliOption(key = "name", mandatory = false, help = "Name of the stack") String name) {
         try {
-            Map<String, String> stackMap = cloudbreak.getStackMap(id);
-            stackMap.remove("description");
-            return renderSingleMap(stackMap, "FIELD", "VALUE");
+            if (id != null) {
+                Map<String, String> stackMap = cloudbreak.getStackMap(id);
+                stackMap.remove("description");
+                return renderSingleMap(stackMap, "FIELD", "VALUE");
+            } else if (name != null) {
+                Object stack = cloudbreak.getStackByName(name);
+                if (stack != null) {
+                    Map<String, Object> sMap = (Map<String, Object>) stack;
+                    String stackId = sMap.get("id").toString();
+                    Map<String, String> stackMap = cloudbreak.getStackMap(stackId);
+                    stackMap.remove("description");
+                    return renderSingleMap(stackMap, "FIELD", "VALUE");
+                }
+            }
+            return "No stack specified.";
         } catch (HttpResponseException ex) {
             return ex.getResponse().getData().toString();
         } catch (Exception ex) {

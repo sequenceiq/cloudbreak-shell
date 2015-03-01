@@ -89,19 +89,27 @@ public class RecipeCommands implements CommandMarker {
         }
     }
 
-    @CliCommand(value = "recipe select", help = "Select the recipe by its id")
+    @CliCommand(value = "recipe select", help = "Select the recipe by its id or name")
     public String selectRecipe(
-            @CliOption(key = "id", mandatory = true, help = "Id of the recipe") String id) {
-        String message;
+            @CliOption(key = "id", mandatory = false, help = "Id of the recipe") String id,
+            @CliOption(key = "name", mandatory = false, help = "Name of the recipe") String name) {
         try {
-            if (cloudbreak.getRecipe(id) != null) {
-                context.addRecipe(id);
-                context.setHint(Hints.CREATE_STACK);
-                message = String.format("Recipe has been selected, id: %s", id);
-            } else {
-                message = String.format("Recipe '%s' cannot be found.", id);
+            if (id != null) {
+                if (cloudbreak.getRecipe(id) != null) {
+                    context.addRecipe(id);
+                    context.setHint(Hints.CREATE_STACK);
+                    return String.format("Recipe has been selected, id: %s", id);
+                }
+            } else if (name != null) {
+                Object recipe = cloudbreak.getRecipeByName(name);
+                if (recipe != null) {
+                    Map<String, Object> recipeMap = (Map<String, Object>) recipe;
+                    context.addRecipe(recipeMap.get("id").toString());
+                    context.setHint(Hints.CREATE_STACK);
+                    return String.format("Recipe has been selected, name: %s", name);
+                }
             }
-            return message;
+            return String.format("Recipe '%s' cannot be found.", id);
         } catch (HttpResponseException ex) {
             return ex.getResponse().getData().toString();
         } catch (Exception ex) {
@@ -111,12 +119,27 @@ public class RecipeCommands implements CommandMarker {
 
     @CliCommand(value = "recipe show", help = "Shows the properties of the specified recipe")
     public Object showRecipe(
-            @CliOption(key = "id", mandatory = true, help = "Id of the recipe") String id) {
+            @CliOption(key = "id", mandatory = false, help = "Id of the recipe") String id,
+            @CliOption(key = "name", mandatory = false, help = "Name of the recipe") String name) {
         try {
+            Map<String, Object> recipeMap = null;
+            if (id != null) {
+                recipeMap = cloudbreak.getRecipeMap(id);
+            } else if (name != null) {
+                Object recipe = cloudbreak.getRecipeByName(name);
+                if (recipe != null) {
+                    Map<String, Object> rMap = (Map<String, Object>) recipe;
+                    String recipeId = rMap.get("id").toString();
+                    recipeMap = cloudbreak.getRecipeMap(recipeId);
+                } else {
+                    return "Recipe not specified.";
+                }
+            } else {
+                return "Recipe not specified.";
+            }
             Map<String, String> map = new HashMap<>();
             List<String> plugins = new ArrayList<>();
             Map<String, String> properties = new HashMap<>();
-            Map<String, Object> recipeMap = cloudbreak.getRecipeMap(id);
 
             for (Map.Entry<String, Object> propertyEntry : recipeMap.entrySet()) {
                 if ("plugins".equals(propertyEntry.getKey().toString())) {
@@ -137,11 +160,17 @@ public class RecipeCommands implements CommandMarker {
         }
     }
 
-    @CliCommand(value = "recipe delete", help = "Delete the recipe by its id")
+    @CliCommand(value = "recipe delete", help = "Delete the recipe by its id or name")
     public Object deleteRecipe(
-            @CliOption(key = "id", mandatory = true, help = "Id of the recipe") String id) {
+            @CliOption(key = "id", mandatory = false, help = "Id of the recipe") String id,
+            @CliOption(key = "name", mandatory = false, help = "Name of the recipe") String name) {
         try {
-            return cloudbreak.deleteRecipe(id);
+            if (id != null) {
+                return cloudbreak.deleteRecipe(id);
+            } else if (name != null) {
+                return cloudbreak.deleteRecipeByName(name);
+            }
+            return "Recipe not specified (select recipe by --id or --name)";
         } catch (HttpResponseException ex) {
             return ex.getResponse().getData().toString();
         } catch (Exception ex) {

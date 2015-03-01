@@ -24,6 +24,7 @@ public class CloudbreakContext {
     private Map<String, Map<Long, Integer>> instanceGroups = new HashMap<>();
     private Set<String> activeHostgoups = new HashSet<>();
     private Set<String> activeTemplates = new HashSet<>();
+    private Set<String> activeTemplateNames = new HashSet<>();
     private String activeCloudPlatform;
 
     @Autowired
@@ -71,6 +72,10 @@ public class CloudbreakContext {
         return activeTemplates;
     }
 
+    public Set<String> getActiveTemplateNames() {
+        return activeTemplateNames;
+    }
+
     public boolean isBlueprintAvailable() {
         return isPropertyAvailable(PropertyKey.BLUEPRINT_ID);
     }
@@ -100,9 +105,17 @@ public class CloudbreakContext {
         Map<String, String> credential = (Map<String, String>) client.getCredential(id);
         this.activeCloudPlatform = credential.get("cloudPlatform");
         Map<String, Map<String, String>> templateList = client.getAccountTemplatesWithCloudPlatformMap(this.activeCloudPlatform);
-        this.activeTemplates = templateList.keySet();
+        fillTemplates(templateList);
         addProperty(PropertyKey.CREDENTIAL_ID, id);
         setCredentialAccessible();
+    }
+
+    private void fillTemplates(Map<String, Map<String, String>> templateList) {
+        this.activeTemplates = templateList.keySet();
+        for (Map.Entry templateEntry : templateList.entrySet()) {
+            Map<String, String> templateMap = (Map<String, String>) templateEntry.getValue();
+            this.activeTemplateNames.addAll(templateMap.keySet());
+        }
     }
 
     public Set<String> getActiveHostgoups() {

@@ -66,9 +66,20 @@ public class CredentialCommands implements CommandMarker {
 
     @CliCommand(value = "credential show", help = "Shows the credential by its id")
     public Object showCredential(
-            @CliOption(key = "id", mandatory = true, help = "Id of the credential") String id) {
+            @CliOption(key = "id", mandatory = false, help = "Id of the credential") String id,
+            @CliOption(key = "name", mandatory = false, help = "Name of the credential") String name) {
         try {
-            return renderSingleMap(cloudbreak.getCredentialMap(id), "FIELD", "VALUE");
+            if (id != null) {
+                return renderSingleMap(cloudbreak.getCredentialMap(id), "FIELD", "VALUE");
+            } else if (name != null) {
+                Object credential = cloudbreak.getCredentialByName(name);
+                if (credential != null) {
+                    Map<String, Object> credMap = (Map<String, Object>) credential;
+                    String credId = credMap.get("id").toString();
+                    return renderSingleMap(cloudbreak.getCredentialMap(credId), "FIELD", "VALUE");
+                }
+            }
+            return "No credential specified (select a credential by --id or --name)";
         } catch (Exception ex) {
             return ex.toString();
         }
@@ -76,9 +87,15 @@ public class CredentialCommands implements CommandMarker {
 
     @CliCommand(value = "credential delete", help = "Delete the credential by its id")
     public Object deleteCredential(
-            @CliOption(key = "id", mandatory = true, help = "Id of the credential") String id) {
+            @CliOption(key = "id", mandatory = false, help = "Id of the credental") String id,
+            @CliOption(key = "name", mandatory = false, help = "Name of the credential") String name) {
         try {
-            return cloudbreak.deleteCredential(id);
+            if (id != null) {
+                return cloudbreak.deleteCredential(id);
+            } else if (name != null) {
+                return cloudbreak.deleteCredentialByName(name);
+            }
+            return "No credential specified (select a credential by --id or --name)";
         } catch (Exception ex) {
             return ex.toString();
         }
@@ -93,18 +110,28 @@ public class CredentialCommands implements CommandMarker {
         }
     }
 
-    @CliCommand(value = "credential select", help = "Select the credential by its id")
+    @CliCommand(value = "credential select", help = "Select the credential by its id or name")
     public String selectCredential(
-            @CliOption(key = "id", mandatory = true, help = "Id of the credential") String id) {
+            @CliOption(key = "id", mandatory = false, help = "Id of the credential") String id,
+            @CliOption(key = "name", mandatory = false, help = "Name of the credential") String name) {
         try {
 
-            if (cloudbreak.getCredential(id) != null) {
-                context.setCredential(id);
-                createOrSelectTemplateHint();
-                return "Credential selected, id: " + id;
-            } else {
-                return "No credential specified";
+            if (id != null) {
+                if (cloudbreak.getCredential(id) != null) {
+                    context.setCredential(id);
+                    createOrSelectTemplateHint();
+                    return "Credential selected, id: " + id;
+                }
+            } else if (name != null) {
+                Object credential = cloudbreak.getCredentialByName(name);
+                if (credential != null) {
+                    Map<String, Object> credMap = (Map<String, Object>) credential;
+                    context.setCredential(credMap.get("id").toString());
+                    createOrSelectTemplateHint();
+                    return "Credential selected, name: " + name;
+                }
             }
+            return "No credential specified (select a credential by --id or --name)";
         } catch (Exception ex) {
             return ex.toString();
         }
