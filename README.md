@@ -13,7 +13,7 @@ The goal with the CLI was to provide an interactive command line tool which supp
 
 You have 3 options to give it a try:
 
-- use our prepared [docker image](https://github.com/sequenceiq/docker-cb-shell)
+- use our prepared [docker image](https://github.com/sequenceiq/docker-cb-shell) - **recommended** solution
 - download the latest self-containing executable jar from our maven repo
 - build it from source
 
