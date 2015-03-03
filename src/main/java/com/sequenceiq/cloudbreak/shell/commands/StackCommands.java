@@ -127,7 +127,7 @@ public class StackCommands implements CommandMarker {
                             context.getInstanceGroups(),
                             onFailureAction == null ? OnFailureAction.ROLLBACK.name() : onFailureAction.name(),
                             threshold == null ? 1L : threshold,
-                            adjustmentType == null ? AdjustmentType.EXACT.name() : adjustmentType.name(),
+                            adjustmentType == null ? AdjustmentType.BEST_EFFORT.name() : adjustmentType.name(),
                             image,
                             parameters);
             context.addStack(id, name);
