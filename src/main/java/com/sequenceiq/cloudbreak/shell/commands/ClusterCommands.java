@@ -66,7 +66,7 @@ public class ClusterCommands implements CommandMarker {
             if (adjustment > -1) {
                 return "The adjustment value in case of node removal should be negative.";
             }
-            cloudbreak.putCluster(Integer.valueOf(context.getStackId()), hostGroup, adjustment * (-1));
+            cloudbreak.putCluster(Integer.valueOf(context.getStackId()), hostGroup, adjustment);
             return context.getStackId();
         } catch (Exception ex) {
             return ex.toString();

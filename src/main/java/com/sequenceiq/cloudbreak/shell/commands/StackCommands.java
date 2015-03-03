@@ -84,7 +84,7 @@ public class StackCommands implements CommandMarker {
             if (adjustment > -1) {
                 return "The adjustment value in case of node removal should be negative.";
             }
-            cloudbreak.putStack(Integer.valueOf(context.getStackId()), instanceGroup, adjustment * (-1));
+            cloudbreak.putStack(Integer.valueOf(context.getStackId()), instanceGroup, adjustment);
             return context.getStackId();
         } catch (Exception ex) {
             return ex.toString();
