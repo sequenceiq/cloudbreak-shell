@@ -101,8 +101,21 @@ public class StackCommands implements CommandMarker {
             @CliOption(key = "publicInAccount", mandatory = false, help = "marks the stack as visible for all members of the account") Boolean publicInAccount,
             @CliOption(key = "onFailureAction", mandatory = false, help = "onFailureAction which is ROLLBACK or DO_NOTHING.") OnFailureAction onFailureAction,
             @CliOption(key = "adjustmentType", mandatory = false, help = "adjustmentType which is EXACT or PERCENTAGE.") AdjustmentType adjustmentType,
-            @CliOption(key = "threshold", mandatory = false, help = "threshold of failure") Long threshold) {
+            @CliOption(key = "threshold", mandatory = false, help = "threshold of failure") Long threshold,
+            @CliOption(key = "vpcId", mandatory = false, help = "VPC id of stack") String vpcId,
+            @CliOption(key = "subnetCIDR", mandatory = false, help = "Subnet CIDR of stack") String subnetCIDR,
+            @CliOption(key = "internetGatewayId", mandatory = false, help = "Internet gateway id of stack") String internetGatewayId) {
         try {
+            Map<String, String> parameters = new HashMap<>();
+            if (vpcId != null) {
+                parameters.put("vpcId", vpcId);
+            }
+            if (subnetCIDR != null) {
+                parameters.put("subnetCIDR", subnetCIDR);
+            }
+            if (internetGatewayId != null) {
+                parameters.put("internetGatewayId", internetGatewayId);
+            }
             String id =
                     cloudbreak.postStack(
                             name,
@@ -115,7 +128,8 @@ public class StackCommands implements CommandMarker {
                             onFailureAction == null ? OnFailureAction.ROLLBACK.name() : onFailureAction.name(),
                             threshold == null ? 1L : threshold,
                             adjustmentType == null ? AdjustmentType.EXACT.name() : adjustmentType.name(),
-                            image);
+                            image,
+                            parameters);
             context.addStack(id, name);
             context.setHint(Hints.CREATE_CLUSTER);
             return "Stack created, id: " + id;

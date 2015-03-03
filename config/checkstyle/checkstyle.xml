@@ -75,7 +75,7 @@
 
         <!-- Metrics -->
         <module name="ParameterNumber">
-            <property name="max" value="10" />
+            <property name="max" value="20" />
             <property name="tokens" value="METHOD_DEF" />
         </module>
         <module name="CyclomaticComplexity">
