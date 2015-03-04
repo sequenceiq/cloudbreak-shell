@@ -6,9 +6,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
@@ -138,21 +136,24 @@ public class RecipeCommands implements CommandMarker {
                 return "Recipe not specified.";
             }
             Map<String, String> map = new HashMap<>();
-            List<String> plugins = new ArrayList<>();
+            Map<String, String> plugins = new HashMap<>();
             Map<String, String> properties = new HashMap<>();
 
             for (Map.Entry<String, Object> propertyEntry : recipeMap.entrySet()) {
                 if ("plugins".equals(propertyEntry.getKey().toString())) {
-                    plugins = (List<String>) propertyEntry.getValue();
-                    map.put(propertyEntry.getKey(), plugins.toString());
+                    plugins = (Map<String, String>) propertyEntry.getValue();
                 } else if ("properties".equals(propertyEntry.getKey().toString())) {
                     properties = (Map<String, String>) propertyEntry.getValue();
                 } else {
-                    map.put(propertyEntry.getKey(), propertyEntry.getValue().toString());
+                    if (propertyEntry.getValue() != null) {
+                        map.put(propertyEntry.getKey(), propertyEntry.getValue().toString());
+                    }
                 }
             }
 
-            return renderSingleMap(map, "FIELD", "INFO") + "\n\n" + renderSingleMap(properties, "CONSUL-KEY", "VALUE") + "\n\n";
+            return renderSingleMap(map, "FIELD", "INFO") + "\n\n"
+                    + renderSingleMap(properties, "CONSUL-KEY", "VALUE") + "\n\n"
+                    + renderSingleMap(plugins, "PLUGIN", "EXECUTION_TYPE") + "\n\n";
         } catch (HttpResponseException ex) {
             return ex.getResponse().getData().toString();
         } catch (Exception ex) {
