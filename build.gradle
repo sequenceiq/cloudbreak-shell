@@ -25,7 +25,6 @@ sourceCompatibility = 1.7
 group = 'com.sequenceiq'
 
 allprojects {
-    systemProperties = System.properties
     apply from: "$rootDir/gradle/versioning.gradle"
     ext.config = new ConfigSlurper(env).parse(file("$rootDir/gradle/config/buildConfig.groovy").toURL())
 }
@@ -80,12 +79,15 @@ jacocoTestReport {
     }
 }
 
-sonarRunner {
+test {
     jacoco {
         append = false
         destinationFile = file("$buildDir/jacoco/jacocoTest.exec")
         classDumpFile = file("$buildDir/jacoco/classpathdumps")
     }
+}
+
+sonarRunner {
     sonarProperties {
         property "sonar.host.url", "$config.sonar_host_url"
         property "sonar.jdbc.url", "$config.sonar_jdbc_url"
@@ -123,10 +125,9 @@ dependencies {
     deployerJars 'org.springframework.build.aws:org.springframework.build.aws.maven:3.0.0.RELEASE'
 }
 
-task wrapper(type: Wrapper) { gradleVersion = "1.12" }
+task wrapper(type: Wrapper) { gradleVersion = "2.3" }
 
 task buildInfo(type: BuildInfoTask) {
-    systemProperties = System.properties
     destination = file("$buildDir")
     applicationPropertiesPath = "$buildDir"
     basename = jar.baseName
