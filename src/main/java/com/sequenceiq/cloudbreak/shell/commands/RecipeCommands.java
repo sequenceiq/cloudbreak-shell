@@ -6,9 +6,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
@@ -22,7 +20,6 @@ import org.springframework.stereotype.Component;
 
 import com.sequenceiq.cloudbreak.client.CloudbreakClient;
 import com.sequenceiq.cloudbreak.shell.model.CloudbreakContext;
-import com.sequenceiq.cloudbreak.shell.model.Hints;
 
 import groovyx.net.http.HttpResponseException;
 
@@ -80,36 +77,7 @@ public class RecipeCommands implements CommandMarker {
         try {
             String json = file == null ? IOUtils.toString(new URL(url)) : IOUtils.toString(new FileInputStream(file));
             String id = cloudbreak.postRecipe(json, publicInAccount);
-            context.addRecipe(id);
             return String.format("Recipe '%s' has been added with id: %s", getRecipeName(json), id);
-        } catch (HttpResponseException ex) {
-            return ex.getResponse().getData().toString();
-        } catch (Exception ex) {
-            return ex.toString();
-        }
-    }
-
-    @CliCommand(value = "recipe select", help = "Select the recipe by its id or name")
-    public String selectRecipe(
-            @CliOption(key = "id", mandatory = false, help = "Id of the recipe") String id,
-            @CliOption(key = "name", mandatory = false, help = "Name of the recipe") String name) {
-        try {
-            if (id != null) {
-                if (cloudbreak.getRecipe(id) != null) {
-                    context.addRecipe(id);
-                    context.setHint(Hints.CREATE_STACK);
-                    return String.format("Recipe has been selected, id: %s", id);
-                }
-            } else if (name != null) {
-                Object recipe = cloudbreak.getRecipeByName(name);
-                if (recipe != null) {
-                    Map<String, Object> recipeMap = (Map<String, Object>) recipe;
-                    context.addRecipe(recipeMap.get("id").toString());
-                    context.setHint(Hints.CREATE_STACK);
-                    return String.format("Recipe has been selected, name: %s", name);
-                }
-            }
-            return String.format("Recipe '%s' cannot be found.", id);
         } catch (HttpResponseException ex) {
             return ex.getResponse().getData().toString();
         } catch (Exception ex) {
@@ -138,21 +106,24 @@ public class RecipeCommands implements CommandMarker {
                 return "Recipe not specified.";
             }
             Map<String, String> map = new HashMap<>();
-            List<String> plugins = new ArrayList<>();
+            Map<String, String> plugins = new HashMap<>();
             Map<String, String> properties = new HashMap<>();
 
             for (Map.Entry<String, Object> propertyEntry : recipeMap.entrySet()) {
                 if ("plugins".equals(propertyEntry.getKey().toString())) {
-                    plugins = (List<String>) propertyEntry.getValue();
-                    map.put(propertyEntry.getKey(), plugins.toString());
+                    plugins = (Map<String, String>) propertyEntry.getValue();
                 } else if ("properties".equals(propertyEntry.getKey().toString())) {
                     properties = (Map<String, String>) propertyEntry.getValue();
                 } else {
-                    map.put(propertyEntry.getKey(), propertyEntry.getValue().toString());
+                    if (propertyEntry.getValue() != null) {
+                        map.put(propertyEntry.getKey(), propertyEntry.getValue().toString());
+                    }
                 }
             }
 
-            return renderSingleMap(map, "FIELD", "INFO") + "\n\n" + renderSingleMap(properties, "CONSUL-KEY", "VALUE") + "\n\n";
+            return renderSingleMap(map, "FIELD", "INFO") + "\n\n"
+                    + renderSingleMap(properties, "CONSUL-KEY", "VALUE") + "\n\n"
+                    + renderSingleMap(plugins, "PLUGIN", "EXECUTION_TYPE") + "\n\n";
         } catch (HttpResponseException ex) {
             return ex.getResponse().getData().toString();
         } catch (Exception ex) {

@@ -3,10 +3,6 @@ package com.sequenceiq.cloudbreak.shell.commands;
 import static com.sequenceiq.cloudbreak.shell.support.TableRenderer.renderSingleMap;
 import static java.lang.Integer.parseInt;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.CommandMarker;
 import org.springframework.shell.core.annotation.CliAvailabilityIndicator;
@@ -90,21 +86,12 @@ public class ClusterCommands implements CommandMarker {
     public String createCluster(
             @CliOption(key = "description", mandatory = false, help = "Description of the blueprint") String description) {
         try {
-            Integer recipeId = null;
-            if (context.isRecipeAvailable()) {
-                recipeId = parseInt(context.getRecipeId());
-            }
-            Set<String> activeHostgroups = context.getActiveHostgoups();
-            Map<String, String> hostGroups = new HashMap<>();
-            for (String hostGroup : activeHostgroups) {
-                hostGroups.put(hostGroup, hostGroup);
-            }
             cloudbreak.postCluster(
                     context.getStackName(),
                     parseInt(context.getBlueprintId()),
-                    recipeId,
                     description,
-                    parseInt(context.getStackId()), hostGroups);
+                    parseInt(context.getStackId()),
+                    context.getHostGroups());
             context.setHint(Hints.NONE);
             return "Cluster creation started";
         } catch (HttpResponseException ex) {

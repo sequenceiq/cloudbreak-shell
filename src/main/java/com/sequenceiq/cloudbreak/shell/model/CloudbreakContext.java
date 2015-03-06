@@ -1,8 +1,10 @@
 package com.sequenceiq.cloudbreak.shell.model;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -22,6 +24,7 @@ public class CloudbreakContext {
     private Hints hint;
     private Map<PropertyKey, String> properties = new HashMap<>();
     private Map<String, Map<Long, Integer>> instanceGroups = new HashMap<>();
+    private List<Map<String, Object>> hostGroups = new ArrayList<>();
     private Set<String> activeHostgoups = new HashSet<>();
     private Set<String> activeTemplates = new HashSet<>();
     private Set<String> activeTemplateNames = new HashSet<>();
@@ -59,13 +62,35 @@ public class CloudbreakContext {
         this.instanceGroups = instanceGroups;
     }
 
+    public void setHostGroups(List<Map<String, Object>> hostGroups) {
+        this.hostGroups = hostGroups;
+    }
+
     public Map<String, Map<Long, Integer>> getInstanceGroups() {
         return this.instanceGroups;
+    }
+
+    public List<Map<String, Object>> getHostGroups() {
+        return hostGroups;
+    }
+
+    public Map<String, Object> getHostGroupByName(String name) {
+        for (Map<String, Object> hostGroup : hostGroups) {
+            if (hostGroup.get("name").equals(name)) {
+                return hostGroup;
+            }
+        }
+        return null;
     }
 
     public Map<String, Map<Long, Integer>> putInstanceGroup(String name, Map<Long, Integer> value) {
         this.instanceGroups.put(name, value);
         return this.instanceGroups;
+    }
+
+    public List<Map<String, Object>> putHostGroup(Map<String, Object> hostGroup) {
+        this.hostGroups.add(hostGroup);
+        return this.hostGroups;
     }
 
     public Set<String> getActiveTemplates() {
@@ -83,18 +108,10 @@ public class CloudbreakContext {
     public void addBlueprint(String id) throws Exception {
         Map<String, Object> blueprintMap = client.getBlueprintMap(id);
         this.instanceGroups = new HashMap<>();
+        this.hostGroups = new ArrayList<>();
         this.activeHostgoups = ((LinkedHashMap) blueprintMap.get("ambariBlueprint")).keySet();
         addProperty(PropertyKey.BLUEPRINT_ID, id);
         setBlueprintAccessible();
-    }
-
-    public boolean isRecipeAvailable() {
-        return isPropertyAvailable(PropertyKey.RECIPE_ID);
-    }
-
-    public void addRecipe(String id) {
-        addProperty(PropertyKey.RECIPE_ID, id);
-        setRecipeAccessible();
     }
 
     public boolean isCredentialAvailable() {
