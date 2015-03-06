@@ -1,21 +1,21 @@
 package com.sequenceiq.cloudbreak.shell.commands;
 
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.verify;
-import static org.mockito.BDDMockito.times;
 import static org.mockito.BDDMockito.anyString;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.times;
+import static org.mockito.BDDMockito.verify;
 
-import com.sequenceiq.cloudbreak.client.CloudbreakClient;
-import com.sequenceiq.cloudbreak.shell.model.CloudbreakContext;
-import com.sequenceiq.cloudbreak.shell.model.Hints;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.sequenceiq.cloudbreak.client.CloudbreakClient;
+import com.sequenceiq.cloudbreak.shell.model.CloudbreakContext;
 
 public class RecipeCommandsTest {
     private static final String RECIPE_ID = "50";
@@ -41,44 +41,6 @@ public class RecipeCommandsTest {
     }
 
     @Test
-    public void testSelectRecipeById() throws Exception {
-        given(mockClient.getRecipe(RECIPE_ID)).willReturn(dummyResult);
-        underTest.selectRecipe(RECIPE_ID, null);
-        verify(mockClient, times(1)).getRecipe(anyString());
-        verify(mockContext, times(1)).setHint(Hints.CREATE_STACK);
-    }
-
-    @Test
-    public void testSelectRecipeByName() throws Exception {
-        given(mockClient.getRecipeByName(RECIPE_NAME)).willReturn(dummyResult);
-        underTest.selectRecipe(null, RECIPE_NAME);
-        verify(mockClient, times(1)).getRecipeByName(anyString());
-        verify(mockContext, times(1)).setHint(Hints.CREATE_STACK);
-    }
-
-    @Test
-    public void testSelectRecipeByIdAndName() throws Exception {
-        given(mockClient.getRecipe(RECIPE_ID)).willReturn(dummyResult);
-        underTest.selectRecipe(RECIPE_ID, RECIPE_NAME);
-        verify(mockClient, times(1)).getRecipe(anyString());
-        verify(mockClient, times(0)).getRecipeByName(anyString());
-        verify(mockContext, times(1)).setHint(Hints.CREATE_STACK);
-    }
-
-    @Test
-    public void testSelectRecipeByNameNotFound() throws Exception {
-        given(mockClient.getRecipeByName(RECIPE_NAME)).willReturn(null);
-        underTest.selectRecipe(null, RECIPE_NAME);
-        verify(mockContext, times(0)).setHint(Hints.CREATE_STACK);
-    }
-
-    @Test
-    public void testSelectRecipeWithoutIdAndName() throws Exception {
-        underTest.selectRecipe(null, null);
-        verify(mockContext, times(0)).setHint(Hints.CREATE_STACK);
-    }
-
-    @Test
     public void testShowRecipeById() throws Exception {
         given(mockClient.getRecipeMap(RECIPE_ID)).willReturn(dummyResult);
         underTest.showRecipe(RECIPE_ID, null);
@@ -96,7 +58,7 @@ public class RecipeCommandsTest {
 
     @Test
     public void testShowRecipeWithoutIdAndName() throws Exception {
-        underTest.selectRecipe(null, null);
+        underTest.showRecipe(null, null);
         verify(mockClient, times(0)).getRecipeMap(anyString());
     }
 
