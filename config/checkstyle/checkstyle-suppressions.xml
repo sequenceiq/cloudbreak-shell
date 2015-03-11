@@ -17,6 +17,8 @@
     <suppress checks="string-instantiation" files="CredentialCommands.java" />
     <suppress checks="HideUtilityClassConstructor" files=".*Application.java" />
     <suppress checks="CyclomaticComplexity" files="CredentialCommands.java" />
+    <suppress checks="CyclomaticComplexity" files="TemplateCommands.java" />
+
 
     <!-- -->
 

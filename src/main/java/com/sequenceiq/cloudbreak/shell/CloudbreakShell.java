@@ -69,7 +69,7 @@ public class CloudbreakShell implements CommandLineRunner, ShellStatusListener {
     }
 
     public static void main(String[] args) throws IOException {
-        if (args.length == 1 && ("--help".equals(args[0]) || "-h".equals(args[0]))) {
+        if ((args.length == 1 && ("--help".equals(args[0]) || "-h".equals(args[0]))) || args.length == 0) {
             System.out.println(
                     "\nCloudbreak Shell: Interactive command line tool for managing Cloudbreak.\n\n"
                             + "Usage:\n"
