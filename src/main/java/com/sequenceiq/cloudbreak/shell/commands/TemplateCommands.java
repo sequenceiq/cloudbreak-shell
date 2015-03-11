@@ -76,6 +76,7 @@ public class TemplateCommands implements CommandMarker {
             @CliOption(key = "volumeCount", mandatory = true, help = "volumeCount of the template") Integer volumeCount,
             @CliOption(key = "volumeSize", mandatory = true, help = "volumeSize(GB) of the template") Integer volumeSize,
             @CliOption(key = "volumeType", mandatory = false, help = "volumeType of the template", specifiedDefaultValue = "Gp2") VolumeType volumeType,
+            @CliOption(key = "encrypted", mandatory = false, help = "use encrypted disks") Boolean encrypted,
             @CliOption(key = "spotPrice", mandatory = false, help = "spotPrice of the template") Double spotPrice,
             @CliOption(key = "sshLocation", mandatory = false, specifiedDefaultValue = "0.0.0.0/0", help = "sshLocation of the template") String sshLocation,
             @CliOption(key = "publicInAccount", mandatory = false, help = "flags if the template is public in the account") Boolean publicInAccount,
@@ -97,7 +98,8 @@ public class TemplateCommands implements CommandMarker {
                         volumeCount.toString(),
                         volumeSize.toString(),
                         volumeType == null ? VolumeType.Gp2.name() : volumeType.name(),
-                        publicInAccount(publicInAccount)
+                        publicInAccount(publicInAccount),
+                        encrypted == null ? false : encrypted
                 );
             } else {
                 id = cloudbreak.postSpotEc2Template(name,
@@ -108,7 +110,8 @@ public class TemplateCommands implements CommandMarker {
                         volumeSize.toString(),
                         volumeType == null ? VolumeType.Gp2.name() : volumeType.name(),
                         spotPrice.toString(),
-                        publicInAccount(publicInAccount)
+                        publicInAccount(publicInAccount),
+                        encrypted == null ? false : encrypted
                 );
             }
             createOrSelectBlueprintHint();
