@@ -42,8 +42,8 @@ public class StackCommands implements CommandMarker {
     @CliAvailabilityIndicator(value = "stack create")
     public boolean isStackCreateCommandAvailable() {
         return context.isCredentialAvailable()
-                && (context.getActiveHostgoups().size() == context.getInstanceGroups().size()
-                && context.getActiveHostgoups().size() != 0);
+                && (context.getActiveHostGroups().size() == context.getInstanceGroups().size()
+                && context.getActiveHostGroups().size() != 0);
     }
 
     @CliAvailabilityIndicator({ "stack node --ADD", "stack node --REMOVE" })

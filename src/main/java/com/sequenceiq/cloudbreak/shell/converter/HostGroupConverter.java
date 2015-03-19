@@ -27,7 +27,7 @@ public class HostGroupConverter extends AbstractConverter<HostGroup> {
     @Override
     public boolean getAllPossibleValues(List<Completion> completions, Class<?> targetType, String existingData, String optionContext, MethodTarget target) {
         try {
-            return getAllPossibleValues(completions, context.getActiveHostgoups());
+            return getAllPossibleValues(completions, context.getActiveHostGroups());
         } catch (Exception e) {
             return false;
         }

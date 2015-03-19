@@ -260,8 +260,8 @@ public class TemplateCommands implements CommandMarker {
         } else if (!context.isCredentialAccessible()) {
             context.setHint(Hints.SELECT_CREDENTIAL);
         } else if (context.isCredentialAvailable()
-                && (context.getActiveHostgoups().size() == context.getInstanceGroups().size()
-                && context.getActiveHostgoups().size() != 0)) {
+                && (context.getActiveHostGroups().size() == context.getInstanceGroups().size()
+                && context.getActiveHostGroups().size() != 0)) {
             context.setHint(Hints.CREATE_STACK);
         } else if (context.isStackAccessible()) {
             context.setHint(Hints.CREATE_STACK);

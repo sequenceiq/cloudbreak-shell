@@ -22,6 +22,12 @@ import com.sequenceiq.cloudbreak.shell.model.Hints;
 @ComponentScan(basePackageClasses = { CloudbreakShell.class })
 public class CloudbreakShell implements CommandLineRunner, ShellStatusListener {
 
+    public static final String DOLLAR = "$";
+    public static final String SPACE = " ";
+    public static final String EMPTY = "";
+    public static final String FAILED = "FAILED";
+    public static final String SUCCESS = "SUCCESS";
+
     @Autowired
     private CommandLine commandLine;
     @Autowired
@@ -35,9 +41,14 @@ public class CloudbreakShell implements CommandLineRunner, ShellStatusListener {
     public void run(String... arg) throws Exception {
         String[] shellCommandsToExecute = commandLine.getShellCommandsToExecute();
         if (shellCommandsToExecute != null) {
+            init();
             for (String cmd : shellCommandsToExecute) {
-                if (!shell.executeScriptLine(cmd)) {
+                String replacedCommand =  getReplacedString(cmd);
+                if (!shell.executeScriptLine(replacedCommand)) {
+                    System.out.println(String.format("%s: [%s]", replacedCommand, FAILED));
                     break;
+                } else {
+                    System.out.println(String.format("%s: [%s]", replacedCommand, SUCCESS));
                 }
             }
         } else {
@@ -48,22 +59,38 @@ public class CloudbreakShell implements CommandLineRunner, ShellStatusListener {
         }
     }
 
+    private String getReplacedString(String cmd) {
+        String result =  cmd;
+        if (result != null) {
+            for (String split : cmd.split(SPACE)) {
+                if (split.startsWith(DOLLAR)) {
+                    result = result.replace(split, System.getenv(split.replace(DOLLAR, EMPTY)));
+                }
+            }
+        }
+        return result;
+    }
+
     @Override
     public void onShellStatusChange(ShellStatus oldStatus, ShellStatus newStatus) {
         if (newStatus.getStatus() == ShellStatus.Status.STARTED) {
             try {
-                cloudbreak.health();
-                initResourceAccessibility();
-                if (!context.isCredentialAccessible()) {
-                    context.setHint(Hints.CREATE_CREDENTIAL);
-                } else {
-                    context.setHint(Hints.SELECT_CREDENTIAL);
-                }
+                init();
             } catch (Exception e) {
                 System.out.println("Can't connect to Cloudbreak");
                 e.printStackTrace();
                 shell.executeCommand("quit");
             }
+        }
+    }
+
+    private void init() throws Exception {
+        cloudbreak.health();
+        initResourceAccessibility();
+        if (!context.isCredentialAccessible()) {
+            context.setHint(Hints.CREATE_CREDENTIAL);
+        } else {
+            context.setHint(Hints.SELECT_CREDENTIAL);
         }
     }
 
