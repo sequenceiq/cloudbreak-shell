@@ -13,7 +13,7 @@ public enum Hints {
     SELECT_TEMPLATE("Create a cloud template with the 'template create' command or select an existing one with 'template select'"),
     CREATE_STACK("Create a stack based on a template with the 'stack create' command"),
     SELECT_STACK("Create a stack based on a template with the 'stack create' command or select an existing one with 'stack select'"),
-    CREATE_CLUSTER("Create a cluster with the 'cluster create' command"),
+    CREATE_CLUSTER("Create a cluster with the 'cluster create' command or configure the recipes with 'hostgroup configure' command"),
     CONFIGURE_INSTANCEGROUP("Configure instancegroups with the 'instancegroup configure' command"),
     NONE("No more hints for you.. :(");
 

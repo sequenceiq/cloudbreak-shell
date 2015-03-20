@@ -1,16 +1,15 @@
 package com.sequenceiq.cloudbreak.shell.model;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.google.common.collect.ImmutableMap;
 import com.sequenceiq.cloudbreak.client.CloudbreakClient;
 
 /**
@@ -24,8 +23,8 @@ public class CloudbreakContext {
     private Hints hint;
     private Map<PropertyKey, String> properties = new HashMap<>();
     private Map<String, Map<Long, Integer>> instanceGroups = new HashMap<>();
-    private List<Map<String, Object>> hostGroups = new ArrayList<>();
-    private Set<String> activeHostgoups = new HashSet<>();
+    private Map<String, Map<String, Object>> hostGroups = new HashMap<>();
+    private Set<String> activeHostGroups = new HashSet<>();
     private Set<String> activeTemplates = new HashSet<>();
     private Set<String> activeTemplateNames = new HashSet<>();
     private String activeCloudPlatform;
@@ -37,7 +36,8 @@ public class CloudbreakContext {
         this.focus = getRootFocus();
         this.hint = Hints.NONE;
         this.instanceGroups = new HashMap<>();
-        this.activeHostgoups = new HashSet<>();
+        this.hostGroups = new HashMap<>();
+        this.activeHostGroups = new HashSet<>();
     }
 
     public boolean isStackAvailable() {
@@ -62,25 +62,16 @@ public class CloudbreakContext {
         this.instanceGroups = instanceGroups;
     }
 
-    public void setHostGroups(List<Map<String, Object>> hostGroups) {
-        this.hostGroups = hostGroups;
-    }
-
     public Map<String, Map<Long, Integer>> getInstanceGroups() {
         return this.instanceGroups;
     }
 
-    public List<Map<String, Object>> getHostGroups() {
-        return hostGroups;
+    public void setHostGroups(Map<String, Map<String, Object>> hostGroups) {
+        this.hostGroups = hostGroups;
     }
 
-    public Map<String, Object> getHostGroupByName(String name) {
-        for (Map<String, Object> hostGroup : hostGroups) {
-            if (hostGroup.get("name").equals(name)) {
-                return hostGroup;
-            }
-        }
-        return null;
+    public Map<String, Map<String, Object>> getHostGroups() {
+        return hostGroups;
     }
 
     public Map<String, Map<Long, Integer>> putInstanceGroup(String name, Map<Long, Integer> value) {
@@ -88,8 +79,8 @@ public class CloudbreakContext {
         return this.instanceGroups;
     }
 
-    public List<Map<String, Object>> putHostGroup(Map<String, Object> hostGroup) {
-        this.hostGroups.add(hostGroup);
+    public Map<String, Map<String, Object>> putHostGroup(Map.Entry<String, Object> hostGroup) {
+        this.hostGroups.put(hostGroup.getKey(), ImmutableMap.of(hostGroup.getKey(), hostGroup.getValue()));
         return this.hostGroups;
     }
 
@@ -108,8 +99,8 @@ public class CloudbreakContext {
     public void addBlueprint(String id) throws Exception {
         Map<String, Object> blueprintMap = client.getBlueprintMap(id);
         this.instanceGroups = new HashMap<>();
-        this.hostGroups = new ArrayList<>();
-        this.activeHostgoups = ((LinkedHashMap) blueprintMap.get("ambariBlueprint")).keySet();
+        this.hostGroups = new HashMap<>();
+        this.activeHostGroups = ((LinkedHashMap) blueprintMap.get("ambariBlueprint")).keySet();
         addProperty(PropertyKey.BLUEPRINT_ID, id);
         setBlueprintAccessible();
     }
@@ -135,8 +126,8 @@ public class CloudbreakContext {
         }
     }
 
-    public Set<String> getActiveHostgoups() {
-        return activeHostgoups;
+    public Set<String> getActiveHostGroups() {
+        return activeHostGroups;
     }
 
     public void setBlueprintAccessible() {

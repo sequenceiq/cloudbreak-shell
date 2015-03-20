@@ -3,6 +3,11 @@ package com.sequenceiq.cloudbreak.shell.commands;
 import static com.sequenceiq.cloudbreak.shell.support.TableRenderer.renderSingleMap;
 import static java.lang.Integer.parseInt;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.CommandMarker;
 import org.springframework.shell.core.annotation.CliAvailabilityIndicator;
@@ -26,7 +31,7 @@ public class ClusterCommands implements CommandMarker {
 
     @CliAvailabilityIndicator(value = "cluster create")
     public boolean isClusterCreateCommandAvailable() {
-        return context.isBlueprintAvailable() && context.isStackAvailable();
+        return context.isBlueprintAvailable() && context.isStackAvailable() && context.getActiveHostGroups().size() == context.getHostGroups().keySet().size();
     }
 
     @CliAvailabilityIndicator(value = "cluster show")
@@ -86,12 +91,20 @@ public class ClusterCommands implements CommandMarker {
     public String createCluster(
             @CliOption(key = "description", mandatory = false, help = "Description of the blueprint") String description) {
         try {
+            List<Map<String, Object>> hostGroupList = new ArrayList<>();
+            for (Map<String, Object> hostGroupListEntity : context.getHostGroups().values()) {
+                Map<String, Object> hostGroupMap = new HashMap<String, Object>();
+                hostGroupMap.put("name", hostGroupListEntity.keySet().iterator().next());
+                hostGroupMap.put("instanceGroupName", hostGroupListEntity.keySet().iterator().next());
+                hostGroupMap.put("recipeIds", hostGroupListEntity.values().iterator().next());
+                hostGroupList.add(hostGroupMap);
+            }
             cloudbreak.postCluster(
                     context.getStackName(),
                     parseInt(context.getBlueprintId()),
                     description,
                     parseInt(context.getStackId()),
-                    context.getHostGroups());
+                    hostGroupList);
             context.setHint(Hints.NONE);
             return "Cluster creation started";
         } catch (HttpResponseException ex) {
