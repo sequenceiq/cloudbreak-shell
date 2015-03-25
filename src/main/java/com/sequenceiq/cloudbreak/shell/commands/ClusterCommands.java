@@ -52,7 +52,7 @@ public class ClusterCommands implements CommandMarker {
             if (adjustment < 1) {
                 return "The adjustment value in case of node addition should be at least 1.";
             }
-            cloudbreak.putCluster(Integer.valueOf(context.getStackId()), hostGroup, adjustment);
+            cloudbreak.putCluster(Integer.valueOf(context.getStackId()), hostGroup, adjustment, false);
             return context.getStackId();
         } catch (Exception ex) {
             return ex.toString();
@@ -62,12 +62,13 @@ public class ClusterCommands implements CommandMarker {
     @CliCommand(value = "cluster node --REMOVE", help = "Remove nodes from the cluster")
     public String removeNodeToCluster(
             @CliOption(key = "hostgroup", mandatory = true, help = "Name of the hostgroup") String hostGroup,
-            @CliOption(key = "adjustment", mandatory = true, help = "The number of the nodes to be removed from the cluster.") Integer adjustment) {
+            @CliOption(key = "adjustment", mandatory = true, help = "The number of the nodes to be removed from the cluster.") Integer adjustment,
+            @CliOption(key = "withStackDownScale", mandatory = false, help = "Do the downscale with the stack together") Boolean withStackDownScale) {
         try {
             if (adjustment > -1) {
                 return "The adjustment value in case of node removal should be negative.";
             }
-            cloudbreak.putCluster(Integer.valueOf(context.getStackId()), hostGroup, adjustment);
+            cloudbreak.putCluster(Integer.valueOf(context.getStackId()), hostGroup, adjustment, withStackDownScale == null ? false : withStackDownScale);
             return context.getStackId();
         } catch (Exception ex) {
             return ex.toString();

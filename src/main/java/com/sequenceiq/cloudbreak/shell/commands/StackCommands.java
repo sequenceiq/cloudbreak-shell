@@ -64,12 +64,13 @@ public class StackCommands implements CommandMarker {
     @CliCommand(value = "stack node --ADD", help = "Add new nodes to the cluster")
     public String addNodeToStack(
             @CliOption(key = "instanceGroup", mandatory = true, help = "Name of the instanceGroup") String instanceGroup,
-            @CliOption(key = "adjustment", mandatory = true, help = "Count of the nodes which will be added to the stack") Integer adjustment) {
+            @CliOption(key = "adjustment", mandatory = true, help = "Count of the nodes which will be added to the stack") Integer adjustment,
+            @CliOption(key = "withClusterUpScale", mandatory = false, help = "Do the upscale with the cluster together") Boolean withClusterUpScale) {
         try {
             if (adjustment < 1) {
                 return "The adjustment value in case of node addition should be at least 1.";
             }
-            cloudbreak.putStack(Integer.valueOf(context.getStackId()), instanceGroup, adjustment);
+            cloudbreak.putStack(Integer.valueOf(context.getStackId()), instanceGroup, adjustment, withClusterUpScale == null ? false : withClusterUpScale);
             return context.getStackId();
         } catch (Exception ex) {
             return ex.toString();
@@ -84,7 +85,7 @@ public class StackCommands implements CommandMarker {
             if (adjustment > -1) {
                 return "The adjustment value in case of node removal should be negative.";
             }
-            cloudbreak.putStack(Integer.valueOf(context.getStackId()), instanceGroup, adjustment);
+            cloudbreak.putStack(Integer.valueOf(context.getStackId()), instanceGroup, adjustment, false);
             return context.getStackId();
         } catch (Exception ex) {
             return ex.toString();

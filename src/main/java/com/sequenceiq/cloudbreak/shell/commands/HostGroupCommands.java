@@ -73,7 +73,7 @@ public class HostGroupCommands implements CommandMarker {
 
     @CliCommand(value = "hostgroup show", help = "Configure host groups")
     public String showHostGroup() throws Exception {
-        return renderObjectMapValueMap(context.getHostGroups(), "hostgroup", "templateId", "nodeCount");
+        return renderObjectMapValueMap(context.getHostGroups(), "hostgroup", "instanceGroupName", "recipeIds");
     }
 
 }
