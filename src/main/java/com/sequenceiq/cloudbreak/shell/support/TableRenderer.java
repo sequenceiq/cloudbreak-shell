@@ -2,6 +2,9 @@ package com.sequenceiq.cloudbreak.shell.support;
 
 import static java.util.Collections.singletonList;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +16,8 @@ import org.springframework.shell.support.table.TableHeader;
  * Utility class used to render tables.
  */
 public final class TableRenderer {
+
+    public static final int THREE = 3;
 
     private TableRenderer() {
         throw new IllegalStateException();
@@ -90,6 +95,61 @@ public final class TableRenderer {
         }
         return format(table);
     }
+
+    public static String renderObjectValueMap(Map<String, Object> rows, String mainHeader) {
+        Table table = null;
+        List<String> mainHeaders = new ArrayList<>();
+        if (rows != null) {
+            int index = 0;
+            for (String key1 : rows.keySet()) {
+                Object value = rows.get(key1);
+                if (value != null) {
+                    Field[] fields = value.getClass().getDeclaredFields();
+                    if (index == 0) {
+                        List<String> headers = new ArrayList<>();
+                        headers.add(mainHeader);
+                        for (Field classField : fields) {
+                            if (!classField.getName().contains("jacoco")) {
+                                headers.add(classField.getName());
+                                mainHeaders.add(classField.getName());
+                            }
+                        }
+                        table = createTable(headers.toArray(new String[headers.size()]));
+                    }
+                    List<String> rowValues = new ArrayList<>();
+                    rowValues.add(key1);
+                    for (Field classField : fields) {
+                        if (mainHeaders.contains(classField.getName())) {
+                            classField.setAccessible(true);
+                            Object o = runGetter(classField, value);
+                            if (o != null) {
+                                rowValues.add(o.toString());
+                            }
+                        }
+                    }
+                    table.addRow(rowValues.toArray(new String[rowValues.size()]));
+                    index++;
+                }
+            }
+        }
+        return format(table);
+    }
+
+    public static Object runGetter(Field field, Object o) {
+        for (Method method : o.getClass().getMethods()) {
+            if ((method.getName().startsWith("get")) && (method.getName().length() == (field.getName().length() + THREE))) {
+                if (method.getName().toLowerCase().endsWith(field.getName().toLowerCase())) {
+                    try {
+                        return method.invoke(o);
+                    } catch (Exception e) {
+                        return null;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
 
     private static Table createTable(String... headers) {
         Table table = new Table();

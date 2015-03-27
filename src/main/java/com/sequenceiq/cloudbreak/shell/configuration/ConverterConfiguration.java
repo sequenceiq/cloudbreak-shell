@@ -1,6 +1,5 @@
 package com.sequenceiq.cloudbreak.shell.configuration;
 
-import com.sequenceiq.cloudbreak.shell.converter.InstanceGroupTemplateNameConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,7 +23,9 @@ import org.springframework.shell.core.Converter;
 
 import com.sequenceiq.cloudbreak.client.CloudbreakClient;
 import com.sequenceiq.cloudbreak.shell.converter.HostGroupConverter;
+import com.sequenceiq.cloudbreak.shell.converter.InstanceGroupConverter;
 import com.sequenceiq.cloudbreak.shell.converter.InstanceGroupTemplateIdConverter;
+import com.sequenceiq.cloudbreak.shell.converter.InstanceGroupTemplateNameConverter;
 import com.sequenceiq.cloudbreak.shell.converter.StackRegionConverter;
 
 /**
@@ -114,6 +115,11 @@ public class ConverterConfiguration {
     @Bean
     Converter hostGroupConverter() {
         return new HostGroupConverter(client);
+    }
+
+    @Bean
+    Converter instanceGroupConverter() {
+        return new InstanceGroupConverter(client);
     }
 
     @Bean

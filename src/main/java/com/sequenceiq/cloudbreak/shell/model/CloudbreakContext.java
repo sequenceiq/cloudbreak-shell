@@ -22,9 +22,10 @@ public class CloudbreakContext {
     private Focus focus;
     private Hints hint;
     private Map<PropertyKey, String> properties = new HashMap<>();
-    private Map<String, Map<Long, Integer>> instanceGroups = new HashMap<>();
+    private Map<String, Object> instanceGroups = new HashMap<>();
     private Map<String, Map<String, Object>> hostGroups = new HashMap<>();
     private Set<String> activeHostGroups = new HashSet<>();
+    private Set<String> activeInstanceGroups = new HashSet<>();
     private Set<String> activeTemplates = new HashSet<>();
     private Set<String> activeTemplateNames = new HashSet<>();
     private String activeCloudPlatform;
@@ -38,6 +39,7 @@ public class CloudbreakContext {
         this.instanceGroups = new HashMap<>();
         this.hostGroups = new HashMap<>();
         this.activeHostGroups = new HashSet<>();
+        this.activeInstanceGroups = new HashSet<>();
     }
 
     public boolean isStackAvailable() {
@@ -58,11 +60,11 @@ public class CloudbreakContext {
         removeProperty(PropertyKey.STACK_ID, id);
     }
 
-    public void setInstanceGroups(Map<String, Map<Long, Integer>> instanceGroups) {
+    public void setInstanceGroups(Map<String, Object> instanceGroups) {
         this.instanceGroups = instanceGroups;
     }
 
-    public Map<String, Map<Long, Integer>> getInstanceGroups() {
+    public Map<String, Object> getInstanceGroups() {
         return this.instanceGroups;
     }
 
@@ -74,7 +76,7 @@ public class CloudbreakContext {
         return hostGroups;
     }
 
-    public Map<String, Map<Long, Integer>> putInstanceGroup(String name, Map<Long, Integer> value) {
+    public Map<String, Object> putInstanceGroup(String name, InstanceGroupEntry value) {
         this.instanceGroups.put(name, value);
         return this.instanceGroups;
     }
@@ -100,7 +102,10 @@ public class CloudbreakContext {
         Map<String, Object> blueprintMap = client.getBlueprintMap(id);
         this.instanceGroups = new HashMap<>();
         this.hostGroups = new HashMap<>();
-        this.activeHostGroups = ((LinkedHashMap) blueprintMap.get("ambariBlueprint")).keySet();
+        Object ambariBlueprint = blueprintMap.get("ambariBlueprint");
+        this.activeHostGroups = new HashSet<>(((LinkedHashMap) ambariBlueprint).keySet());
+        this.activeInstanceGroups = new HashSet<>(((LinkedHashMap) ambariBlueprint).keySet());
+        this.activeInstanceGroups.add("cbgateway");
         addProperty(PropertyKey.BLUEPRINT_ID, id);
         setBlueprintAccessible();
     }
@@ -128,6 +133,10 @@ public class CloudbreakContext {
 
     public Set<String> getActiveHostGroups() {
         return activeHostGroups;
+    }
+
+    public Set<String> getActiveInstanceGroups() {
+        return activeInstanceGroups;
     }
 
     public void setBlueprintAccessible() {

@@ -1,10 +1,10 @@
 package com.sequenceiq.cloudbreak.shell.commands;
 
-import static org.mockito.BDDMockito.anyMap;
 import static org.mockito.BDDMockito.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.times;
 import static org.mockito.BDDMockito.verify;
+import static org.mockito.Matchers.any;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,17 +16,18 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import com.sequenceiq.cloudbreak.client.CloudbreakClient;
-import com.sequenceiq.cloudbreak.shell.completion.HostGroup;
+import com.sequenceiq.cloudbreak.shell.completion.InstanceGroup;
 import com.sequenceiq.cloudbreak.shell.completion.InstanceGroupTemplateId;
 import com.sequenceiq.cloudbreak.shell.completion.InstanceGroupTemplateName;
 import com.sequenceiq.cloudbreak.shell.model.CloudbreakContext;
+import com.sequenceiq.cloudbreak.shell.model.InstanceGroupEntry;
 
 public class InstanceGroupCommandsTest {
 
     private static final Integer DUMMY_NODE_COUNT = 1;
     private static final String DUMMY_TEMPLATE = "dummy-template";
     private static final String DUMMY_TEMPLATE_ID = "50";
-    private HostGroup hostGroup = new HostGroup("master");
+    private InstanceGroup hostGroup = new InstanceGroup("master");
     private InstanceGroupTemplateId dummyTemplateId = new InstanceGroupTemplateId(DUMMY_TEMPLATE_ID);
     private InstanceGroupTemplateName dummyTemplateName = new InstanceGroupTemplateName(DUMMY_TEMPLATE);
 
@@ -44,7 +45,7 @@ public class InstanceGroupCommandsTest {
     @Before
     public void setUp() {
         underTest = new InstanceGroupCommands();
-        hostGroup = new HostGroup("master");
+        hostGroup = new InstanceGroup("master");
         MockitoAnnotations.initMocks(this);
         dummyResult = new HashMap<>();
         dummyResult.put("id", DUMMY_TEMPLATE_ID);
@@ -53,7 +54,7 @@ public class InstanceGroupCommandsTest {
     @Test
     public void testConfigureByTemplateId() throws Exception {
         underTest.createInstanceGroup(hostGroup, DUMMY_NODE_COUNT, dummyTemplateId, null);
-        verify(mockContext, times(1)).putInstanceGroup(anyString(), anyMap());
+        verify(mockContext, times(1)).putInstanceGroup(anyString(), any(InstanceGroupEntry.class));
     }
 
     @Test
@@ -61,13 +62,13 @@ public class InstanceGroupCommandsTest {
         given(mockClient.getTemplateByName(DUMMY_TEMPLATE)).willReturn(dummyResult);
         underTest.createInstanceGroup(hostGroup, DUMMY_NODE_COUNT, null, dummyTemplateName);
         verify(mockClient, times(1)).getTemplateByName(anyString());
-        verify(mockContext, times(1)).putInstanceGroup(anyString(), anyMap());
+        verify(mockContext, times(1)).putInstanceGroup(anyString(), any(InstanceGroupEntry.class));
     }
 
     @Test
     public void testConfigureByTemplateIdAndName() throws Exception {
         underTest.createInstanceGroup(hostGroup, DUMMY_NODE_COUNT, dummyTemplateId, dummyTemplateName);
-        verify(mockContext, times(1)).putInstanceGroup(anyString(), anyMap());
+        verify(mockContext, times(1)).putInstanceGroup(anyString(), any(InstanceGroupEntry.class));
         verify(mockClient, times(0)).getTemplateByName(anyString());
     }
 
@@ -76,6 +77,6 @@ public class InstanceGroupCommandsTest {
         given(mockClient.getTemplateByName(DUMMY_TEMPLATE)).willReturn(null);
         underTest.createInstanceGroup(hostGroup, DUMMY_NODE_COUNT, null, dummyTemplateName);
         verify(mockClient, times(1)).getTemplateByName(anyString());
-        verify(mockContext, times(0)).putInstanceGroup(anyString(), anyMap());
+        verify(mockContext, times(0)).putInstanceGroup(anyString(), any(InstanceGroupEntry.class));
     }
 }
