@@ -119,7 +119,6 @@ dependencies {
     compile 'org.codehaus.jackson:jackson-mapper-asl:1.9.13'
     compile 'com.sequenceiq:cloudbreak-rest-client:0.2.38'
     compile 'org.apache.httpcomponents:httpclient:4.3.5'
-    compile 'com.github.lalyos:jfiglet:0.0.3'
 
     testCompile 'org.springframework.boot:spring-boot-starter-test:1.0.2.RELEASE'
     deployerJars 'org.springframework.build.aws:org.springframework.build.aws.maven:3.0.0.RELEASE'
