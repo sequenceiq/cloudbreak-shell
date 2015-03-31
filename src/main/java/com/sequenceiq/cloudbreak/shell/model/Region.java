@@ -30,7 +30,8 @@ public enum Region {
     JAPAN_EAST("AZURE"),
     JAPAN_WEST("AZURE"),
     SOUTHEAST_ASIA("AZURE"),
-    BRAZIL_SOUTH("AZURE");
+    BRAZIL_SOUTH("AZURE"),
+    local("OPENSTACK");
 
     private String cloudPlatform;
 
