@@ -59,7 +59,7 @@ public class CredentialCommands implements CommandMarker {
         return context.isCredentialAccessible();
     }
 
-    @CliAvailabilityIndicator({ "credential create --GCP", "credential create --EC2", "credential create --AZURE" })
+    @CliAvailabilityIndicator({ "credential create --GCP", "credential create --EC2", "credential create --AZURE", "credential create --OPENSTACK" })
     public boolean isCredentialEc2CreateCommandAvailable() {
         return true;
     }
@@ -132,6 +132,47 @@ public class CredentialCommands implements CommandMarker {
                 }
             }
             return "No credential specified (select a credential by --id or --name)";
+        } catch (Exception ex) {
+            return ex.toString();
+        }
+    }
+
+    @CliCommand(value = "credential create --OPENSTACK", help = "Create a new OPENSTACK credential")
+    public String createOpenStackCredential(
+            @CliOption(key = "name", mandatory = true, help = "Name of the credential") String name,
+            @CliOption(key = "userName", mandatory = true, help = "Username of the credential") String userName,
+            @CliOption(key = "password", mandatory = true, help = "password of the credential") String password,
+            @CliOption(key = "tenantName", mandatory = true, help = "tenantName of the credential") String tenantName,
+            @CliOption(key = "endPoint", mandatory = true, help = "endPoint of the credential") String endPoint,
+            @CliOption(key = "sshKeyPath", mandatory = false, help = "path of a public SSH key file") File sshKeyPath,
+            @CliOption(key = "sshKeyUrl", mandatory = false, help = "URL of a public SSH key file") String sshKeyUrl,
+            @CliOption(key = "description", mandatory = false, help = "Description of the credential") String description,
+            @CliOption(key = "publicInAccount", mandatory = false, help = "flags if the credential is public in the account") Boolean publicInAccount
+        ) {
+        if ((sshKeyPath == null) && (sshKeyUrl == null || sshKeyUrl.isEmpty())) {
+            return "An SSH public key must be specified either with --sshKeyPath or --sshKeyUrl";
+        }
+        String sshKey;
+        if (sshKeyPath != null) {
+            try {
+                sshKey = new String(Files.readAllBytes(Paths.get(sshKeyPath.getPath()))).replaceAll("\n", "");
+            } catch (IOException e) {
+                return "File not found with ssh key.";
+            }
+        } else {
+            try {
+                sshKey = readUrl(sshKeyUrl);
+            } catch (IOException e) {
+                return "Url not found with ssh key.";
+            }
+        }
+        try {
+            String id = cloudbreak.postOpenStackCredential(name, description, userName, password, tenantName, endPoint, sshKey, publicInAccount);
+            context.setCredential(id);
+            createOrSelectTemplateHint();
+            return "Credential created, id: " + id;
+        } catch (HttpResponseException ex) {
+            return ex.getResponse().getData().toString();
         } catch (Exception ex) {
             return ex.toString();
         }

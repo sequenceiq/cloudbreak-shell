@@ -52,7 +52,7 @@ public class TemplateCommands implements CommandMarker {
         return true;
     }
 
-    @CliAvailabilityIndicator({ "template create --GCP", "template create --EC2", "template create --AZURE" })
+    @CliAvailabilityIndicator({ "template create --GCP", "template create --EC2", "template create --AZURE", "template create --OPENSTACK" })
     public boolean isTemplateEc2CreateCommandAvailable() {
         return true;
     }
@@ -66,6 +66,34 @@ public class TemplateCommands implements CommandMarker {
             return ex.getResponse().getData().toString();
         } catch (Exception e) {
             return e.getMessage();
+        }
+    }
+
+    @CliCommand(value = "template create --OPENSTACK", help = "Create a new OPENSTACK template")
+    public String createOpenStackTemplate(
+            @CliOption(key = "name", mandatory = true, help = "Name of the template") String name,
+            @CliOption(key = "instanceType", mandatory = true, help = "instanceType of the template") String instanceType,
+            @CliOption(key = "volumeCount", mandatory = true, help = "volumeCount of the template") Integer volumeCount,
+            @CliOption(key = "volumeSize", mandatory = true, help = "volumeSize(GB) of the template") Integer volumeSize,
+            @CliOption(key = "publicNetId", mandatory = true, help = "publicNetId of the template") String publicNetId,
+            @CliOption(key = "publicInAccount", mandatory = false, help = "flags if the template is public in the account") Boolean publicInAccount,
+            @CliOption(key = "description", mandatory = false, help = "Description of the template") String description
+            ) {
+        try {
+            if (volumeCount < VOLUME_COUNT_MIN || volumeCount > VOLUME_COUNT_MAX) {
+                return "volumeCount has to be between 1 and 8.";
+            }
+            if (volumeSize < VOLUME_SIZE_MIN || volumeSize > VOLUME_SIZE_MAX) {
+                return "VolumeSize has to be between 1 and 1024.";
+            }
+            String id;
+            id = cloudbreak.postOpenStackTemplate(name, description, instanceType, publicNetId, volumeCount.toString(), volumeSize.toString(), publicInAccount);
+            createOrSelectBlueprintHint();
+            return "Template created, id: " + id;
+        } catch (HttpResponseException ex) {
+            return ex.getResponse().getData().toString();
+        } catch (Exception ex) {
+            return ex.toString();
         }
     }
 
