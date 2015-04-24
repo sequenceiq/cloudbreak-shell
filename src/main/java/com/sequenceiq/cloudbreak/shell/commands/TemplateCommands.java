@@ -19,6 +19,7 @@ import com.sequenceiq.cloudbreak.shell.model.AwsInstanceType;
 import com.sequenceiq.cloudbreak.shell.model.AzureInstanceType;
 import com.sequenceiq.cloudbreak.shell.model.CloudbreakContext;
 import com.sequenceiq.cloudbreak.shell.model.GcpInstanceType;
+import com.sequenceiq.cloudbreak.shell.model.GcpVolumeType;
 import com.sequenceiq.cloudbreak.shell.model.Hints;
 import com.sequenceiq.cloudbreak.shell.model.VolumeType;
 
@@ -194,6 +195,7 @@ public class TemplateCommands implements CommandMarker {
             @CliOption(key = "instanceType", mandatory = true, help = "type of the VM") GcpInstanceType instanceType,
             @CliOption(key = "volumeCount", mandatory = true, help = "volumeCount of the template") Integer volumeCount,
             @CliOption(key = "volumeSize", mandatory = true, help = "volumeSize(GB) of the template") Integer volumeSize,
+            @CliOption(key = "volumeType", mandatory = false, help = "volumeType of the template", unspecifiedDefaultValue = "HDD") GcpVolumeType volumeType,
             @CliOption(key = "publicInAccount", mandatory = false, help = "flags if the template is public in the account") Boolean publicInAccount,
             @CliOption(key = "description", mandatory = false, help = "Description of the template") String description
             ) {
@@ -207,6 +209,7 @@ public class TemplateCommands implements CommandMarker {
             String id = cloudbreak.postGccTemplate(name,
                     getDescription(description, "Gcp"),
                     instanceType.name(),
+                    volumeType.name(),
                     volumeCount.toString(),
                     volumeSize.toString(),
                     publicInAccount(publicInAccount)
