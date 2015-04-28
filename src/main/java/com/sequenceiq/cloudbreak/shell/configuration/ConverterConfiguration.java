@@ -26,6 +26,8 @@ import com.sequenceiq.cloudbreak.shell.converter.HostGroupConverter;
 import com.sequenceiq.cloudbreak.shell.converter.InstanceGroupConverter;
 import com.sequenceiq.cloudbreak.shell.converter.InstanceGroupTemplateIdConverter;
 import com.sequenceiq.cloudbreak.shell.converter.InstanceGroupTemplateNameConverter;
+import com.sequenceiq.cloudbreak.shell.converter.NetworkIdConverter;
+import com.sequenceiq.cloudbreak.shell.converter.NetworkNameConverter;
 import com.sequenceiq.cloudbreak.shell.converter.StackRegionConverter;
 
 /**
@@ -140,5 +142,15 @@ public class ConverterConfiguration {
     @Bean
     Converter staticFieldConverterImpl() {
         return new StaticFieldConverterImpl();
+    }
+
+    @Bean
+    Converter networkIdConverter() {
+        return new NetworkIdConverter(client);
+    }
+
+    @Bean
+    Converter networkNameConverter() {
+        return new NetworkNameConverter(client);
     }
 }

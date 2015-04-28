@@ -76,9 +76,9 @@ public class InstanceGroupCommands implements CommandMarker {
                     context.putInstanceGroup(instanceGroup.getName(), new InstanceGroupEntry(parsedTemplateId, nodeCount, "GATEWAY"));
                 }
                 if (context.getActiveHostGroups().size() == context.getInstanceGroups().size() - 1  && context.getActiveHostGroups().size() != 0) {
-                    context.setHint(Hints.CREATE_STACK);
+                    context.setHint(Hints.SELECT_NETWORK);
                 } else {
-                    context.setHint(Hints.CONFIGURE_INSTANCEGROUP);
+                    context.setHint(Hints.CONFIGURE_HOSTGROUP);
                 }
                 return renderObjectValueMap(context.getInstanceGroups(), "instanceGroup");
             } else {

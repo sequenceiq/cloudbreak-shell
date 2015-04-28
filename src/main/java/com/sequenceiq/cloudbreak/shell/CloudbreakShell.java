@@ -3,6 +3,8 @@ package com.sequenceiq.cloudbreak.shell;
 import static com.sequenceiq.cloudbreak.shell.VersionedApplication.versionedApplication;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -136,6 +138,10 @@ public class CloudbreakShell implements CommandLineRunner, ShellStatusListener {
         }
         if (!cloudbreak.getAccountRecipes().isEmpty()) {
             context.setRecipeAccessible();
+        }
+        List<Map> accountNetworks = cloudbreak.getAccountNetworks();
+        for (Map network : accountNetworks) {
+            context.putNetwork(network.get("id").toString(), network.get("cloudPlatform").toString());
         }
     }
 }
