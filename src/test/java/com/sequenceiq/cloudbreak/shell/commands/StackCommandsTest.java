@@ -39,6 +39,7 @@ public class StackCommandsTest {
         dummyResult = new HashMap<>();
         dummyResult.put("id", STACK_ID);
         dummyResult.put("name", STACK_NAME);
+        given(mockContext.isCredentialAvailable()).willReturn(true);
     }
 
     @Test

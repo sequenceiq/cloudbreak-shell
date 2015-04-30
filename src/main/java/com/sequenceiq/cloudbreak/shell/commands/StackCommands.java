@@ -58,7 +58,7 @@ public class StackCommands implements CommandMarker {
 
     @CliAvailabilityIndicator(value = "stack select")
     public boolean isStackSelectCommandAvailable() throws Exception {
-        return context.isStackAccessible();
+        return context.isStackAccessible() && context.isBlueprintAvailable();
     }
 
     @CliCommand(value = "stack node --ADD", help = "Add new nodes to the cluster")
@@ -150,14 +150,22 @@ public class StackCommands implements CommandMarker {
                 Object stack = cloudbreak.getStack(id);
                 if (stack != null) {
                     context.addStack(id, ((HashMap) stack).get("name").toString());
-                    context.setHint(Hints.CREATE_CLUSTER);
+                    if (context.isCredentialAvailable()) {
+                        context.setHint(Hints.CREATE_CLUSTER);
+                    } else {
+                        context.setHint(Hints.CONFIGURE_HOSTGROUP);
+                    }
                     return "Stack selected, id: " + id;
                 }
             } else if (name != null) {
                 Object stack = cloudbreak.getStackByName(name);
                 if (stack != null) {
                     context.addStack(((HashMap) stack).get("id").toString(), name);
-                    context.setHint(Hints.CREATE_CLUSTER);
+                    if (context.isCredentialAvailable()) {
+                        context.setHint(Hints.CREATE_CLUSTER);
+                    } else {
+                        context.setHint(Hints.CONFIGURE_HOSTGROUP);
+                    }
                     return "Stack selected, name: " + name;
                 }
             }
