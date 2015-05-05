@@ -36,7 +36,7 @@ public class ClusterCommands implements CommandMarker {
 
     @CliAvailabilityIndicator(value = "cluster show")
     public boolean isClusterShowCommandAvailable() {
-        return true;
+        return context.isStackAvailable();
     }
 
     @CliAvailabilityIndicator({ "cluster node --ADD", "cluster node --REMOVE" })
@@ -54,6 +54,8 @@ public class ClusterCommands implements CommandMarker {
             }
             cloudbreak.putCluster(Integer.valueOf(context.getStackId()), hostGroup, adjustment, false);
             return context.getStackId();
+        } catch (HttpResponseException ex) {
+            return ex.getResponse().getData().toString();
         } catch (Exception ex) {
             return ex.toString();
         }
@@ -70,6 +72,8 @@ public class ClusterCommands implements CommandMarker {
             }
             cloudbreak.putCluster(Integer.valueOf(context.getStackId()), hostGroup, adjustment, withStackDownScale == null ? false : withStackDownScale);
             return context.getStackId();
+        } catch (HttpResponseException ex) {
+            return ex.getResponse().getData().toString();
         } catch (Exception ex) {
             return ex.toString();
         }
