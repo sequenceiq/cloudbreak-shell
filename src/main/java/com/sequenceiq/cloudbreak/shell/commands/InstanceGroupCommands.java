@@ -71,7 +71,7 @@ public class InstanceGroupCommands implements CommandMarker {
                 map.put(parsedTemplateId, nodeCount);
                 if (!"cbgateway".equals(instanceGroup.getName())) {
                     context.putHostGroup(new HashMap.SimpleEntry<String, Object>(instanceGroup.getName(), new HashSet<>()));
-                    context.putInstanceGroup(instanceGroup.getName(), new InstanceGroupEntry(parsedTemplateId, nodeCount, "HOSTGROUP"));
+                    context.putInstanceGroup(instanceGroup.getName(), new InstanceGroupEntry(parsedTemplateId, nodeCount, "CORE"));
                 } else {
                     context.putInstanceGroup(instanceGroup.getName(), new InstanceGroupEntry(parsedTemplateId, nodeCount, "GATEWAY"));
                 }
