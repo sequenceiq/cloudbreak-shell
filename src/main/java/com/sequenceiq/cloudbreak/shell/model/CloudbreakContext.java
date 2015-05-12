@@ -29,6 +29,8 @@ public class CloudbreakContext {
     private Set<String> activeTemplates = new HashSet<>();
     private Set<String> activeTemplateNames = new HashSet<>();
     private String activeCloudPlatform;
+    private Map<String, String> networksByProvider = new HashMap<>();
+    private String activeNetworkId;
 
     @Autowired
     private CloudbreakClient client;
@@ -189,6 +191,26 @@ public class CloudbreakContext {
 
     public String getCredentialId() {
         return getLastPropertyValue(PropertyKey.CREDENTIAL_ID);
+    }
+
+    public Map<String, String> getNetworksByProvider() {
+        return networksByProvider;
+    }
+
+    public void putNetwork(String id, String provider) {
+        networksByProvider.put(id, provider);
+    }
+
+    public void putNetworks(Map<String, String> networksByProvider) {
+        this.networksByProvider.putAll(networksByProvider);
+    }
+
+    public String getActiveNetworkId() {
+        return activeNetworkId;
+    }
+
+    public void setActiveNetworkId(String activeNetworkId) {
+        this.activeNetworkId = activeNetworkId;
     }
 
     /**

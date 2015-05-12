@@ -76,7 +76,6 @@ public class TemplateCommands implements CommandMarker {
             @CliOption(key = "instanceType", mandatory = true, help = "instanceType of the template") String instanceType,
             @CliOption(key = "volumeCount", mandatory = true, help = "volumeCount of the template") Integer volumeCount,
             @CliOption(key = "volumeSize", mandatory = true, help = "volumeSize(GB) of the template") Integer volumeSize,
-            @CliOption(key = "publicNetId", mandatory = true, help = "publicNetId of the template") String publicNetId,
             @CliOption(key = "publicInAccount", mandatory = false, help = "flags if the template is public in the account") Boolean publicInAccount,
             @CliOption(key = "description", mandatory = false, help = "Description of the template") String description
             ) {
@@ -88,7 +87,7 @@ public class TemplateCommands implements CommandMarker {
                 return "VolumeSize has to be between 1 and 1024.";
             }
             String id;
-            id = cloudbreak.postOpenStackTemplate(name, description, instanceType, publicNetId, volumeCount.toString(), volumeSize.toString(), publicInAccount);
+            id = cloudbreak.postOpenStackTemplate(name, description, instanceType, volumeCount.toString(), volumeSize.toString(), publicInAccount);
             createOrSelectBlueprintHint();
             return "Template created, id: " + id;
         } catch (HttpResponseException ex) {
