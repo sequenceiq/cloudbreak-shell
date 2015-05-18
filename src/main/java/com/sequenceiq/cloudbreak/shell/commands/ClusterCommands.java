@@ -95,7 +95,18 @@ public class ClusterCommands implements CommandMarker {
 
     @CliCommand(value = "cluster create", help = "Create a new cluster based on a blueprint and optionally a recipe")
     public String createCluster(
-            @CliOption(key = "description", mandatory = false, help = "Description of the blueprint") String description) {
+            @CliOption(key = "userName", mandatory = false, unspecifiedDefaultValue = "admin", help = "Username of the Ambari server") String userName,
+            @CliOption(key = "password", mandatory = false, unspecifiedDefaultValue = "admin", help = "Password of the Ambari server") String password,
+            @CliOption(key = "description", mandatory = false, help = "Description of the blueprint") String description,
+            @CliOption(key = "stack", mandatory = false, help = "Ambari stack name, like HDP") String stack,
+            @CliOption(key = "version", mandatory = false, help = "Ambari stack version") String version,
+            @CliOption(key = "os", mandatory = false, help = "Ambari stack os, Cloudbreak runs on redhat6 based os") String os,
+            @CliOption(key = "stackRepoId", mandatory = false, help = "Ambari stack repository id") String stackRepoId,
+            @CliOption(key = "stackBaseURL", mandatory = false, help = "Ambari stack url") String stackBaseURL,
+            @CliOption(key = "utilsRepoId", mandatory = false, help = "Ambari stack utils repoId") String utilsRepoId,
+            @CliOption(key = "utilsBaseURL", mandatory = false, help = "Ambari stack utils url") String utilsBaseURL,
+            @CliOption(key = "verify", mandatory = false, help = "Whether to verify to URLs or not") Boolean verify
+    ) {
         try {
             List<Map<String, Object>> hostGroupList = new ArrayList<>();
             for (Map<String, Object> hostGroupListEntity : context.getHostGroups().values()) {
@@ -107,10 +118,15 @@ public class ClusterCommands implements CommandMarker {
             }
             cloudbreak.postCluster(
                     context.getStackName(),
+                    userName, password,
                     parseInt(context.getBlueprintId()),
                     description,
                     parseInt(context.getStackId()),
-                    hostGroupList);
+                    hostGroupList,
+                    stack, version, os,
+                    stackRepoId, stackBaseURL,
+                    utilsRepoId, utilsBaseURL,
+                    verify);
             context.setHint(Hints.NONE);
             return "Cluster creation started";
         } catch (HttpResponseException ex) {

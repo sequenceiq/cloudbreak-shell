@@ -96,9 +96,7 @@ public class StackCommands implements CommandMarker {
     @CliCommand(value = "stack create", help = "Create a new stack based on a template")
     public String createStack(
             @CliOption(key = "name", mandatory = true, help = "Name of the stack") String name,
-            @CliOption(key = "userName", mandatory = false, unspecifiedDefaultValue = "admin", help = "Username of the Ambari server") String userName,
             @CliOption(key = "region", mandatory = true, help = "region of the stack") StackRegion region,
-            @CliOption(key = "password", mandatory = false, unspecifiedDefaultValue = "admin", help = "Password of the Ambari server") String password,
             @CliOption(key = "image", mandatory = false, specifiedDefaultValue = "image-name", help = "Specific image name") String image,
             @CliOption(key = "publicInAccount", mandatory = false, help = "marks the stack as visible for all members of the account") Boolean publicInAccount,
             @CliOption(key = "onFailureAction", mandatory = false, help = "onFailureAction which is ROLLBACK or DO_NOTHING.") OnFailureAction onFailureAction,
@@ -112,8 +110,6 @@ public class StackCommands implements CommandMarker {
             String id =
                     cloudbreak.postStack(
                             name,
-                            userName,
-                            password,
                             context.getCredentialId(),
                             region.getName(),
                             publicInAccount == null ? false : publicInAccount,
