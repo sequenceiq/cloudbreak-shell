@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 import com.sequenceiq.cloudbreak.client.CloudbreakClient;
 import com.sequenceiq.cloudbreak.shell.model.CloudbreakContext;
 import com.sequenceiq.cloudbreak.shell.model.Hints;
+import com.sequenceiq.cloudbreak.shell.model.StatusRequest;
 
 import groovyx.net.http.HttpResponseException;
 
@@ -34,7 +35,7 @@ public class ClusterCommands implements CommandMarker {
         return context.isBlueprintAvailable() && context.isStackAvailable() && context.getActiveHostGroups().size() == context.getHostGroups().keySet().size();
     }
 
-    @CliAvailabilityIndicator(value = "cluster show")
+    @CliAvailabilityIndicator(value = { "cluster show", "cluster stop", "cluster start" })
     public boolean isClusterShowCommandAvailable() {
         return context.isStackAvailable();
     }
@@ -119,4 +120,23 @@ public class ClusterCommands implements CommandMarker {
         }
     }
 
+    @CliCommand(value = "cluster stop", help = "Stop your cluster")
+    public String stopCluster() {
+        try {
+            cloudbreak.putClusterStatus(Integer.valueOf(context.getStackId()), StatusRequest.STOPPED.name());
+            return "Cluster is stopping";
+        } catch (Exception ex) {
+            return ex.toString();
+        }
+    }
+
+    @CliCommand(value = "cluster start", help = "Start your cluster")
+    public String startCluster() {
+        try {
+            cloudbreak.putClusterStatus(Integer.valueOf(context.getStackId()), StatusRequest.STARTED.name());
+            return "Cluster is starting";
+        } catch (Exception ex) {
+            return ex.toString();
+        }
+    }
 }

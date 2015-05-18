@@ -18,6 +18,7 @@ import com.sequenceiq.cloudbreak.shell.model.AdjustmentType;
 import com.sequenceiq.cloudbreak.shell.model.CloudbreakContext;
 import com.sequenceiq.cloudbreak.shell.model.Hints;
 import com.sequenceiq.cloudbreak.shell.model.OnFailureAction;
+import com.sequenceiq.cloudbreak.shell.model.StatusRequest;
 
 import groovyx.net.http.HttpResponseException;
 
@@ -46,7 +47,7 @@ public class StackCommands implements CommandMarker {
                 && context.getActiveHostGroups().size() != 0);
     }
 
-    @CliAvailabilityIndicator({ "stack node --ADD", "stack node --REMOVE" })
+    @CliAvailabilityIndicator({ "stack node --ADD", "stack node --REMOVE", "stack stop", "stack start" })
     public boolean isStackNodeCommandAvailable() {
         return context.isStackAvailable();
     }
@@ -207,6 +208,27 @@ public class StackCommands implements CommandMarker {
             return ex.toString();
         }
     }
+
+    @CliCommand(value = "stack stop", help = "Stop your stack")
+    public String stopStack() {
+        try {
+            cloudbreak.putStackStatus(Integer.valueOf(context.getStackId()), StatusRequest.STOPPED.name());
+            return "Stack is stopping";
+        } catch (Exception ex) {
+            return ex.toString();
+        }
+    }
+
+    @CliCommand(value = "stack start", help = "Start your stack")
+    public String startStack() {
+        try {
+            cloudbreak.putStackStatus(Integer.valueOf(context.getStackId()), StatusRequest.STARTED.name());
+            return "Stack is starting";
+        } catch (Exception ex) {
+            return ex.toString();
+        }
+    }
+
 
     @CliCommand(value = "stack show", help = "Shows the stack by its id")
     public Object showStack(
