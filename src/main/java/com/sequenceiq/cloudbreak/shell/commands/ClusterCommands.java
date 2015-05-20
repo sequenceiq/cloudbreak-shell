@@ -98,14 +98,14 @@ public class ClusterCommands implements CommandMarker {
             @CliOption(key = "userName", mandatory = false, unspecifiedDefaultValue = "admin", help = "Username of the Ambari server") String userName,
             @CliOption(key = "password", mandatory = false, unspecifiedDefaultValue = "admin", help = "Password of the Ambari server") String password,
             @CliOption(key = "description", mandatory = false, help = "Description of the blueprint") String description,
-            @CliOption(key = "stack", mandatory = false, help = "Ambari stack name, like HDP") String stack,
-            @CliOption(key = "version", mandatory = false, help = "Ambari stack version") String version,
-            @CliOption(key = "os", mandatory = false, help = "Ambari stack os, Cloudbreak runs on redhat6 based os") String os,
-            @CliOption(key = "stackRepoId", mandatory = false, help = "Ambari stack repository id") String stackRepoId,
-            @CliOption(key = "stackBaseURL", mandatory = false, help = "Ambari stack url") String stackBaseURL,
-            @CliOption(key = "utilsRepoId", mandatory = false, help = "Ambari stack utils repoId") String utilsRepoId,
-            @CliOption(key = "utilsBaseURL", mandatory = false, help = "Ambari stack utils url") String utilsBaseURL,
-            @CliOption(key = "verify", mandatory = false, help = "Whether to verify to URLs or not") Boolean verify
+            @CliOption(key = "stack", mandatory = false, help = "Stack definition name, like HDP") String stack,
+            @CliOption(key = "version", mandatory = false, help = "Stack definition version") String version,
+            @CliOption(key = "os", mandatory = false, help = "Stack OS to select package manager, default is RedHat") String os,
+            @CliOption(key = "stackRepoId", mandatory = false, help = "Stack repository id") String stackRepoId,
+            @CliOption(key = "stackBaseURL", mandatory = false, help = "Stack url") String stackBaseURL,
+            @CliOption(key = "utilsRepoId", mandatory = false, help = "Stack utils repoId") String utilsRepoId,
+            @CliOption(key = "utilsBaseURL", mandatory = false, help = "Stack utils URL") String utilsBaseURL,
+            @CliOption(key = "verify", mandatory = false, help = "Whether to verify the URLs or not") Boolean verify
     ) {
         try {
             List<Map<String, Object>> hostGroupList = new ArrayList<>();
