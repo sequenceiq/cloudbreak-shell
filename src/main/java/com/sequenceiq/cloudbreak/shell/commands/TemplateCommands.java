@@ -205,7 +205,7 @@ public class TemplateCommands implements CommandMarker {
             return "VolumeSize has to be between 1 and 1024.";
         }
         try {
-            String id = cloudbreak.postGccTemplate(name,
+            String id = cloudbreak.postGcpTemplate(name,
                     getDescription(description, "Gcp"),
                     instanceType.name(),
                     volumeType.name(),

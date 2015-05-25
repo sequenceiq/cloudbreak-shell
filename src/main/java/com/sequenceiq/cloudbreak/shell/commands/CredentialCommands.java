@@ -261,7 +261,7 @@ public class CredentialCommands implements CommandMarker {
         }
 
         try {
-            String id = cloudbreak.postGccCredential(
+            String id = cloudbreak.postGcpCredential(
                     name,
                     description == null ? "Gcp credential was created by the cloudbreak-shell" : description,
                     sshKey,

@@ -4,12 +4,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 public enum Region {
-    US_CENTRAL1_A("GCC"),
-    US_CENTRAL1_B("GCC"),
-    US_CENTRAL1_F("GCC"),
-    EUROPE_WEST1_B("GCC"),
-    ASIA_EAST1_A("GCC"),
-    ASIA_EAST1_B("GCC"),
+    US_CENTRAL1_A("GCP"),
+    US_CENTRAL1_B("GCP"),
+    US_CENTRAL1_F("GCP"),
+    EUROPE_WEST1_B("GCP"),
+    ASIA_EAST1_A("GCP"),
+    ASIA_EAST1_B("GCP"),
     US_EAST_1("AWS"),
     US_WEST_1("AWS"),
     US_WEST_2("AWS"),
