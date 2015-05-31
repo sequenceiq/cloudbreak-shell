@@ -63,13 +63,59 @@ Once you are connected you can start to create a cluster. If you are lost and ne
 
 ### Create a cloud credential
 
-In order to start using Cloudbreak you will need to have a cloud user, for example an Amazon AWS account. Note that Cloudbreak **does not** store you cloud user details - we work around the concept of [IAM](http://aws.amazon.com/iam/) - on Amazon (or other cloud providers) you will have to create an IAM role, a policy and associate that with your Cloudbreak account - for further documentation please refer to the [documentation](http://sequenceiq.com/cloudbreak/#accounts).
+In order to start using Cloudbreak you will need to have a cloud user. The synthax will vary depending on the target cloud service provider but the logic is similar. Note that Cloudbreak **does not** store you cloud user details - we work around the concept of [IAM](http://aws.amazon.com/iam/) - on Amazon (or other cloud providers) you will have to create an IAM role, a policy and associate that with your Cloudbreak account - for further documentation please refer to the [documentation](http://sequenceiq.com/cloudbreak/#accounts).
+
+#### Amazon AWS example
 
 ```
-credential createEC2 --description “description" --name “myCredentialName" --roleArn "arn:aws:iam::NUMBER:role/cloudbreak-ABC" --sshKeyUrl “URL towards your AWS public key"
+credential create --EC2 --description “description" --name “myCredentialName" --roleArn "arn:aws:iam::NUMBER:role/cloudbreak-ABC" --sshKeyUrl “URL towards your public SSH key file"
 ```
 
-Alternatively you can upload your public key from a file as well, by using the `—sshKeyPath` switch. You can check whether the credential was creates successfully by using the `credential list` command. You can switch between your cloud credential - when you’d like to use one and act with that you will have to use:
+Other available options:
+
+- --sshKeyPath "path": upload your public key from a file (replaces --sshKeyUrl)
+
+- --publicInAccount "flag": flags if the credential is public in the account
+
+#### Google Cloud Platform example
+
+```
+credential create --GCP --description “description" --name “myCredentialName" --projectId "myProjectId" --serviceAccountId "myServiceAccoundId" --serviceAccountPrivateKeyPath "path of a service account private key (p12) file" --sshKeyUrl “URL towards your public SSH key file"
+```
+
+Other available options:
+
+- --sshKeyPath "path": upload your public key from a file (replaces --sshKeyUrl)
+
+- --publicInAccount "flag": flags if the credential is public in the account
+
+#### Openstack example
+
+```
+credential create --OPENSTACK --description “description" --name “myCredentialName" --userName "myUsername" --password "myPassword" --tenantName "myTenantName" --endPoint "myEndPoint" --sshKeyUrl “URL towards your public SSH key file"
+```
+
+Other available options:
+
+- --sshKeyPath "path": upload your public key from a file (replaces --sshKeyUrl)
+
+- --publicInAccount "flag": flags if the credential is public in the account
+
+#### Azure example
+
+```
+credential create --AZURE --description “description" --name “myCredentialName" --subscriptionId "mySubscriptionId" --sshKeyUrl “URL towards your public SSH key file"
+```
+
+Other available options:
+
+- --sshKeyPath "path": upload your public key from a file (replaces --sshKeyUrl)
+
+- --publicInAccount "flag": flags if the credential is public in the account
+
+#### Checking credential creation
+
+You can check whether the credential was creates successfully by using the `credential list` command. You can (and probably want to use the new credential if automating tasks) switch between your cloud credential - when you’d like to use one and act with that you will have to use:
 
 ```
 credential select --id #ID of the credential
@@ -79,9 +125,59 @@ credential select --id #ID of the credential
 
 A template gives developers and systems administrators an easy way to create and manage a collection of cloud infrastructure related resources, maintaining and updating them in an orderly and predictable fashion. A template can be used repeatedly to create identical copies of the same stack (or to use as a foundation to start a new stack).
 
+#### Amazon AWS example
+
 ```
-template createEC2 --name awstemplate --description aws-template  --region EU_WEST_1 --instanceType M3Xlarge --volumeSize 100 --volumeCount 2
+template create --EC2 --name awstemplate --description aws-template --instanceType M3Xlarge --volumeSize 100 --volumeCount 2
 ```
+
+Other available options:
+
+- --volumeType "voltype": defaults to "Gp2", other allowed value: "Io1"
+
+- --encrypted "boolean": use encrypted disks
+
+- --spotPrice "double": amount you're willing to pay for resources
+
+- --sshLocation "CIDR": defaults to 0.0.0.0/0
+
+- --publicInAccount "flag": flags if the template is public in the account
+
+#### Google Cloud Platform example
+
+```
+template create --GCP --name gcptemplate --description gcp-template --instanceType N1_STANDARD_4 --volumeSize 100 --volumeCount 2
+```
+
+Other available options:
+
+- --volumeType "voltype": defaults to "HDD", other allowed value: "SSD"
+
+- --publicInAccount "flag": flags if the template is public in the account
+
+#### Openstack example
+
+```
+template create --OPENSTACK --name openstacktemplate --description openstack-template --instanceType "type" --volumeSize 100 --volumeCount 2
+```
+
+Other available options:
+
+- --publicInAccount "flag": flags if the template is public in the account
+
+#### Azure example
+
+```
+template create --AZURE --name azuretemplate --description azure-template --instanceType STANDARD_D2 --volumeSize 100 --volumeCount 2
+```
+
+Other available options:
+
+- --publicInAccount "flag": flags if the template is public in the account
+
+
+#### Viewing created template
+
 You can check whether the template was created successfully by using the `template list` command. Check the template and select it if you are happy with it:
 
 ```
@@ -89,6 +185,7 @@ template show --id #ID of the template
 
 template select --id #ID of the template
 ```
+
 ### Create a stack
 
 Stacks are template `instances` - a running cloud infrastructure created based on a template. Use the following command to create a stack to be used with your Hadoop cluster:
