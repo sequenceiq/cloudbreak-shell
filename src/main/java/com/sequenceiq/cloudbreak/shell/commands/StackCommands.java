@@ -101,7 +101,8 @@ public class StackCommands implements CommandMarker {
             @CliOption(key = "publicInAccount", mandatory = false, help = "marks the stack as visible for all members of the account") Boolean publicInAccount,
             @CliOption(key = "onFailureAction", mandatory = false, help = "onFailureAction which is ROLLBACK or DO_NOTHING.") OnFailureAction onFailureAction,
             @CliOption(key = "adjustmentType", mandatory = false, help = "adjustmentType which is EXACT or PERCENTAGE.") AdjustmentType adjustmentType,
-            @CliOption(key = "threshold", mandatory = false, help = "threshold of failure") Long threshold) {
+            @CliOption(key = "threshold", mandatory = false, help = "threshold of failure") Long threshold,
+            @CliOption(key = "diskPerStorage", mandatory = false, help = "disk per Storage Account on Azure") Integer diskPerStorage) {
         try {
             String networkId = context.getActiveNetworkId();
             if (networkId == null || (networkId != null && context.getNetworksByProvider().get(networkId) == context.getActiveCloudPlatform())) {
@@ -118,7 +119,8 @@ public class StackCommands implements CommandMarker {
                             threshold == null ? 1L : threshold,
                             adjustmentType == null ? AdjustmentType.BEST_EFFORT.name() : adjustmentType.name(),
                             image,
-                            networkId);
+                            networkId,
+                            diskPerStorage);
             context.addStack(id, name);
             context.setHint(Hints.CREATE_CLUSTER);
             return "Stack created, id: " + id;
