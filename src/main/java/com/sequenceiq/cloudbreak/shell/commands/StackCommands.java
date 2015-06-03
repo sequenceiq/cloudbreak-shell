@@ -102,7 +102,8 @@ public class StackCommands implements CommandMarker {
             @CliOption(key = "onFailureAction", mandatory = false, help = "onFailureAction which is ROLLBACK or DO_NOTHING.") OnFailureAction onFailureAction,
             @CliOption(key = "adjustmentType", mandatory = false, help = "adjustmentType which is EXACT or PERCENTAGE.") AdjustmentType adjustmentType,
             @CliOption(key = "threshold", mandatory = false, help = "threshold of failure") Long threshold,
-            @CliOption(key = "diskPerStorage", mandatory = false, help = "disk per Storage Account on Azure") Integer diskPerStorage) {
+            @CliOption(key = "diskPerStorage", mandatory = false, help = "disk per Storage Account on Azure") Integer diskPerStorage,
+            @CliOption(key = "dedicatedInstances", mandatory = false, help = "request dedicated instances on AWS") Boolean dedicatedInstances) {
         try {
             String networkId = context.getActiveNetworkId();
             if (networkId == null || (networkId != null && context.getNetworksByProvider().get(networkId) == context.getActiveCloudPlatform())) {
@@ -120,7 +121,8 @@ public class StackCommands implements CommandMarker {
                             adjustmentType == null ? AdjustmentType.BEST_EFFORT.name() : adjustmentType.name(),
                             image,
                             networkId,
-                            diskPerStorage);
+                            diskPerStorage,
+                            dedicatedInstances);
             context.addStack(id, name);
             context.setHint(Hints.CREATE_CLUSTER);
             return "Stack created, id: " + id;
