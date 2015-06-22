@@ -143,5 +143,9 @@ public class CloudbreakShell implements CommandLineRunner, ShellStatusListener {
         for (Map network : accountNetworks) {
             context.putNetwork(network.get("id").toString(), network.get("cloudPlatform").toString());
         }
+        List<Map> securityGroups = cloudbreak.getAccountSecurityGroups();
+        for (Map securityGroup : securityGroups) {
+            context.putSecurityGroup(securityGroup.get("id").toString(), securityGroup.get("name").toString());
+        }
     }
 }

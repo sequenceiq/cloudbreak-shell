@@ -220,7 +220,7 @@ public class NetworkCommands implements CommandMarker {
     }
 
     private void createHintAndAddNetworkToContext(String id, String provider) throws Exception {
-        context.setHint(Hints.CREATE_STACK);
+        context.setHint(Hints.SELECT_SECURITY_GROUP);
         context.putNetwork(id, provider);
         context.setActiveNetworkId(id);
     }

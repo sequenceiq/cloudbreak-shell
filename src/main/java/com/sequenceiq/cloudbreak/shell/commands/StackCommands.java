@@ -109,6 +109,10 @@ public class StackCommands implements CommandMarker {
             if (networkId == null || (networkId != null && context.getNetworksByProvider().get(networkId) == context.getActiveCloudPlatform())) {
                 return "A network must be selected with the same cloud platform as the credential!";
             }
+            String securityGroupId = context.getActiveSecurityGroupId();
+            if (securityGroupId == null) {
+                return "A security group must be selected";
+            }
             String id =
                     cloudbreak.postStack(
                             name,
@@ -121,6 +125,7 @@ public class StackCommands implements CommandMarker {
                             adjustmentType == null ? AdjustmentType.BEST_EFFORT.name() : adjustmentType.name(),
                             image,
                             networkId,
+                            securityGroupId,
                             diskPerStorage,
                             dedicatedInstances);
             context.addStack(id, name);
