@@ -30,7 +30,9 @@ public class CloudbreakContext {
     private Set<String> activeTemplateNames = new HashSet<>();
     private String activeCloudPlatform;
     private Map<String, String> networksByProvider = new HashMap<>();
+    private Map<String, String> securityGroups = new HashMap<>();
     private String activeNetworkId;
+    private String activeSecurityGroupId;
 
     @Autowired
     private CloudbreakClient client;
@@ -205,12 +207,32 @@ public class CloudbreakContext {
         this.networksByProvider.putAll(networksByProvider);
     }
 
+    public void putSecurityGroup(String id, String name) {
+        this.securityGroups.put(id, name);
+    }
+
+    public Map<String, String> getSecurityGroups() {
+        return securityGroups;
+    }
+
+    public void setSecurityGroups(Map<String, String> securityGroups) {
+        this.securityGroups = securityGroups;
+    }
+
     public String getActiveNetworkId() {
         return activeNetworkId;
     }
 
     public void setActiveNetworkId(String activeNetworkId) {
         this.activeNetworkId = activeNetworkId;
+    }
+
+    public String getActiveSecurityGroupId() {
+        return activeSecurityGroupId;
+    }
+
+    public void setActiveSecurityGroupId(String id) {
+        this.activeSecurityGroupId = id;
     }
 
     /**
