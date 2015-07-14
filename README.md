@@ -14,7 +14,7 @@ The goal with the CLI was to provide an interactive command line tool which supp
 You have 3 options to give it a try:
 
 - use our prepared [docker image](https://github.com/sequenceiq/docker-cb-shell) - **recommended** solution
-- download the latest self-containing executable jar from our maven repo
+- download the latest self-containing executable jar from our maven repo with the ./latest-release.sh file
 - build it from source
 
 ### Build from source
@@ -28,8 +28,7 @@ cd cloudbreak-shell
 ./gradlew clean build
 ```
 
-_Note: In case you use the hosted version of Cloudbreak you should use the `latest-release.sh` to get the right version of the CLI.
-In case you build your own Cloudbreak from the `master` branch you should use the `latest-snap.sh` to get the right version of the CLI._
+_Note: In case you use the hosted version of Cloudbreak you should use the `latest-release.sh` to get the right version of the CLI._
 
 <!--more-->
 
@@ -39,16 +38,16 @@ There are several different ways to use the shell. First of all you'll need a Cl
 
 Alternatively you can host your own Cloudbreak instance - for that just follow up with the steps in the Cloudbreak [documentation](http://sequenceiq.com/cloudbreak/#quickstart-and-installation). If you're hosting your own Cloudbreak server you can still use your SequenceIQ credentials and our identity server, but then you'll have to configure your Cloudbreak installation with proper client credentials that will be accepted by our identity server. It is currently not supported to register your Cloudbreak application through an API (but it is planned), so contact us if you'd like to use this solution.
 
-The third alternative is to deploy our whole stack locally in your organization along with [Cloudbreak](http://sequenceiq.com/cloudbreak/#quickstart-and-installation), our OAuth2 based [Identity Server](http://blog.sequenceiq.com/blog/2014/10/16/using-uaa-as-an-identity-server/), and our user management application, [Sultans](https://github.com/sequenceiq/sultans).
+The third alternative is to deploy our whole stack locally in your organization with [cloudbreak-deployer](https://github.com/sequenceiq/cloudbreak-deployer).
 
-We suggest to try our hosted solution as in case you have any issues we can always help you. Please feel free to create bugs, ask for enhancements or just give us feedback by either using our [GitHub repository](https://github.com/sequenceiq/cloudbreak) or the other channels highlighted in the product documentation (Google Groups, email or social channels).
+Please feel free to create bugs, ask for enhancements or just give us feedback by either using our [GitHub repository](https://github.com/sequenceiq/cloudbreak) or the other channels highlighted in the product documentation (Google Groups, email or social channels).
 
 The shell is built as a single executable jar with the help of [Spring Boot](http://projects.spring.io/spring-boot/).
 
 ```
 Usage:
-  java -jar cloudbreak-shell-0.2-SNAPSHOT.jar                  : Starts Cloudbreak Shell in interactive mode.
-  java -jar cloudbreak-shell-0.2-SNAPSHOT.jar --cmdfile=<FILE> : Cloudbreak executes commands read from the file.
+  java -jar cloudbreak-shell-0.5-SNAPSHOT.jar                  : Starts Cloudbreak Shell in interactive mode.
+  java -jar cloudbreak-shell-0.5-SNAPSHOT.jar --cmdfile=<FILE> : Cloudbreak executes commands read from the file.
 
 Options:
   --cloudbreak.address=<http[s]://HOSTNAME:PORT>  Address of the Cloudbreak Server [default: https://cloudbreak-api.sequenceiq.com].
@@ -68,7 +67,7 @@ In order to start using Cloudbreak you will need to have a cloud user. The synth
 #### Amazon AWS example
 
 ```
-credential create --EC2 --description “description" --name “myCredentialName" --roleArn "arn:aws:iam::NUMBER:role/cloudbreak-ABC" --sshKeyUrl “URL towards your public SSH key file"
+credential create --EC2 --description "description" --name "myCredentialName" --roleArn "arn:aws:iam::NUMBER:role/cloudbreak-ABC" --sshKeyUrl "URL towards your public SSH key file"
 ```
 
 Other available options:
@@ -80,7 +79,7 @@ Other available options:
 #### Google Cloud Platform example
 
 ```
-credential create --GCP --description “description" --name “myCredentialName" --projectId "myProjectId" --serviceAccountId "myServiceAccoundId" --serviceAccountPrivateKeyPath "path of a service account private key (p12) file" --sshKeyUrl “URL towards your public SSH key file"
+credential create --GCP --description "description" --name "myCredentialName" --projectId "myProjectId" --serviceAccountId "myServiceAccoundId" --serviceAccountPrivateKeyPath "path of a service account private key (p12) file" --sshKeyUrl "URL towards your public SSH key file"
 ```
 
 Other available options:
@@ -92,7 +91,7 @@ Other available options:
 #### Openstack example
 
 ```
-credential create --OPENSTACK --description “description" --name “myCredentialName" --userName "myUsername" --password "myPassword" --tenantName "myTenantName" --endPoint "myEndPoint" --sshKeyUrl “URL towards your public SSH key file"
+credential create --OPENSTACK --description "description" --name "myCredentialName" --userName "myUsername" --password "myPassword" --tenantName "myTenantName" --endPoint "myEndPoint" --sshKeyUrl "URL towards your public SSH key file"
 ```
 
 Other available options:
@@ -104,7 +103,7 @@ Other available options:
 #### Azure example
 
 ```
-credential create --AZURE --description “description" --name “myCredentialName" --subscriptionId "mySubscriptionId" --sshKeyUrl “URL towards your public SSH key file"
+credential create --AZURE --description "description" --name "myCredentialName" --subscriptionId "mySubscriptionId" --sshKeyUrl "URL towards your public SSH key file"
 ```
 
 Other available options:
@@ -118,7 +117,11 @@ Other available options:
 You can check whether the credential was creates successfully by using the `credential list` command. You can (and probably want to use the new credential if automating tasks) switch between your cloud credential - when you’d like to use one and act with that you will have to use:
 
 ```
-credential select --id #ID of the credential
+credential select --id <ID of the credential>
+```
+or
+```
+credential select --name <Name of the credential>
 ```
 
 ### Create a template
@@ -133,7 +136,7 @@ template create --EC2 --name awstemplate --description aws-template --instanceTy
 
 Other available options:
 
-- --volumeType "voltype": defaults to "Gp2", other allowed value: "Io1"
+- --volumeType "voltype": defaults to "gp2", other allowed value: "io1" or "standard"
 
 - --encrypted "boolean": use encrypted disks
 
@@ -181,9 +184,129 @@ Other available options:
 You can check whether the template was created successfully by using the `template list` command. Check the template and select it if you are happy with it:
 
 ```
-template show --id #ID of the template
+template show --id <ID of the template>
+```
+or
+```
+template show --name <Name of the template>
+```
 
-template select --id #ID of the template
+### Create a network
+
+A network gives developers and systems administrators an easy way to create and manage a collection of cloud infrastructure related networking, maintaining and updating them in an orderly and predictable fashion. A network can be used repeatedly to create identical copies of the same stack (or to use as a foundation to start a new stack).
+
+#### Amazon AWS example
+
+```
+network create --EC2 --name awsnetwork --description aws-network --subnet 0.0.0.0
+```
+
+Other available options:
+
+- --vpcID "string": your existing vpc on amazon
+
+- --internetGatewayID "string": your amazon internet gateway
+
+- --publicInAccount "flag": flags if the network is public in the account
+
+#### Google Cloud Platform example
+
+```
+network create --GCP --name gcpnetwork --description gcp-network --subnet 0.0.0.0
+```
+
+Other available options:
+
+- --publicInAccount "flag": flags if the network is public in the account
+
+#### Openstack example
+
+```
+network create --OPENSTACK --name openstacknetwork --description openstack-network --publicNetID "324234-32423423-23423423-23423432" --subnet 0.0.0.0
+```
+
+#### Azure example
+
+```
+network create --AZURE --name azurenetwork --description azure-network --addressPrefix 192.168.123.123 --subnet 0.0.0.0
+```
+
+Other available options:
+
+- --publicInAccount "flag": flags if the template is public in the account
+
+#### Viewing created network
+
+You can check whether the network was created successfully by using the `network list` command. Check the network and select it if you are happy with it:
+
+```
+network show --id <ID of the network>
+```
+or
+```
+network show --name <Name of the network>
+```
+
+#### Select a network
+
+You can select one of the created network with
+
+```
+network select --id <ID of the network>
+```
+or
+```
+network select --name <Name of the network>
+```
+
+### Configure an instance groups
+
+You have to configure the instancegroups before the provisioning. An instancegroup is defining a group of your nodes with a specified templates.
+
+```
+instancegroup configure --instanceGroup slave_1 --nodecount 1 --templateId 51
+```
+
+Other available options:
+
+- --templateName "string": Name of the template
+
+### Configure a host groups
+
+You have to configure the host groups before the provisioning(by default the cloudbreak shell doing it automatically). A host group is defining a host group in you ambari cluster.
+
+```
+hostgroup configure --hostgroup slave_1 --recipeIds 1,2,3 
+```
+
+### Configure a recipe
+
+You can create recipes for automate your setups before ambari install or after ambari install.
+
+```
+recipe --url "https://raw.githubusercontent.com/sequenceiq/consul-plugins-titan/master/titan-recipe.json"
+```
+
+Other available options:
+
+- --file "string": the file which contains the recipe
+- --publicInAccount "flag": flags if the template is public in the account
+
+### Select a blueprint
+
+We ship default Hadoop cluster blueprints with Cloudbreak. You can use these blueprints or add yours. To see the available blueprints and use one of them please use:
+
+```
+blueprint list
+```
+then select one of the created blueprints
+
+```
+blueprint select --id <ID of the blueprint>
+```
+or
+```
+blueprint select --name <Name of the blueprint>
 ```
 
 ### Create a stack
@@ -191,27 +314,90 @@ template select --id #ID of the template
 Stacks are template `instances` - a running cloud infrastructure created based on a template. Use the following command to create a stack to be used with your Hadoop cluster:
 
 ```
-stack create --name “myStackName" --nodeCount 10
+stack create --name myStackName --region EU_WEST_1
 ```
-### Select a blueprint
 
-We ship default Hadoop cluster blueprints with Cloudbreak. You can use these blueprints or add yours. To see the available blueprints and use one of them please use:
+Other available options:
 
+- --image "string": the specific image which is used during provisioning
+- --onFailureAction "string": the available values are DO_NOTHING or ROLLBACK
+- --adjustmentType "string": the available values are EXACT or PERCENTAGE
+- --threshold "long": the number for the adjustmentType
+- --diskPerStorage "integer": the number of disks in one storage (only for AZURE)
+- --dedicatedInstances "flags": indicates using dedicated instances (only for AWS)
+- --publicInAccount "flag": flags if the template is public in the account
+
+You can start or stop a stack with:
 ```
-blueprint list
-
-blueprint select --id #ID of the blueprint
+stack start
 ```
+or 
+```
+stack stop
+```
+
+You can also upscale or downscale your stack: 
+```
+stack node --ADD --instanceGroup slave_1 --adjustment 2
+```
+Other available options:
+
+- --withClusterUpScale "flag": indicates cluster upscale after stack upscale
+
+or 
+```
+stack node --REMOVE  --instanceGroup slave_1 --adjustment -2
+```
+
+
 ### Create a Hadoop cluster
 You are almost done - one more command and this will create your Hadoop cluster on your favorite cloud provider. Same as the API, or UI this will use your `template`, and by using CloudFormation will launch a cloud `stack` - once the `stack` is up and running (cloud provisioning is done) it will use your selected `blueprint` and install your custom Hadoop cluster with the selected components and services. For the supported list of Hadoop components and services please check the [documentation](http://sequenceiq.com/cloudbreak/#supported-components).
 
 ```
-cluster create --description “my cluster desc"
+cluster create --description "my cluster desc"
 ```
+Other available options:
+
+- --userName "string": ambari username(default is 'admin')
+- --password "string": ambari username(default is 'admin')
+- --stack "string": the specific repository config stack
+- --version "string": the specific repository config hdp version
+- --os "string": the specific repository config os
+- --stackRepoId "string": the specific repository config stack repo id
+- --stackBaseURL "string": the specific repository config stack base url
+- --utilsRepoId "string": the specific repository config utils repo id
+- --utilsBaseURL "string": the specific repository config utils base url
+- --verify "string": the specific repository config verify flag
+
 You are done - you can check the progress through the Ambari UI. If you log back to [Cloudbreak UI](https://cloudbreak.sequenceiq.com/) you can check the progress over there as well, and learn the IP address of Ambari.
 
+You can start or stop a cluster with:
+```
+cluster start
+```
+or 
+```
+cluster stop
+```
+
+You can also upscale or downscale your cluster: 
+```
+cluster node --ADD --instanceGroup slave_1 --adjustment 2
+```
+or 
+```
+cluster node --REMOVE  --instanceGroup slave_1 --adjustment -2
+```
+Other available options:
+
+- --withStackDownScale "flag": indicates stack downscale after the cluster downscale
+
+
 ### Automate the process
-Each time you start the shell the executed commands are logged in a file line by line and later either with the `script` command or specifying an `—cmdfile` option the same commands can be executed again.
+Each time you start the shell the executed commands are logged in a file line by line and later either with the `script` command or specifying an `-—cmdfile` option the same commands can be executed again.
+
+##[Demo](https://raw.githubusercontent.com/sequenceiq/cloudbreak-shell/readme-update/demo.gif)
+![](demo.gif)
 
 ## Commands
 
@@ -219,38 +405,68 @@ For the full list of available commands please check below. Please note that all
 
 
     * blueprint add - Add a new blueprint with either --url or --file
-    * blueprint defaults - Adds the default blueprints to Cloudbreak
+    * blueprint defaults - Adds the default blueprints to Ambari
+    * blueprint delete - Delete the blueprint by its id or name
     * blueprint list - Shows the currently available blueprints
-    * blueprint select - Select the blueprint by its id
-    * blueprint show - Shows the blueprint by its id
-    * cluster create - Create a new cluster based on a blueprint and template
+    * blueprint select - Select the blueprint by its id or name
+    * blueprint show - Shows the blueprint by its id or name
+    * cluster create - Create a new cluster based on a blueprint and optionally a recipe
+    * cluster node --ADD - Add new nodes to the cluster
+    * cluster node --REMOVE - Remove nodes from the cluster
     * cluster show - Shows the cluster by stack id
-    * credential createAzure - Create a new Azure credential
-    * credential createEC2 - Create a new EC2 credential
-    * credential defaults - Adds the default credentials to Cloudbreak
+    * cluster start - Start your cluster
+    * cluster stop - Stop your cluster
+    * context - Shows some context
+    * credential certificate - get Azure certificate
+    * credential create --AZURE - Create a new AZURE credential
+    * credential create --EC2 - Create a new EC2 credential
+    * credential create --GCP - Create a new Gcp credential
+    * credential create --OPENSTACK - Create a new OPENSTACK credential
+    * credential delete - Delete the credential by its id
     * credential list - Shows all of your credentials
-    * credential select - Select the credential by its id
+    * credential select - Select the credential by its id or name
     * credential show - Shows the credential by its id
     * exit - Exits the shell
     * help - List all commands usage
     * hint - Shows some hints
+    * hostgroup configure - Configure host groups
+    * hostgroup show - Configure host groups
+    * instancegroup configure - Configure instance groups
+    * instancegroup show - Configure instance groups
+    * network create --AWS - Create a new AWS network configuration
+    * network create --AZURE - Create a new AZURE network configuration
+    * network create --GCP - Create a new GCP network configuration
+    * network create --OPENSTACK - Create a new OpenStack network configuration
+    * network delete - Delete network by the given id or name
+    * network list - Shows the currently available networks configurations
+    * network select - Select network by the given id or name
+    * network show - Shows the network by its id or name
     * quit - Exits the shell
-    * recipe add - Adds a recipe
-    * recipe select - Selects a recipe
+    * recipe add - Add a new recipe with either --url or --file
+    * recipe delete - Delete the recipe by its id or name
+    * recipe list - Shows the currently available recipes
+    * recipe show - Shows the properties of the specified recipe
     * script - Parses the specified resource file and executes its commands
+    * security group list - Shows the currently available security groups
+    * security group select - Select a security group by the given id or name
+    * security group show - Shows the security group by its id or name
     * stack create - Create a new stack based on a template
     * stack list - Shows all of your stack
+    * stack node --ADD - Add new nodes to the cluster
+    * stack node --REMOVE - Remove nodes from the cluster
     * stack select - Select the stack by its id
     * stack show - Shows the stack by its id
+    * stack start - Start your stack
+    * stack stop - Stop your stack
     * stack terminate - Terminate the stack by its id
-    * template create - Create a new cloud template
-    * template createEC2 - Create a new EC2 template
-    * template defaults - Adds the default templates to Cloudbreak
+    * template create --AZURE - Create a new AZURE template
+    * template create --EC2 - Create a new EC2 template
+    * template create --GCP - Create a new GCP template
+    * template create --OPENSTACK - Create a new OPENSTACK template
+    * template delete - Shows the template by its id or name
     * template list - Shows the currently available cloud templates
-    * template select - Select the template by its id
-    * template show - Shows the template by its id
+    * template show - Shows the template by its id or name
     * version - Displays shell version
-
 
 
 As usual for us - being committed to 100% open source - we are always open sourcing everything thus you can get the details on our [GitHub](https://github.com/sequenceiq/cloudbreak-shell) repository.
