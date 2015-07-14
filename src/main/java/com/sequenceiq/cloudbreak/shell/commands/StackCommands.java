@@ -59,7 +59,7 @@ public class StackCommands implements CommandMarker {
 
     @CliAvailabilityIndicator(value = "stack select")
     public boolean isStackSelectCommandAvailable() throws Exception {
-        return context.isStackAccessible() && context.isBlueprintAvailable();
+        return context.isStackAccessible();
     }
 
     @CliCommand(value = "stack node --ADD", help = "Add new nodes to the cluster")
@@ -152,17 +152,23 @@ public class StackCommands implements CommandMarker {
                     } else {
                         context.setHint(Hints.CONFIGURE_HOSTGROUP);
                     }
+                    prepareCluster(id);
+                    context.prepareInstanceGroups(stack);
                     return "Stack selected, id: " + id;
                 }
+
             } else if (name != null) {
                 Object stack = cloudbreak.getStackByName(name);
                 if (stack != null) {
-                    context.addStack(((HashMap) stack).get("id").toString(), name);
+                    String stackId = ((HashMap) stack).get("id").toString();
+                    context.addStack(stackId, name);
                     if (context.isCredentialAvailable()) {
                         context.setHint(Hints.CREATE_CLUSTER);
                     } else {
                         context.setHint(Hints.CONFIGURE_HOSTGROUP);
                     }
+                    prepareCluster(stackId);
+                    context.prepareInstanceGroups(stack);
                     return "Stack selected, name: " + name;
                 }
             }
@@ -171,6 +177,18 @@ public class StackCommands implements CommandMarker {
             return ex.getResponse().getData().toString();
         } catch (Exception ex) {
             return ex.toString();
+        }
+    }
+
+    private void prepareCluster(String stackId) {
+        try {
+            Object cluster = cloudbreak.getCluster(stackId);
+            if (cluster != null) {
+                String blueprintId = ((HashMap) cluster).get("blueprintId").toString();
+                context.addBlueprint(blueprintId);
+            }
+        } catch (Exception e) {
+            return;
         }
     }
 

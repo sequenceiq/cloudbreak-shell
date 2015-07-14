@@ -3,6 +3,7 @@ package com.sequenceiq.cloudbreak.shell.model;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -112,6 +113,25 @@ public class CloudbreakContext {
         this.activeInstanceGroups.add("cbgateway");
         addProperty(PropertyKey.BLUEPRINT_ID, id);
         setBlueprintAccessible();
+    }
+
+    public void prepareInstanceGroups(Object stack) {
+        Map<String, Object> stackMap = (HashMap<String, Object>) stack;
+        List<Object> instanceGroupsList = (List<Object>) stackMap.get("instanceGroups");
+        this.instanceGroups = new HashMap<>();
+        this.activeInstanceGroups = new HashSet<>();
+        for (Object instanceGroup : instanceGroupsList) {
+            Map<String, Object> instanceGroupMap = (HashMap<String, Object>) instanceGroup;
+            this.activeInstanceGroups.add(instanceGroupMap.get("group").toString());
+            instanceGroups.put(
+                    instanceGroupMap.get("group").toString(),
+                    new InstanceGroupEntry(
+                            Long.valueOf(instanceGroupMap.get("templateId").toString()),
+                            Integer.valueOf(instanceGroupMap.get("nodeCount").toString()),
+                            instanceGroupMap.get("type").toString()
+                    )
+            );
+        }
     }
 
     public boolean isCredentialAvailable() {
