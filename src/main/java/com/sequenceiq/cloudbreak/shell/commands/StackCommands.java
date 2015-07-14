@@ -13,6 +13,7 @@ import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.stereotype.Component;
 
 import com.sequenceiq.cloudbreak.client.CloudbreakClient;
+import com.sequenceiq.cloudbreak.shell.completion.InstanceGroup;
 import com.sequenceiq.cloudbreak.shell.completion.StackRegion;
 import com.sequenceiq.cloudbreak.shell.model.AdjustmentType;
 import com.sequenceiq.cloudbreak.shell.model.CloudbreakContext;
@@ -64,14 +65,15 @@ public class StackCommands implements CommandMarker {
 
     @CliCommand(value = "stack node --ADD", help = "Add new nodes to the cluster")
     public String addNodeToStack(
-            @CliOption(key = "instanceGroup", mandatory = true, help = "Name of the instanceGroup") String instanceGroup,
+            @CliOption(key = "instanceGroup", mandatory = true, help = "Name of the instanceGroup") InstanceGroup instanceGroup,
             @CliOption(key = "adjustment", mandatory = true, help = "Count of the nodes which will be added to the stack") Integer adjustment,
             @CliOption(key = "withClusterUpScale", mandatory = false, help = "Do the upscale with the cluster together") Boolean withClusterUpScale) {
         try {
             if (adjustment < 1) {
                 return "The adjustment value in case of node addition should be at least 1.";
             }
-            cloudbreak.putStack(Integer.valueOf(context.getStackId()), instanceGroup, adjustment, withClusterUpScale == null ? false : withClusterUpScale);
+            cloudbreak.putStack(Integer.valueOf(context.getStackId()), instanceGroup.getName(), adjustment,
+                    withClusterUpScale == null ? false : withClusterUpScale);
             return context.getStackId();
         } catch (Exception ex) {
             return ex.toString();
@@ -80,13 +82,13 @@ public class StackCommands implements CommandMarker {
 
     @CliCommand(value = "stack node --REMOVE", help = "Remove nodes from the cluster")
     public String removeNodeToStack(
-            @CliOption(key = "instanceGroup", mandatory = true, help = "Name of the instanceGroup") String instanceGroup,
+            @CliOption(key = "instanceGroup", mandatory = true, help = "Name of the instanceGroup") InstanceGroup instanceGroup,
             @CliOption(key = "adjustment", mandatory = true, help = "Count of the nodes which will be removed to the stack") Integer adjustment) {
         try {
             if (adjustment > -1) {
                 return "The adjustment value in case of node removal should be negative.";
             }
-            cloudbreak.putStack(Integer.valueOf(context.getStackId()), instanceGroup, adjustment, false);
+            cloudbreak.putStack(Integer.valueOf(context.getStackId()), instanceGroup.getName(), adjustment, false);
             return context.getStackId();
         } catch (Exception ex) {
             return ex.toString();
