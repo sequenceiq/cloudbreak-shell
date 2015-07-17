@@ -396,7 +396,7 @@ Other available options:
 ### Automate the process
 Each time you start the shell the executed commands are logged in a file line by line and later either with the `script` command or specifying an `-—cmdfile` option the same commands can be executed again.
 
-##[Demo](https://raw.githubusercontent.com/sequenceiq/cloudbreak-shell/readme-update/demo.gif)
+##[Demo](https://raw.githubusercontent.com/sequenceiq/cloudbreak-shell/master/demo.gif)
 ![](demo.gif)
 
 ## Commands
