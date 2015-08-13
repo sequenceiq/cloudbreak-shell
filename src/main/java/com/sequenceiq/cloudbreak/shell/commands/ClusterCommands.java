@@ -107,7 +107,11 @@ public class ClusterCommands implements CommandMarker {
             @CliOption(key = "stackBaseURL", mandatory = false, help = "Stack url") String stackBaseURL,
             @CliOption(key = "utilsRepoId", mandatory = false, help = "Stack utils repoId") String utilsRepoId,
             @CliOption(key = "utilsBaseURL", mandatory = false, help = "Stack utils URL") String utilsBaseURL,
-            @CliOption(key = "verify", mandatory = false, help = "Whether to verify the URLs or not") Boolean verify
+            @CliOption(key = "verify", mandatory = false, help = "Whether to verify the URLs or not") Boolean verify,
+            @CliOption(key = "enableSecurity", mandatory = false, unspecifiedDefaultValue = "false", help = "Kerberos security status") Boolean secure,
+            @CliOption(key = "kerberosMasterKey", mandatory = false, unspecifiedDefaultValue = "key", help = "Kerberos mater key") String kerberosMasterKey,
+            @CliOption(key = "kerberosAdmin", mandatory = false, unspecifiedDefaultValue = "admin", help = "Kerberos admin name") String kerberosAdmin,
+            @CliOption(key = "kerberosPassword", mandatory = false, unspecifiedDefaultValue = "admin", help = "Kerberos admin password") String kerberosPassword
     ) {
         try {
             List<Map<String, Object>> hostGroupList = new ArrayList<>();
@@ -128,7 +132,8 @@ public class ClusterCommands implements CommandMarker {
                     stack, version, os,
                     stackRepoId, stackBaseURL,
                     utilsRepoId, utilsBaseURL,
-                    verify);
+                    verify,
+                    secure, kerberosMasterKey, kerberosAdmin, kerberosPassword);
             context.setHint(Hints.NONE);
             return "Cluster creation started";
         } catch (HttpResponseException ex) {
