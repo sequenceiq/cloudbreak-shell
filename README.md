@@ -276,7 +276,7 @@ Other available options:
 You have to configure the host groups before the provisioning(by default the cloudbreak shell doing it automatically). A host group is defining a host group in you ambari cluster.
 
 ```
-hostgroup configure --hostgroup slave_1 --recipeIds 1,2,3 
+hostgroup configure --hostgroup slave_1 --recipeIds 1,2,3
 ```
 
 ### Configure a recipe
@@ -331,12 +331,12 @@ You can start or stop a stack with:
 ```
 stack start
 ```
-or 
+or
 ```
 stack stop
 ```
 
-You can also upscale or downscale your stack: 
+You can also upscale or downscale your stack:
 ```
 stack node --ADD --instanceGroup slave_1 --adjustment 2
 ```
@@ -344,7 +344,7 @@ Other available options:
 
 - --withClusterUpScale "flag": indicates cluster upscale after stack upscale
 
-or 
+or
 ```
 stack node --REMOVE  --instanceGroup slave_1 --adjustment -2
 ```
@@ -368,6 +368,10 @@ Other available options:
 - --utilsRepoId "string": the specific repository config utils repo id
 - --utilsBaseURL "string": the specific repository config utils base url
 - --verify "string": the specific repository config verify flag
+- --enableSecurity "boolean": kerberos security status
+- --kerberosMasterKey "string": kerberos master key
+- --kerberosAdmin "string": kerberos admin user name
+- --kerberosPassword "string": kerberos admin password
 
 You are done - you can check the progress through the Ambari UI. If you log back to [Cloudbreak UI](https://cloudbreak.sequenceiq.com/) you can check the progress over there as well, and learn the IP address of Ambari.
 
@@ -375,16 +379,16 @@ You can start or stop a cluster with:
 ```
 cluster start
 ```
-or 
+or
 ```
 cluster stop
 ```
 
-You can also upscale or downscale your cluster: 
+You can also upscale or downscale your cluster:
 ```
 cluster node --ADD --instanceGroup slave_1 --adjustment 2
 ```
-or 
+or
 ```
 cluster node --REMOVE  --instanceGroup slave_1 --adjustment -2
 ```
