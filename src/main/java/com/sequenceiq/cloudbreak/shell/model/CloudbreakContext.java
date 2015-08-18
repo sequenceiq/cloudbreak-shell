@@ -57,7 +57,7 @@ public class CloudbreakContext {
     }
 
     public String getActiveCloudPlatform() {
-        return this.activeCloudPlatform == null ? "" : this.activeCloudPlatform;
+        return this.activeCloudPlatform == null ? "" : this.activeCloudPlatform.split("_")[0];
     }
 
     public void removeStack(String id) {
