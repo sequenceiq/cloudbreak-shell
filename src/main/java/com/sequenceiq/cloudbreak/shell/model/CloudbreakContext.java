@@ -2,7 +2,6 @@ package com.sequenceiq.cloudbreak.shell.model;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -108,20 +107,20 @@ public class CloudbreakContext {
         this.instanceGroups = new HashMap<>();
         this.hostGroups = new HashMap<>();
         Object ambariBlueprint = blueprintMap.get("ambariBlueprint");
-        this.activeHostGroups = new HashSet<>(((LinkedHashMap) ambariBlueprint).keySet());
-        this.activeInstanceGroups = new HashSet<>(((LinkedHashMap) ambariBlueprint).keySet());
+        this.activeHostGroups = new HashSet<>(((Map) ambariBlueprint).keySet());
+        this.activeInstanceGroups = new HashSet<>(((Map) ambariBlueprint).keySet());
         this.activeInstanceGroups.add("cbgateway");
         addProperty(PropertyKey.BLUEPRINT_ID, id);
         setBlueprintAccessible();
     }
 
     public void prepareInstanceGroups(Object stack) {
-        Map<String, Object> stackMap = (HashMap<String, Object>) stack;
+        Map<String, Object> stackMap = (Map<String, Object>) stack;
         List<Object> instanceGroupsList = (List<Object>) stackMap.get("instanceGroups");
         this.instanceGroups = new HashMap<>();
         this.activeInstanceGroups = new HashSet<>();
         for (Object instanceGroup : instanceGroupsList) {
-            Map<String, Object> instanceGroupMap = (HashMap<String, Object>) instanceGroup;
+            Map<String, Object> instanceGroupMap = (Map<String, Object>) instanceGroup;
             this.activeInstanceGroups.add(instanceGroupMap.get("group").toString());
             instanceGroups.put(
                     instanceGroupMap.get("group").toString(),

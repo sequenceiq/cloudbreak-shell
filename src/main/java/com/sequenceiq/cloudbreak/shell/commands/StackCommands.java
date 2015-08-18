@@ -2,7 +2,6 @@ package com.sequenceiq.cloudbreak.shell.commands;
 
 import static com.sequenceiq.cloudbreak.shell.support.TableRenderer.renderSingleMap;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -148,7 +147,7 @@ public class StackCommands implements CommandMarker {
             if (id != null) {
                 Object stack = cloudbreak.getStack(id);
                 if (stack != null) {
-                    context.addStack(id, ((HashMap) stack).get("name").toString());
+                    context.addStack(id, ((Map) stack).get("name").toString());
                     if (context.isCredentialAvailable()) {
                         context.setHint(Hints.CREATE_CLUSTER);
                     } else {
@@ -162,7 +161,7 @@ public class StackCommands implements CommandMarker {
             } else if (name != null) {
                 Object stack = cloudbreak.getStackByName(name);
                 if (stack != null) {
-                    String stackId = ((HashMap) stack).get("id").toString();
+                    String stackId = ((Map) stack).get("id").toString();
                     context.addStack(stackId, name);
                     if (context.isCredentialAvailable()) {
                         context.setHint(Hints.CREATE_CLUSTER);
@@ -186,7 +185,7 @@ public class StackCommands implements CommandMarker {
         try {
             Object cluster = cloudbreak.getCluster(stackId);
             if (cluster != null) {
-                String blueprintId = ((HashMap) cluster).get("blueprintId").toString();
+                String blueprintId = ((Map) cluster).get("blueprintId").toString();
                 context.addBlueprint(blueprintId);
             }
         } catch (Exception e) {
