@@ -108,19 +108,16 @@ public class ClusterCommands implements CommandMarker {
             @CliOption(key = "utilsRepoId", mandatory = false, help = "Stack utils repoId") String utilsRepoId,
             @CliOption(key = "utilsBaseURL", mandatory = false, help = "Stack utils URL") String utilsBaseURL,
             @CliOption(key = "verify", mandatory = false, help = "Whether to verify the URLs or not") Boolean verify,
-            @CliOption(key = "enableSecurity", mandatory = false, specifiedDefaultValue = "false", unspecifiedDefaultValue = "false",
-                    help = "Kerberos security status") Boolean secure,
-            @CliOption(key = "kerberosMasterKey", mandatory = false, specifiedDefaultValue = "key", unspecifiedDefaultValue = "key",
-                    help = "Kerberos mater key") String kerberosMasterKey,
-            @CliOption(key = "kerberosAdmin", mandatory = false, specifiedDefaultValue = "admin", unspecifiedDefaultValue = "admin",
-                    help = "Kerberos admin name") String kerberosAdmin,
-            @CliOption(key = "kerberosPassword", mandatory = false, specifiedDefaultValue = "admin", unspecifiedDefaultValue = "admin",
-                    help = "Kerberos admin password") String kerberosPassword
+            @CliOption(key = "enableSecurity", mandatory = false, specifiedDefaultValue = "true", unspecifiedDefaultValue = "false",
+                    help = "Kerberos security status") Boolean enableSecurity,
+            @CliOption(key = "kerberosMasterKey", mandatory = false, specifiedDefaultValue = "key", help = "Kerberos mater key") String kerberosMasterKey,
+            @CliOption(key = "kerberosAdmin", mandatory = false, specifiedDefaultValue = "admin", help = "Kerberos admin name") String kerberosAdmin,
+            @CliOption(key = "kerberosPassword", mandatory = false, specifiedDefaultValue = "admin", help = "Kerberos admin password") String kerberosPassword
     ) {
         try {
             List<Map<String, Object>> hostGroupList = new ArrayList<>();
             for (Map<String, Object> hostGroupListEntity : context.getHostGroups().values()) {
-                Map<String, Object> hostGroupMap = new HashMap<String, Object>();
+                Map<String, Object> hostGroupMap = new HashMap<>();
                 hostGroupMap.put("name", hostGroupListEntity.keySet().iterator().next());
                 hostGroupMap.put("instanceGroupName", hostGroupListEntity.keySet().iterator().next());
                 hostGroupMap.put("recipeIds", hostGroupListEntity.values().iterator().next());
@@ -137,7 +134,7 @@ public class ClusterCommands implements CommandMarker {
                     stackRepoId, stackBaseURL,
                     utilsRepoId, utilsBaseURL,
                     verify,
-                    secure, kerberosMasterKey, kerberosAdmin, kerberosPassword);
+                    enableSecurity, kerberosMasterKey, kerberosAdmin, kerberosPassword);
             context.setHint(Hints.NONE);
             return "Cluster creation started";
         } catch (HttpResponseException ex) {
