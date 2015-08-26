@@ -59,7 +59,8 @@ public class CredentialCommands implements CommandMarker {
         return context.isCredentialAccessible();
     }
 
-    @CliAvailabilityIndicator({ "credential create --GCP", "credential create --EC2", "credential create --AZURE", "credential create --OPENSTACK" })
+    @CliAvailabilityIndicator({ "credential create --GCP", "credential create --EC2", "credential create --AZURE",
+            "credential create --AZURE_RM", "credential create --OPENSTACK" })
     public boolean isCredentialEc2CreateCommandAvailable() {
         return true;
     }
@@ -210,7 +211,7 @@ public class CredentialCommands implements CommandMarker {
                     description == null ? "Aws credential was created by the cloudbreak-shell" : description,
                     roleArn,
                     sshKey,
-                    publicInAccount == null ?  false : publicInAccount
+                    publicInAccount == null ? false : publicInAccount
             );
             context.setCredential(id);
             createOrSelectTemplateHint();
@@ -325,6 +326,56 @@ public class CredentialCommands implements CommandMarker {
                     name,
                     description == null ? "Azure credential was created by the cloudbreak-shell" : description,
                     subscriptionId,
+                    sshKey,
+                    publicInAccount == null ? false : publicInAccount
+            );
+            context.setCredential(id);
+            createOrSelectTemplateHint();
+            return "Credential created, id: " + id;
+        } catch (HttpResponseException ex) {
+            return ex.getResponse().getData().toString();
+        } catch (Exception ex) {
+            return ex.toString();
+        }
+    }
+
+    @CliCommand(value = "credential create --AZURE_RM", help = "Create a new AZURE_RM credential")
+    public String createAzureRmCredential(
+            @CliOption(key = "name", mandatory = true, help = "Name of the credential") String name,
+            @CliOption(key = "subscriptionId", mandatory = true, help = "subscriptionId of the credential") String subscriptionId,
+            @CliOption(key = "tenantId", mandatory = true, help = "tenantId of the credential") String tenantId,
+            @CliOption(key = "secretKey", mandatory = true, help = "secretKey of the credential") String secretKey,
+            @CliOption(key = "accesKey", mandatory = true, help = "accesKey of the credential") String accesKey,
+            @CliOption(key = "sshKeyPath", mandatory = false, help = "sshKeyPath of the template") File sshKeyPath,
+            @CliOption(key = "sshKeyUrl", mandatory = false, help = "sshKeyUrl of the template") String sshKeyUrl,
+            @CliOption(key = "publicInAccount", mandatory = false, help = "flags if the credential is public in the account") Boolean publicInAccount,
+            @CliOption(key = "description", mandatory = false, help = "Description of the credential") String description
+    ) {
+        if ((sshKeyPath == null) && (sshKeyUrl == null || sshKeyUrl.isEmpty())) {
+            return "SshKey cannot be null if password null";
+        }
+        String sshKey;
+        if (sshKeyPath != null) {
+            try {
+                sshKey = Base64.encodeBase64String(Files.readAllBytes(Paths.get(sshKeyPath.getPath())));
+            } catch (IOException e) {
+                return "File not found with ssh key.";
+            }
+        } else {
+            try {
+                sshKey = Base64.encodeBase64String(readUrl(sshKeyUrl).getBytes());
+            } catch (IOException e) {
+                return "Url not found with ssh key.";
+            }
+        }
+        try {
+            String id = cloudbreak.postAzureRmCredential(
+                    name,
+                    description == null ? "Azure Rm credential was created by the cloudbreak-shell" : description,
+                    subscriptionId,
+                    tenantId,
+                    accesKey,
+                    secretKey,
                     sshKey,
                     publicInAccount == null ? false : publicInAccount
             );
