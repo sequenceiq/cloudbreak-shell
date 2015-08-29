@@ -284,7 +284,7 @@ hostgroup configure --hostgroup slave_1 --recipeIds 1,2,3
 You can create recipes for automate your setups before ambari install or after ambari install.
 
 ```
-recipe --url "https://raw.githubusercontent.com/sequenceiq/consul-plugins-titan/master/titan-recipe.json"
+recipe add --url "https://raw.githubusercontent.com/sequenceiq/consul-plugins-titan/master/titan-recipe.json"
 ```
 
 Other available options:
