@@ -112,6 +112,20 @@ Other available options:
 
 - --publicInAccount "flag": flags if the credential is public in the account
 
+#### Azure Resource Manager example
+
+```
+credential create --AZURE_RM --description "description" --name "myCredentialName" --subscriptionId "mySubscriptionId" --tenantId "sdfsd-sdfdsf-dsfdsf-sdfsdf" --secretKey "sdfdsfs-sdfsddsf-sdfsdf-sdfsdf" --accesKey "acceskey" --sshKeyUrl "URL towards your public SSH key file"
+```
+
+**You can use your Azure templates and networks under the stack creation (No need to create new templates and networks !!!)**
+
+Other available options:
+
+- --sshKeyPath "path": upload your public key from a file (replaces --sshKeyUrl)
+
+- --publicInAccount "flag": flags if the credential is public in the account
+
 #### Checking credential creation
 
 You can check whether the credential was creates successfully by using the `credential list` command. You can (and probably want to use the new credential if automating tasks) switch between your cloud credential - when you’d like to use one and act with that you will have to use:
