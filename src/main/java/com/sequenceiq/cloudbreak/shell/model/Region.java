@@ -14,6 +14,7 @@ public enum Region {
     US_WEST_1("AWS"),
     US_WEST_2("AWS"),
     EU_WEST_1("AWS"),
+    EU_CENTRAL_1("AWS"),
     AP_SOUTHEAST_1("AWS"),
     AP_SOUTHEAST_2("AWS"),
     AP_NORTHEAST_1("AWS"),
