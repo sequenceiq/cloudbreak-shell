@@ -44,24 +44,16 @@ public class HostGroupCommands implements CommandMarker {
     @CliCommand(value = "hostgroup configure", help = "Configure host groups")
     public String createHostGroup(
             @CliOption(key = "hostgroup", mandatory = true, help = "Name of the hostgroup") HostGroup hostgroup,
-            @CliOption(key = "recipeIds", mandatory = false, help = "A comma separated list of recipe ids") String recipeIds)
+            @CliOption(key = "recipeIds", mandatory = false, help = "A comma separated list of recipe ids") String recipeIds,
+            @CliOption(key = "recipeNames", mandatory = false, help = "A comma separated list of recipe names") String recipeNames)
             throws Exception {
         try {
             Set<Long> recipeIdSet = new HashSet<>();
             if (recipeIds != null) {
-                recipeIdSet = FluentIterable.from(Splitter.on(",").omitEmptyStrings().trimResults().split(recipeIds)).transform(new Function<String, Long>() {
-                    @Override
-                    public Long apply(String input) {
-                        try {
-                            cloudbreak.getRecipe(input);
-                        } catch (HttpResponseException e) {
-                            throw new RuntimeException("Recipe [" + input + "]: " + e.getResponse().getData().toString());
-                        } catch (Exception e) {
-                            throw new RuntimeException(e.getMessage());
-                        }
-                        return Long.parseLong(input);
-                    }
-                }).toSet();
+                recipeIdSet.addAll(getRecipeIds(recipeIds, RecipeParameterType.ID));
+            }
+            if (recipeNames != null) {
+                recipeIdSet.addAll(getRecipeIds(recipeNames, RecipeParameterType.NAME));
             }
             Map.Entry<String, Object> hostGroupMapEntry = new HashMap.SimpleEntry<String, Object>(hostgroup.getName(), recipeIdSet);
             context.putHostGroup(hostGroupMapEntry);
@@ -76,4 +68,33 @@ public class HostGroupCommands implements CommandMarker {
         return renderObjectMapValueMap(context.getHostGroups(), "hostgroup", "instanceGroupName", "recipeIds");
     }
 
+    private enum RecipeParameterType {
+        ID, NAME
+    }
+
+    private Set<Long> getRecipeIds(String inputs, final RecipeParameterType type) {
+        return FluentIterable.from(Splitter.on(",").omitEmptyStrings().trimResults().split(inputs)).transform(new Function<String, Long>() {
+            @Override
+            public Long apply(String input) {
+                try {
+                    Map<String, String> resp = null;
+                    switch (type) {
+                        case ID:
+                            resp = (Map) cloudbreak.getRecipe(input);
+                            break;
+                        case NAME:
+                            resp = (Map) cloudbreak.getRecipeByName(input);
+                            break;
+                        default:
+                            throw new UnsupportedOperationException();
+                    }
+                    return Long.parseLong(resp.get("id"));
+                } catch (HttpResponseException e) {
+                    throw new RuntimeException("Recipe [" + input + "]: " + e.getResponse().getData().toString());
+                } catch (Exception e) {
+                    throw new RuntimeException(e.getMessage());
+                }
+            }
+        }).toSet();
+    }
 }
