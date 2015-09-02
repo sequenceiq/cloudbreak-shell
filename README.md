@@ -329,7 +329,7 @@ blueprint select --name <Name of the blueprint>
 
 ### Create a stack
 
-Stacks are template `instances` - a running cloud infrastructure created based on a template. Use the following command to create a stack to be used with your Hadoop cluster:
+Stack means the running cloud infrastructure that is created based on the instance groups configured earlier. Use the following command to create a stack to be used with your Hadoop cluster:
 
 ```
 stack create --name myStackName --region EU_WEST_1
@@ -345,16 +345,22 @@ Other available options:
 - --dedicatedInstances "flags": indicates using dedicated instances (only for AWS)
 - --publicInAccount "flag": flags if the template is public in the account
 
-You can start or stop a stack with:
-```
-stack start
-```
-or
+The infrastructure is created asynchronously, the state of the stack can be checked with the `stack show` command. If it reports *AVAILABLE*, it means that the virtual machines and the corresponding infrastructure is running at the cloud provider.
+
+### Stopping and restarting a stack
+
+After a stack is created, its virtual machines can be stopped by running:
 ```
 stack stop
 ```
 
-You can also upscale or downscale your stack:
+A stopped stack can be restarted with:
+```
+stack start
+```
+
+### Upscaling and downscaling a stack
+
 ```
 stack node --ADD --instanceGroup slave_1 --adjustment 2
 ```
