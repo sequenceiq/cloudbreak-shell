@@ -496,6 +496,29 @@ For the full list of available commands please check below. Please note that all
     * template show - Shows the template by its id or name
     * version - Displays shell version
 
+## Example command file
+
+The example below works with default installation of Cloudbreak on Google Cloud Platform (region should be change). Only pre requirement is a [created credential](https://github.com/sequenceiq/cloudbreak-shell#google-cloud-platform-example).
+
+```
+credential select --name [CREDENTIAL_NAME]
+blueprint select --name hdp-small-default
+network select --name default-gcp-network
+security group select --name all-services-port
+instancegroup configure --instanceGroup cbgateway --nodecount 1 --templateName minviable-gcp
+instancegroup configure --instanceGroup host_group_client_1 --nodecount 1 --templateName minviable-gcp
+instancegroup configure --instanceGroup host_group_master_1 --nodecount 1 --templateName minviable-gcp
+instancegroup configure --instanceGroup host_group_master_2 --nodecount 1 --templateName minviable-gcp
+instancegroup configure --instanceGroup host_group_master_3 --nodecount 1 --templateName minviable-gcp
+instancegroup configure --instanceGroup host_group_slave_1 --nodecount 1 --templateName minviable-gcp
+hostgroup configure --hostgroup host_group_client_1
+hostgroup configure --hostgroup host_group_master_1
+hostgroup configure --hostgroup host_group_master_2
+hostgroup configure --hostgroup host_group_master_3
+hostgroup configure --hostgroup host_group_slave_1
+stack create --name example-stack --region US_CENTRAL1_A
+cluster create
+```
 
 As usual for us - being committed to 100% open source - we are always open sourcing everything thus you can get the details on our [GitHub](https://github.com/sequenceiq/cloudbreak-shell) repository.
 Should you have any questions feel free to engage with us on our [blog](http://blog.sequenceiq.com/) or follow us on [LinkedIn](https://www.linkedin.com/company/sequenceiq/), [Twitter](https://twitter.com/sequenceiq) or [Facebook](https://www.facebook).
