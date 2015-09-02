@@ -293,6 +293,10 @@ You have to configure the host groups before the provisioning(by default the clo
 hostgroup configure --hostgroup slave_1 --recipeIds 1,2,3
 ```
 
+Other available option:
+
+- --recipeNames "string": comma separated list of recipe names
+
 ### Configure a recipe
 
 You can create recipes for automate your setups before ambari install or after ambari install.
