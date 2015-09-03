@@ -310,6 +310,20 @@ Other available options:
 - --file "string": the file which contains the recipe
 - --publicInAccount "flag": flags if the template is public in the account
 
+### Create and store custom recipe
+
+You can create and store your custom recipe in Cloudbreak. Name and executionType is mandatory and at least one script file, which exists.
+
+```
+recipe store --name "my_recipe" --executionType (ONE_NODE|ALL_NODES) --preInstallScriptFile /path/of/the/pre-install-script --postInstallScriptFile /path/of/the/post-install-script
+```
+
+Other available options:
+
+- --description "string": description of the recipe
+- --timeout "integer": Timeout of the script execution
+- --publicInAccount "flag": flags if the template is public in the account
+
 ### Select a blueprint
 
 We ship default Hadoop cluster blueprints with Cloudbreak. You can use these blueprints or add yours. To see the available blueprints and use one of them please use:
@@ -471,6 +485,7 @@ For the full list of available commands please check below. Please note that all
     * network show - Shows the network by its id or name
     * quit - Exits the shell
     * recipe add - Add a new recipe with either --url or --file
+    * recipe store - Create and store a new recipe with either --preInstallScriptFile or --postInstallScriptFile
     * recipe delete - Delete the recipe by its id or name
     * recipe list - Shows the currently available recipes
     * recipe show - Shows the properties of the specified recipe
