@@ -498,9 +498,12 @@ For the full list of available commands please check below. Please note that all
 
 ## Example command file
 
-The example below works with default installation of Cloudbreak on Google Cloud Platform (region should be change). Only pre requirement is a [created credential](https://github.com/sequenceiq/cloudbreak-shell#google-cloud-platform-example).
+The example below works with a default installation of Cloudbreak, using **Google Cloud Platform** (`credential`, `template` and `region` is provider specific). For examples of how to create credentials for different cloud providers follow this [link](https://github.com/sequenceiq/cloudbreak-shell#create-a-cloud-credential). 
+
+Make sure you change all the values when creating the credential.
 
 ```
+credential create --GCP --description "description" --name [CREDENTIAL_NAME] --projectId [PROJECT_ID] --serviceAccountId [SERVICE_ACC_ID] --serviceAccountPrivateKeyPath [P12_KEY_PATH] --sshKeyUrl [KEY_URL]
 credential select --name [CREDENTIAL_NAME]
 blueprint select --name hdp-small-default
 network select --name default-gcp-network
