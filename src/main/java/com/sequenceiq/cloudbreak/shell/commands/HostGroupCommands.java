@@ -77,7 +77,7 @@ public class HostGroupCommands implements CommandMarker {
             @Override
             public Long apply(String input) {
                 try {
-                    Map<String, String> resp = null;
+                    Map<String, Object> resp = null;
                     switch (type) {
                         case ID:
                             resp = (Map) cloudbreak.getRecipe(input);
@@ -88,7 +88,7 @@ public class HostGroupCommands implements CommandMarker {
                         default:
                             throw new UnsupportedOperationException();
                     }
-                    return Long.parseLong(resp.get("id"));
+                    return Long.parseLong(resp.get("id").toString());
                 } catch (HttpResponseException e) {
                     throw new RuntimeException("Recipe [" + input + "]: " + e.getResponse().getData().toString());
                 } catch (Exception e) {
