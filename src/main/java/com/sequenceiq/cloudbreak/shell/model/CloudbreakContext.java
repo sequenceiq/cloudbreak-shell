@@ -33,6 +33,9 @@ public class CloudbreakContext {
     private Map<String, String> securityGroups = new HashMap<>();
     private String activeNetworkId;
     private String activeSecurityGroupId;
+    private String fileSystemType;
+    private Map<String, Object> fileSystemParameters = new HashMap<>();
+    private Boolean defaultFileSystem;
 
     @Autowired
     private CloudbreakClient client;
@@ -54,6 +57,12 @@ public class CloudbreakContext {
         addProperty(PropertyKey.STACK_ID, id);
         addProperty(PropertyKey.STACK_NAME, name);
         setStackAccessible();
+    }
+
+    public void resetFileSystemConfiguration() {
+        this.fileSystemParameters = new HashMap<>();
+        this.defaultFileSystem = null;
+        this.defaultFileSystem = null;
     }
 
     public String getActiveCloudPlatform() {
@@ -152,6 +161,30 @@ public class CloudbreakContext {
             Map<String, String> templateMap = (Map<String, String>) templateEntry.getValue();
             this.activeTemplateNames.addAll(templateMap.keySet());
         }
+    }
+
+    public String getFileSystemType() {
+        return fileSystemType;
+    }
+
+    public void setFileSystemType(String fileSystemType) {
+        this.fileSystemType = fileSystemType;
+    }
+
+    public Map<String, Object> getFileSystemParameters() {
+        return fileSystemParameters;
+    }
+
+    public void setFileSystemParameters(Map<String, Object> fileSystemParameters) {
+        this.fileSystemParameters = fileSystemParameters;
+    }
+
+    public Boolean getDefaultFileSystem() {
+        return defaultFileSystem;
+    }
+
+    public void setDefaultFileSystem(Boolean defaultFileSystem) {
+        this.defaultFileSystem = defaultFileSystem;
     }
 
     public Set<String> getActiveHostGroups() {

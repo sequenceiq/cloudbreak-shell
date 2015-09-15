@@ -46,6 +46,56 @@ public class ClusterCommands implements CommandMarker {
         return context.isStackAvailable();
     }
 
+    @CliAvailabilityIndicator({ "cluster fileSystem --DASH", "cluster fileSystem --GCS" })
+    public boolean isClusterFileSystemCommandAvailable() {
+        return context.isStackAvailable();
+    }
+
+    @CliCommand(value = "cluster fileSystem --DASH", help = "Set DASH fileSystem on cluster")
+    public String setAzureRmFileSystem(
+            @CliOption(key = "defaultFileSystem", mandatory = true, help = "Use as default fileSystem") Boolean defaultFileSystem,
+            @CliOption(key = "accountName", mandatory = true, help = "accountName of the DASH") String accountName,
+            @CliOption(key = "accountKey", mandatory = true, help = "accountKey of the DASH") String accountKey) {
+        context.setDefaultFileSystem(defaultFileSystem);
+        context.setFileSystemType("DASH");
+        Map<String, Object> props = new HashMap<>();
+        props.put("accountName", accountName);
+        props.put("accountKey", accountKey);
+        context.setFileSystemParameters(props);
+        return "DASH filesystem configured";
+    }
+
+    @CliCommand(value = "cluster fileSystem --GCS", help = "Set GCS fileSystem on cluster")
+    public String setGcsFileSystem(
+            @CliOption(key = "defaultFileSystem", mandatory = true, help = "Use as default fileSystem") Boolean defaultFileSystem,
+            @CliOption(key = "projectId", mandatory = true, help = "projectId of the GCS") String projectId,
+            @CliOption(key = "serviceAccountEmail", mandatory = true, help = "serviceAccountEmail of the GCS") String serviceAccountEmail,
+            @CliOption(key = "privateKeyEncoded", mandatory = true, help = "privateKeyEncoded of the GCS") String privateKeyEncoded,
+            @CliOption(key = "defaultBucketName", mandatory = true, help = "defaultBucketName of the GCS") String defaultBucketName) {
+        context.setDefaultFileSystem(defaultFileSystem);
+        context.setFileSystemType("GCS");
+        Map<String, Object> props = new HashMap<>();
+        props.put("projectId", projectId);
+        props.put("serviceAccountEmail", serviceAccountEmail);
+        props.put("privateKeyEncoded", privateKeyEncoded);
+        props.put("defaultBucketName", defaultBucketName);
+        context.setFileSystemParameters(props);
+        return "GCS filesystem configured";
+    }
+
+    @CliCommand(value = "cluster show", help = "Shows the cluster by stack id")
+    public Object configCluster() {
+        try {
+            return renderSingleMap(cloudbreak.getClusterMap(context.getStackId()), "FIELD", "VALUE");
+        } catch (IndexOutOfBoundsException ex) {
+            return "There was no cluster for this account.";
+        } catch (HttpResponseException ex) {
+            return ex.getResponse().getData().toString();
+        } catch (Exception ex) {
+            return ex.toString();
+        }
+    }
+
     @CliCommand(value = "cluster node --ADD", help = "Add new nodes to the cluster")
     public String addNodeToCluster(
             @CliOption(key = "hostgroup", mandatory = true, help = "Name of the hostgroup") HostGroup hostGroup,
@@ -134,8 +184,15 @@ public class ClusterCommands implements CommandMarker {
                     stackRepoId, stackBaseURL,
                     utilsRepoId, utilsBaseURL,
                     verify,
-                    enableSecurity, kerberosMasterKey, kerberosAdmin, kerberosPassword);
+                    enableSecurity,
+                    kerberosMasterKey,
+                    kerberosAdmin,
+                    kerberosPassword,
+                    context.getFileSystemType(),
+                    context.getFileSystemParameters(),
+                    context.getDefaultFileSystem());
             context.setHint(Hints.NONE);
+            context.resetFileSystemConfiguration();
             return "Cluster creation started";
         } catch (HttpResponseException ex) {
             return ex.getResponse().getData().toString();

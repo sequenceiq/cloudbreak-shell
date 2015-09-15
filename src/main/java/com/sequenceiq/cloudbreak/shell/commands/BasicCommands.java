@@ -49,6 +49,7 @@ public class BasicCommands implements CommandMarker {
         sb.append(getRow("blueprintId", context.getBlueprintId()));
         sb.append(getRow("credentialId", context.getCredentialId()));
         sb.append(getRow("networkId", context.getActiveNetworkId()));
+        sb.append(getRow("securityGroupId", context.getActiveSecurityGroupId()));
         sb.append(getRow("stackId", context.getStackId()));
         sb.append(getRow("stackName", context.getStackName()));
         sb.append(getRow("recipeId", context.getRecipeId()));
