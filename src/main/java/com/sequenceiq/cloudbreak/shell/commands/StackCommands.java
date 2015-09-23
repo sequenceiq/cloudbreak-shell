@@ -104,6 +104,7 @@ public class StackCommands implements CommandMarker {
             @CliOption(key = "adjustmentType", mandatory = false, help = "adjustmentType which is EXACT or PERCENTAGE.") AdjustmentType adjustmentType,
             @CliOption(key = "threshold", mandatory = false, help = "threshold of failure") Long threshold,
             @CliOption(key = "diskPerStorage", mandatory = false, help = "disk per Storage Account on Azure") Integer diskPerStorage,
+            @CliOption(key = "platformVariant", mandatory = false, help = "select platform variant version") String platformVariant,
             @CliOption(key = "dedicatedInstances", mandatory = false, help = "request dedicated instances on AWS") Boolean dedicatedInstances) {
         try {
             String networkId = context.getActiveNetworkId();
@@ -128,7 +129,8 @@ public class StackCommands implements CommandMarker {
                             networkId,
                             securityGroupId,
                             diskPerStorage,
-                            dedicatedInstances);
+                            dedicatedInstances,
+                            platformVariant);
             context.addStack(id, name);
             context.setHint(Hints.CREATE_CLUSTER);
             return "Stack created, id: " + id;
