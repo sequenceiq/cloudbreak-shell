@@ -3,6 +3,7 @@ package com.sequenceiq.cloudbreak.shell;
 import static com.sequenceiq.cloudbreak.shell.VersionedApplication.versionedApplication;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -16,6 +17,7 @@ import org.springframework.shell.core.JLineShellComponent;
 import org.springframework.shell.event.ShellStatus;
 import org.springframework.shell.event.ShellStatusListener;
 
+import com.google.common.collect.Maps;
 import com.sequenceiq.cloudbreak.client.CloudbreakClient;
 import com.sequenceiq.cloudbreak.shell.model.CloudbreakContext;
 import com.sequenceiq.cloudbreak.shell.model.Hints;
@@ -45,7 +47,7 @@ public class CloudbreakShell implements CommandLineRunner, ShellStatusListener {
         if (shellCommandsToExecute != null) {
             init();
             for (String cmd : shellCommandsToExecute) {
-                String replacedCommand =  getReplacedString(cmd);
+                String replacedCommand = getReplacedString(cmd);
                 if (!shell.executeScriptLine(replacedCommand)) {
                     System.out.println(String.format("%s: [%s]", replacedCommand, FAILED));
                     break;
@@ -62,7 +64,7 @@ public class CloudbreakShell implements CommandLineRunner, ShellStatusListener {
     }
 
     private String getReplacedString(String cmd) {
-        String result =  cmd;
+        String result = cmd;
         if (result != null) {
             for (String split : cmd.split(SPACE)) {
                 if (split.startsWith(DOLLAR)) {
@@ -89,6 +91,7 @@ public class CloudbreakShell implements CommandLineRunner, ShellStatusListener {
     private void init() throws Exception {
         cloudbreak.health();
         initResourceAccessibility();
+        initPlatformVariants();
         if (!context.isCredentialAccessible()) {
             context.setHint(Hints.CREATE_CREDENTIAL);
         } else {
@@ -148,4 +151,16 @@ public class CloudbreakShell implements CommandLineRunner, ShellStatusListener {
             context.putSecurityGroup(securityGroup.get("id").toString(), securityGroup.get("name").toString());
         }
     }
+
+    private void initPlatformVariants() {
+        Map<String, Collection<String>> platformToVariants = Maps.newHashMap();
+        try {
+            platformToVariants = ((Map<String, Map<String, Collection<String>>>) cloudbreak.getPlatformVariants()).get("platformToVariants");
+        } catch (Exception e) {
+            System.out.println("Error during retrieving platform variants");
+        } finally {
+            context.setPlatformToVariantsMap(platformToVariants);
+        }
+    }
+
 }
