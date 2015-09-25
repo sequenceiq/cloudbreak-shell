@@ -1,5 +1,6 @@
 package com.sequenceiq.cloudbreak.shell.model;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -19,6 +20,7 @@ import com.sequenceiq.cloudbreak.client.CloudbreakClient;
 public class CloudbreakContext {
 
     private static final String ACCESSIBLE = "accessible";
+    private Map<String, Collection<String>> platformToVariants;
     private Focus focus;
     private Hints hint;
     private Map<PropertyKey, String> properties = new HashMap<>();
@@ -185,6 +187,14 @@ public class CloudbreakContext {
 
     public void setDefaultFileSystem(Boolean defaultFileSystem) {
         this.defaultFileSystem = defaultFileSystem;
+    }
+
+    public void setPlatformToVariantsMap(Map<String, Collection<String>> platformToVariants) {
+        this.platformToVariants = platformToVariants;
+    }
+
+    public Collection<String> getVariantsByPlatform(String platform) {
+        return platformToVariants.get(platform);
     }
 
     public Set<String> getActiveHostGroups() {

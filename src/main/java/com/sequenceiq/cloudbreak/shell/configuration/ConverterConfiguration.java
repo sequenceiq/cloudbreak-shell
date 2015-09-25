@@ -28,6 +28,7 @@ import com.sequenceiq.cloudbreak.shell.converter.InstanceGroupTemplateIdConverte
 import com.sequenceiq.cloudbreak.shell.converter.InstanceGroupTemplateNameConverter;
 import com.sequenceiq.cloudbreak.shell.converter.NetworkIdConverter;
 import com.sequenceiq.cloudbreak.shell.converter.NetworkNameConverter;
+import com.sequenceiq.cloudbreak.shell.converter.PlatformVariantConverter;
 import com.sequenceiq.cloudbreak.shell.converter.SecurityGroupIdConverter;
 import com.sequenceiq.cloudbreak.shell.converter.SecurityGroupNameConverter;
 import com.sequenceiq.cloudbreak.shell.converter.StackRegionConverter;
@@ -164,5 +165,10 @@ public class ConverterConfiguration {
     @Bean
     Converter secGroupNameConverter() {
         return new SecurityGroupNameConverter(client);
+    }
+
+    @Bean
+    Converter platformVariantConverter() {
+        return new PlatformVariantConverter(client);
     }
 }
