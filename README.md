@@ -391,18 +391,22 @@ stack node --REMOVE  --instanceGroup slave_1 --adjustment -2
 ### Create a Hadoop cluster
 You are almost done - one more command and this will create your Hadoop cluster on your favorite cloud provider. Same as the API, or UI this will use your `template`, and by using CloudFormation will launch a cloud `stack` - once the `stack` is up and running (cloud provisioning is done) it will use your selected `blueprint` and install your custom Hadoop cluster with the selected components and services. For the supported list of Hadoop components and services please check the [documentation](http://sequenceiq.com/cloudbreak/#supported-components).
 
-If you need specific filesystem you can configure it with the shell:
+*Optional:* If you need a specific filesystem other that the local HDFS it can be configured with the shell:
 
 - DASH filesystem
 ```
-cluster fileSystem --AZURE_RM --defaultFileSystem true --accountName "accountName" --accountKey "accountKey"
+cluster fileSystem --DASH --defaultFileSystem true --accountName "accountName" --accountKey "accountKey"
+```
+- WASB filesystem
+```
+cluster fileSystem --WASB --defaultFileSystem true --accountName "accountName" --accountKey "accountKey"
 ```
 - GCS filesystem
 ```
 cluster fileSystem --GCP --defaultFileSystem true --projectId "projectId" --serviceAccountEmail "serviceAccountEmail" --privateKeyEncoded "privateKeyEncoded" --defaultBucketName "defaultBucketName"
 ```
 
-You can create a cluster now but you can do it without filesystem configuration:
+You can create a cluster now:
 
 ```
 cluster create --description "my cluster desc"
