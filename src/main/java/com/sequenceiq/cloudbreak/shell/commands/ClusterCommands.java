@@ -46,24 +46,39 @@ public class ClusterCommands implements CommandMarker {
         return context.isStackAvailable();
     }
 
-    @CliAvailabilityIndicator({ "cluster fileSystem --DASH", "cluster fileSystem --GCS" })
+    @CliAvailabilityIndicator({ "cluster fileSystem --DASH", "cluster fileSystem --GCS", "cluster fileSystem --WASB" })
     public boolean isClusterFileSystemCommandAvailable() {
         return context.isStackAvailable();
     }
 
-    @CliCommand(value = "cluster fileSystem --DASH", help = "Set DASH fileSystem on cluster")
+    @CliCommand(value = "cluster fileSystem --DASH", help = "Set Windows Azure Blob Storage filesystem with DASH on cluster")
     public String setAzureRmFileSystem(
-            @CliOption(key = "defaultFileSystem", mandatory = true, help = "Use as default fileSystem") Boolean defaultFileSystem,
-            @CliOption(key = "accountName", mandatory = true, help = "accountName of the DASH") String accountName,
-            @CliOption(key = "accountKey", mandatory = true, help = "accountKey of the DASH") String accountKey) {
+            @CliOption(key = "defaultFileSystem", mandatory = true, help = "Use as default filesystem") Boolean defaultFileSystem,
+            @CliOption(key = "accountName", mandatory = true, help = "accountName of the DASH service") String accountName,
+            @CliOption(key = "accountKey", mandatory = true, help = "access key of the DASH service") String accountKey) {
         context.setDefaultFileSystem(defaultFileSystem);
         context.setFileSystemType("DASH");
         Map<String, Object> props = new HashMap<>();
         props.put("accountName", accountName);
         props.put("accountKey", accountKey);
         context.setFileSystemParameters(props);
-        return "DASH filesystem configured";
+        return "Windows Azure Blob Storage with DASH configured as the filesystem";
     }
+
+    @CliCommand(value = "cluster fileSystem --WASB", help = "Set Windows Azure Blob Storage filesystem on cluster")
+    public String setWasbFileSystem(
+            @CliOption(key = "defaultFileSystem", mandatory = true, help = "Use as default filesystem") Boolean defaultFileSystem,
+            @CliOption(key = "accountName", mandatory = true, help = "name of the storage account") String accountName,
+            @CliOption(key = "accountKey", mandatory = true, help = "primary access key to the storage account") String accountKey) {
+        context.setDefaultFileSystem(defaultFileSystem);
+        context.setFileSystemType("WASB");
+        Map<String, Object> props = new HashMap<>();
+        props.put("accountName", accountName);
+        props.put("accountKey", accountKey);
+        context.setFileSystemParameters(props);
+        return "Windows Azure Blob Storage filesystem configured";
+    }
+
 
     @CliCommand(value = "cluster fileSystem --GCS", help = "Set GCS fileSystem on cluster")
     public String setGcsFileSystem(
