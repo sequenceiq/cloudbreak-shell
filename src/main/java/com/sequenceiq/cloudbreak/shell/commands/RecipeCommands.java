@@ -70,8 +70,8 @@ public class RecipeCommands implements CommandMarker {
 
     @CliCommand(value = "recipe add", help = "Add a new recipe with either --url or --file")
     public String addRecipe(
-            @CliOption(key = "url", mandatory = false, help = "URL of the blueprint to download from") String url,
-            @CliOption(key = "file", mandatory = false, help = "File which contains the blueprint") File file,
+            @CliOption(key = "url", mandatory = false, help = "URL of the Recipe to download from") String url,
+            @CliOption(key = "file", mandatory = false, help = "File which contains the Recipe") File file,
             @CliOption(key = "publicInAccount", mandatory = false, help = "flags if the recipe is public in the account") Boolean publicInAccount) {
         try {
             String json = file == null ? IOUtils.toString(new URL(url)) : IOUtils.toString(new FileInputStream(file));
