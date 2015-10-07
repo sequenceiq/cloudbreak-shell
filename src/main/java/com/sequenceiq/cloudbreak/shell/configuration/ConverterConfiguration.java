@@ -31,6 +31,7 @@ import com.sequenceiq.cloudbreak.shell.converter.NetworkNameConverter;
 import com.sequenceiq.cloudbreak.shell.converter.PlatformVariantConverter;
 import com.sequenceiq.cloudbreak.shell.converter.SecurityGroupIdConverter;
 import com.sequenceiq.cloudbreak.shell.converter.SecurityGroupNameConverter;
+import com.sequenceiq.cloudbreak.shell.converter.SecurityRulesConverter;
 import com.sequenceiq.cloudbreak.shell.converter.StackRegionConverter;
 
 /**
@@ -170,5 +171,10 @@ public class ConverterConfiguration {
     @Bean
     Converter platformVariantConverter() {
         return new PlatformVariantConverter(client);
+    }
+
+    @Bean
+    Converter securityRulesConverter() {
+        return new SecurityRulesConverter(client);
     }
 }

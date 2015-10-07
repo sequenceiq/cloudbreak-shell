@@ -273,6 +273,40 @@ or
 network select --name <Name of the network>
 ```
 
+### Create a security group
+
+A security group gives developers and systems administrators an easy way to create and manage a collection of cloud infrastructure related security rules, maintaining and updating them in an orderly and predictable fashion. A security group can be used repeatedly to create identical copies of the same stack (or to use as a foundation to start a new stack).
+
+#### Security group creation example
+
+```
+securitygroup create --name secgroup_example --description securitygroup-example --rules 0.0.0.0/0:tcp:8080,9090;10.0.33.0/24:tcp:1234,1235
+```
+
+#### Viewing created security group
+
+You can check whether the security group was created successfully by using the `securitygroup list` command. Check the security group and select it if you are happy with it:
+
+```
+securitygroup show --id <ID of the security group>
+```
+or
+```
+securitygroup show --name <Name of the security group>
+```
+
+#### Select a security group
+
+You can select one of the created network with
+
+```
+securitygroup select --id <ID of the security group>
+```
+or
+```
+securitygroup select --name <Name of the security group>
+```
+
 ### Configure an instance groups
 
 You have to configure the instancegroups before the provisioning. An instancegroup is defining a group of your nodes with a specified templates.
@@ -462,7 +496,6 @@ Each time you start the shell the executed commands are logged in a file line by
 
 For the full list of available commands please check below. Please note that all commands are context aware, and you can always use `TAB` for command completion.
 
-
     * blueprint add - Add a new blueprint with either --url or --file
     * blueprint defaults - Adds the default blueprints to Ambari
     * blueprint delete - Delete the blueprint by its id or name
@@ -470,6 +503,9 @@ For the full list of available commands please check below. Please note that all
     * blueprint select - Select the blueprint by its id or name
     * blueprint show - Shows the blueprint by its id or name
     * cluster create - Create a new cluster based on a blueprint and optionally a recipe
+    * cluster fileSystem --DASH - Set Windows Azure Blob Storage filesystem with DASH on cluster
+    * cluster fileSystem --GCS - Set GCS fileSystem on cluster
+    * cluster fileSystem --WASB - Set Windows Azure Blob Storage filesystem on cluster
     * cluster node --ADD - Add new nodes to the cluster
     * cluster node --REMOVE - Remove nodes from the cluster
     * cluster show - Shows the cluster by stack id
@@ -478,6 +514,7 @@ For the full list of available commands please check below. Please note that all
     * context - Shows some context
     * credential certificate - get Azure certificate
     * credential create --AZURE - Create a new AZURE credential
+    * credential create --AZURE_RM - Create a new AZURE_RM credential
     * credential create --EC2 - Create a new EC2 credential
     * credential create --GCP - Create a new Gcp credential
     * credential create --OPENSTACK - Create a new OPENSTACK credential
@@ -485,9 +522,6 @@ For the full list of available commands please check below. Please note that all
     * credential list - Shows all of your credentials
     * credential select - Select the credential by its id or name
     * credential show - Shows the credential by its id
-    * cluster fileSystem --AZURE - Set fileSystem on cluster
-    * cluster fileSystem --AZURE_RM - Set fileSystem on cluster
-    * cluster fileSystem --GCP - Set fileSystem on cluster
     * exit - Exits the shell
     * help - List all commands usage
     * hint - Shows some hints
@@ -505,14 +539,16 @@ For the full list of available commands please check below. Please note that all
     * network show - Shows the network by its id or name
     * quit - Exits the shell
     * recipe add - Add a new recipe with either --url or --file
-    * recipe store - Create and store a new recipe with either --preInstallScriptFile or --postInstallScriptFile
     * recipe delete - Delete the recipe by its id or name
     * recipe list - Shows the currently available recipes
     * recipe show - Shows the properties of the specified recipe
+    * recipe store - Create and store a new recipe
     * script - Parses the specified resource file and executes its commands
-    * security group list - Shows the currently available security groups
-    * security group select - Select a security group by the given id or name
-    * security group show - Shows the security group by its id or name
+    * securitygroup create - Creates a new security group
+    * securitygroup delete - Delete security group by the given id or name
+    * securitygroup list - Shows the currently available security groups
+    * securitygroup select - Select a security group by the given id or name
+    * securitygroup show - Shows the security group by its id or name
     * stack create - Create a new stack based on a template
     * stack list - Shows all of your stack
     * stack node --ADD - Add new nodes to the cluster
@@ -542,7 +578,7 @@ credential create --GCP --description "description" --name [CREDENTIAL_NAME] --p
 credential select --name [CREDENTIAL_NAME]
 blueprint select --name hdp-small-default
 network select --name default-gcp-network
-security group select --name all-services-port
+securitygroup select --name all-services-port
 instancegroup configure --instanceGroup cbgateway --nodecount 1 --templateName minviable-gcp
 instancegroup configure --instanceGroup host_group_client_1 --nodecount 1 --templateName minviable-gcp
 instancegroup configure --instanceGroup host_group_master_1 --nodecount 1 --templateName minviable-gcp
