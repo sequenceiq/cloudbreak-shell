@@ -475,11 +475,11 @@ cluster stop
 
 You can also upscale or downscale your cluster:
 ```
-cluster node --ADD --instanceGroup slave_1 --adjustment 2
+cluster node --ADD --hostgroup slave_1 --adjustment 2
 ```
 or
 ```
-cluster node --REMOVE  --instanceGroup slave_1 --adjustment -2
+cluster node --REMOVE  --hostgroup slave_1 --adjustment -2
 ```
 Other available options:
 
