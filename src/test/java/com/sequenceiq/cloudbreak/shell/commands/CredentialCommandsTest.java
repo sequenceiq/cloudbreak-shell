@@ -1,9 +1,8 @@
 package com.sequenceiq.cloudbreak.shell.commands;
 
-import static org.mockito.BDDMockito.times;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.times;
 import static org.mockito.BDDMockito.verify;
-import static org.mockito.Mockito.anyBoolean;
 import static org.mockito.Mockito.anyString;
 
 import java.io.File;
@@ -11,7 +10,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Answers;
 import org.mockito.InjectMocks;
@@ -120,28 +118,6 @@ public class CredentialCommandsTest {
         underTest.deleteCredential(null, null);
         verify(cloudbreak, times(0)).deleteBlueprint(anyString());
         verify(cloudbreak, times(0)).deleteBlueprintByName(anyString());
-    }
-
-    @Test
-    @Ignore
-    public void testCreateAzureCredentialsWithSshKeyPath() throws Exception {
-        // GIVEN
-        String sshKeyPath = getAbsolutePath("keys/azure");
-        // WHEN
-        underTest.createAzureCredential(DUMMY_NAME, DUMMY_SUBSCRIPTION_ID, new File("test"), null, false, DUMMY_DESCRIPTION);
-        // THEN
-        verify(cloudbreak, times(1)).postAzureCredential(anyString(), anyString(), anyString(), anyString(), anyBoolean());
-    }
-
-    @Test
-    @Ignore
-    public void testCreateAzureCredentialsWithSshKeyPathFileNotFound() throws Exception {
-        // GIVEN
-        String sshKeyPath = DUMMY_SSH_KEY_PATH;
-        // WHEN
-        underTest.createAzureCredential(DUMMY_NAME, DUMMY_SUBSCRIPTION_ID, null, sshKeyPath, false, DUMMY_DESCRIPTION);
-        // THEN
-        verify(cloudbreak, times(0)).postAzureCredential(anyString(), anyString(), anyString(), anyString(), anyBoolean());
     }
 
     private String getAbsolutePath(String path) {

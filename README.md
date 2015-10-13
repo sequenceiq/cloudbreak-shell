@@ -100,22 +100,10 @@ Other available options:
 
 - --publicInAccount "flag": flags if the credential is public in the account
 
-#### Azure example
-
-```
-credential create --AZURE --description "description" --name "myCredentialName" --subscriptionId "mySubscriptionId" --sshKeyUrl "URL towards your public SSH key file"
-```
-
-Other available options:
-
-- --sshKeyPath "path": upload your public key from a file (replaces --sshKeyUrl)
-
-- --publicInAccount "flag": flags if the credential is public in the account
-
 #### Azure Resource Manager example
 
 ```
-credential create --AZURE_RM --description "description" --name "myCredentialName" --subscriptionId "mySubscriptionId" --tenantId "sdfsd-sdfdsf-dsfdsf-sdfsdf" --secretKey "sdfdsfs-sdfsddsf-sdfsdf-sdfsdf" --accesKey "acceskey" --sshKeyUrl "URL towards your public SSH key file"
+credential create --AZURE --description "description" --name "myCredentialName" --subscriptionId "mySubscriptionId" --tenantId "sdfsd-sdfdsf-dsfdsf-sdfsdf" --secretKey "sdfdsfs-sdfsddsf-sdfsdf-sdfsdf" --accesKey "acceskey" --sshKeyUrl "URL towards your public SSH key file"
 ```
 
 **You can use your Azure templates and networks under the stack creation (No need to create new templates and networks !!!)**
@@ -514,7 +502,6 @@ For the full list of available commands please check below. Please note that all
     * context - Shows some context
     * credential certificate - get Azure certificate
     * credential create --AZURE - Create a new AZURE credential
-    * credential create --AZURE_RM - Create a new AZURE_RM credential
     * credential create --EC2 - Create a new EC2 credential
     * credential create --GCP - Create a new Gcp credential
     * credential create --OPENSTACK - Create a new OPENSTACK credential
