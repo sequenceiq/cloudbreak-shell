@@ -79,10 +79,7 @@
             <property name="tokens" value="METHOD_DEF" />
         </module>
         <module name="CyclomaticComplexity">
-            <property name="max" value="12" />
-        </module>
-        <module name="NPathComplexity">
-            <property name="max" value="256" />
+            <property name="max" value="24" />
         </module>
         <!-- -->
 
