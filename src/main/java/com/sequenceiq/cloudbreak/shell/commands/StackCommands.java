@@ -14,11 +14,13 @@ import org.springframework.stereotype.Component;
 import com.sequenceiq.cloudbreak.client.CloudbreakClient;
 import com.sequenceiq.cloudbreak.shell.completion.InstanceGroup;
 import com.sequenceiq.cloudbreak.shell.completion.PlatformVariant;
+import com.sequenceiq.cloudbreak.shell.completion.StackAvailabilityZone;
 import com.sequenceiq.cloudbreak.shell.completion.StackRegion;
 import com.sequenceiq.cloudbreak.shell.model.AdjustmentType;
 import com.sequenceiq.cloudbreak.shell.model.CloudbreakContext;
 import com.sequenceiq.cloudbreak.shell.model.Hints;
 import com.sequenceiq.cloudbreak.shell.model.OnFailureAction;
+import com.sequenceiq.cloudbreak.shell.model.Region;
 import com.sequenceiq.cloudbreak.shell.model.StatusRequest;
 
 import groovyx.net.http.HttpResponseException;
@@ -99,6 +101,7 @@ public class StackCommands implements CommandMarker {
     public String createStack(
             @CliOption(key = "name", mandatory = true, help = "Name of the stack") String name,
             @CliOption(key = "region", mandatory = true, help = "region of the stack") StackRegion region,
+            @CliOption(key = "availabilityZone", mandatory = false, help = "availabilityZone of the stack") StackAvailabilityZone availabilityZone,
             @CliOption(key = "image", mandatory = false, specifiedDefaultValue = "image-name", help = "Specific image name") String image,
             @CliOption(key = "publicInAccount", mandatory = false, help = "marks the stack as visible for all members of the account") Boolean publicInAccount,
             @CliOption(key = "onFailureAction", mandatory = false, help = "onFailureAction which is ROLLBACK or DO_NOTHING.") OnFailureAction onFailureAction,
@@ -116,6 +119,12 @@ public class StackCommands implements CommandMarker {
             if (securityGroupId == null) {
                 return "A security group must be selected";
             }
+            if (availabilityZone != null) {
+                if (!Region.regionContainsAvZone(region.getName(), availabilityZone.getName())) {
+                    return "Availability zone is not in the selected region. The available zones in the regions are: "
+                            + Region.valueOf(region.getName()).avZones();
+                }
+            }
             String id =
                     cloudbreak.postStack(
                             name,
@@ -131,7 +140,8 @@ public class StackCommands implements CommandMarker {
                             securityGroupId,
                             diskPerStorage,
                             dedicatedInstances,
-                            platformVariant == null ? "" : platformVariant.getName());
+                            platformVariant == null ? "" : platformVariant.getName(),
+                            availabilityZone == null ? null : availabilityZone.getName());
             context.addStack(id, name);
             context.setHint(Hints.CREATE_CLUSTER);
             return "Stack created, id: " + id;

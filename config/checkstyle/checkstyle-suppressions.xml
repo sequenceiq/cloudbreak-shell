@@ -7,12 +7,7 @@
 <suppressions>
     <!-- suppressing checks in tests -->
     <suppress checks="Javadoc.*" files="test|Dummy|Mock" />
-    <suppress checks="ParameterNumber|ClassFanOutComplexity|CyclomaticComplexity|JavaNCSS|NPathComplexity" files="test|Dummy|Mock" />
-    <suppress checks="MagicNumberCheck" files="test|Dummy|Mock|simulator" />
-    <suppress id="IllegalTypeImpl" files="test" />
-    <suppress checks="IllegalCatch" files="test" />
-    <suppress checks="AbstractClassName" files="test" />
-    <suppress checks="EmptyBlock" files="test" />
+    <suppress checks="MagicNumberCheck|ParameterNumber|ClassFanOutComplexity|CyclomaticComplexity|JavaNCSS|NPathComplexity|IllegalTypeImpl|IllegalCatch|AbstractClassName|EmptyBlock" files="test|Dummy|Mock" />
     <suppress checks="sysout" files="CloudbreakShell.java" />
     <suppress checks="string-instantiation" files="CredentialCommands.java" />
     <suppress checks="HideUtilityClassConstructor" files=".*Application.java" />

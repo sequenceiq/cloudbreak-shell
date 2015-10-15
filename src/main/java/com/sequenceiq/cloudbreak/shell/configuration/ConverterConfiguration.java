@@ -32,6 +32,7 @@ import com.sequenceiq.cloudbreak.shell.converter.PlatformVariantConverter;
 import com.sequenceiq.cloudbreak.shell.converter.SecurityGroupIdConverter;
 import com.sequenceiq.cloudbreak.shell.converter.SecurityGroupNameConverter;
 import com.sequenceiq.cloudbreak.shell.converter.SecurityRulesConverter;
+import com.sequenceiq.cloudbreak.shell.converter.StackAvailabilityZoneConverter;
 import com.sequenceiq.cloudbreak.shell.converter.StackRegionConverter;
 
 /**
@@ -141,6 +142,11 @@ public class ConverterConfiguration {
     @Bean
     Converter stackRegionConverter() {
         return new StackRegionConverter(client);
+    }
+
+    @Bean
+    Converter stackAvailabilityZoneConverter() {
+        return new StackAvailabilityZoneConverter(client);
     }
 
     @Bean
