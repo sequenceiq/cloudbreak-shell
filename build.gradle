@@ -21,6 +21,8 @@ apply plugin: 'jacoco'
 apply plugin: 'sonar-runner'
 apply plugin: 'license-report'
 
+mainClassName = 'com.sequenceiq.cloudbreak.shell.CloudbreakShell'
+
 sourceCompatibility = 1.7
 group = 'com.sequenceiq'
 
