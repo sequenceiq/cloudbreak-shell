@@ -103,7 +103,7 @@ Other available options:
 #### Azure Resource Manager example
 
 ```
-credential create --AZURE --description "description" --name "myCredentialName" --subscriptionId "mySubscriptionId" --tenantId "sdfsd-sdfdsf-dsfdsf-sdfsdf" --secretKey "sdfdsfs-sdfsddsf-sdfsdf-sdfsdf" --accesKey "acceskey" --sshKeyUrl "URL towards your public SSH key file"
+credential create --AZURE --description "description" --name "myCredentialName" --subscriptionId "mySubscriptionId" --tenantId "sdfsd-sdfdsf-dsfdsf-sdfsdf" --appId "sdfdsfs-sdfsddsf-sdfsdf-sdfsdf" --password "acceskey" --sshKeyUrl "URL towards your public SSH key file"
 ```
 
 **You can use your Azure templates and networks under the stack creation (No need to create new templates and networks !!!)**

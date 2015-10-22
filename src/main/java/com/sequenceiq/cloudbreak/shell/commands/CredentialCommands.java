@@ -299,8 +299,8 @@ public class CredentialCommands implements CommandMarker {
             @CliOption(key = "name", mandatory = true, help = "Name of the credential") String name,
             @CliOption(key = "subscriptionId", mandatory = true, help = "subscriptionId of the credential") String subscriptionId,
             @CliOption(key = "tenantId", mandatory = true, help = "tenantId of the credential") String tenantId,
-            @CliOption(key = "secretKey", mandatory = true, help = "secretKey of the credential") String secretKey,
-            @CliOption(key = "accesKey", mandatory = true, help = "accesKey of the credential") String accesKey,
+            @CliOption(key = "appId", mandatory = true, help = "appId of the credential") String appId,
+            @CliOption(key = "password", mandatory = true, help = "password of the credential") String password,
             @CliOption(key = "sshKeyPath", mandatory = false, help = "sshKeyPath of the template") File sshKeyPath,
             @CliOption(key = "sshKeyUrl", mandatory = false, help = "sshKeyUrl of the template") String sshKeyUrl,
             @CliOption(key = "publicInAccount", mandatory = false, help = "flags if the credential is public in the account") Boolean publicInAccount,
@@ -329,8 +329,8 @@ public class CredentialCommands implements CommandMarker {
                     description == null ? "Azure Rm credential was created by the cloudbreak-shell" : description,
                     subscriptionId,
                     tenantId,
-                    accesKey,
-                    secretKey,
+                    appId,
+                    password,
                     sshKey,
                     publicInAccount == null ? false : publicInAccount
             );
