@@ -93,6 +93,10 @@ public class InstanceGroupCommands implements CommandMarker {
 
     @CliCommand(value = "instancegroup show", help = "Configure instance groups")
     public String showInstanceGroup() throws Exception {
-        return renderObjectValueMap(context.getInstanceGroups(), "instanceGroup");
+        if (context.getInstanceGroups().isEmpty()) {
+            return "List of instance groups is empty currently.";
+        } else {
+            return renderObjectValueMap(context.getInstanceGroups(), "instanceGroup");
+        }
     }
 }

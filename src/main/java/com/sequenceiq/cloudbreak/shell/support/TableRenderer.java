@@ -97,7 +97,7 @@ public final class TableRenderer {
     }
 
     public static String renderObjectValueMap(Map<String, Object> rows, String mainHeader) {
-        Table table = null;
+        Table table = new Table();
         List<String> mainHeaders = new ArrayList<>();
         if (rows != null) {
             int index = 0;
