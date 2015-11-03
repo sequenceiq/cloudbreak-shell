@@ -2,7 +2,7 @@
 
 The goal with the CLI was to provide an interactive command line tool which supports:
 
-* all functionality available through the REST API or Cloudbreak web UI
+* all functionality available through the REST API or Cloudbreak Web UI
 * makes possible complete automation of management task via **scripts**
 * context aware command availability
 * tab completion
