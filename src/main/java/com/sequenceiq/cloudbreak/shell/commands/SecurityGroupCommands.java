@@ -36,7 +36,7 @@ public class SecurityGroupCommands implements CommandMarker {
         return true;
     }
 
-    @CliAvailabilityIndicator({"securitygroup delete", "securitygroup select", "securitygroup show" })
+    @CliAvailabilityIndicator({ "securitygroup delete", "securitygroup select", "securitygroup show" })
     public boolean areExistSecurityGroupCommandsAvailable() {
         return !context.getSecurityGroups().isEmpty();
     }
@@ -50,7 +50,16 @@ public class SecurityGroupCommands implements CommandMarker {
         @CliOption(key = "publicInAccount", mandatory = false, help = "Marks the securitygroup as visible for all members of the account",
                 specifiedDefaultValue = "true", unspecifiedDefaultValue = "false") Boolean publicInAccount) throws Exception {
         try {
-            String id = cloudbreakClient.postSecurityGroup(name, description, rules.getRules(), publicInAccount);
+            Map<String, String> tcpRules = new HashMap<>();
+            Map<String, String> udpRules = new HashMap<>();
+            for (Map<String, String> rule : rules.getRules()) {
+                if ("tcp".equals(rule.get("protocol"))) {
+                    tcpRules.put(rule.get("subnet"), rule.get("ports"));
+                } else {
+                    udpRules.put(rule.get("subnet"), rule.get("ports"));
+                }
+            }
+            String id = cloudbreakClient.postSecurityGroup(name, description, tcpRules, udpRules, publicInAccount);
             context.putSecurityGroup(id, name);
             context.setActiveSecurityGroupId(id);
             setHint();
