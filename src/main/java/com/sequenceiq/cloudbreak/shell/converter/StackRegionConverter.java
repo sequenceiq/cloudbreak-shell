@@ -9,7 +9,6 @@ import org.springframework.shell.core.MethodTarget;
 import com.sequenceiq.cloudbreak.client.CloudbreakClient;
 import com.sequenceiq.cloudbreak.shell.completion.StackRegion;
 import com.sequenceiq.cloudbreak.shell.model.CloudbreakContext;
-import com.sequenceiq.cloudbreak.shell.model.Region;
 
 public class StackRegionConverter extends AbstractConverter<StackRegion> {
 
@@ -28,7 +27,7 @@ public class StackRegionConverter extends AbstractConverter<StackRegion> {
     @Override
     public boolean getAllPossibleValues(List<Completion> completions, Class<?> targetType, String existingData, String optionContext, MethodTarget target) {
         try {
-            return getAllPossibleValues(completions, Region.filterRegionsByPlatform(context.getActiveCloudPlatform()));
+            return getAllPossibleValues(completions, context.getRegionsByPlatform(context.getActiveCloudPlatform()));
         } catch (Exception e) {
             return false;
         }

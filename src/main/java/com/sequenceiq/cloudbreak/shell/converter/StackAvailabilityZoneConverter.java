@@ -9,7 +9,6 @@ import org.springframework.shell.core.MethodTarget;
 import com.sequenceiq.cloudbreak.client.CloudbreakClient;
 import com.sequenceiq.cloudbreak.shell.completion.StackAvailabilityZone;
 import com.sequenceiq.cloudbreak.shell.model.CloudbreakContext;
-import com.sequenceiq.cloudbreak.shell.model.Region;
 
 public class StackAvailabilityZoneConverter extends AbstractConverter<StackAvailabilityZone> {
 
@@ -28,7 +27,7 @@ public class StackAvailabilityZoneConverter extends AbstractConverter<StackAvail
     @Override
     public boolean getAllPossibleValues(List<Completion> completions, Class<?> targetType, String existingData, String optionContext, MethodTarget target) {
         try {
-            return getAllPossibleValues(completions, Region.filterAvZones(context.getActiveCloudPlatform()));
+            return getAllPossibleValues(completions, context.getAvailabilityZonesByPlatform(context.getActiveCloudPlatform()));
         } catch (Exception e) {
             return false;
         }
