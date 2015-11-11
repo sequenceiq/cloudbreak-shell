@@ -154,12 +154,20 @@ public class CloudbreakShell implements CommandLineRunner, ShellStatusListener {
 
     private void initPlatformVariants() {
         Map<String, Collection<String>> platformToVariants = Maps.newHashMap();
+        Map<String, Collection<String>> regions = Maps.newHashMap();
+        Map<String, Map<String, Collection<String>>> availabilityZones = Maps.newHashMap();
         try {
-            platformToVariants = ((Map<String, Map<String, Collection<String>>>) cloudbreak.getPlatformVariants()).get("platformToVariants");
+            Map<String, Map<String, Map>> cloudConnectorParams = (Map<String, Map<String, Map>>) cloudbreak.getCloudConnectorParams();
+            platformToVariants = (Map<String, Collection<String>>) cloudConnectorParams.get("variants").get("platformToVariants");
+            regions = (Map<String, Collection<String>>) cloudConnectorParams.get("regions").get("regions");
+            regions.put("AZURE", regions.get("AZURE_RM"));
+            availabilityZones = (Map<String, Map<String, Collection<String>>>) cloudConnectorParams.get("regions").get("availabilityZones");
         } catch (Exception e) {
             System.out.println("Error during retrieving platform variants");
         } finally {
             context.setPlatformToVariantsMap(platformToVariants);
+            context.setRegions(regions);
+            context.setAvailabilityZones(availabilityZones);
         }
     }
 

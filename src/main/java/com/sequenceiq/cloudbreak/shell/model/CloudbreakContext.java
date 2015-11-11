@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import com.sequenceiq.cloudbreak.client.CloudbreakClient;
 
 /**
@@ -21,6 +22,8 @@ public class CloudbreakContext {
 
     private static final String ACCESSIBLE = "accessible";
     private Map<String, Collection<String>> platformToVariants;
+    private Map<String, Collection<String>> regions;
+    private Map<String, Map<String, Collection<String>>> availabilityZones;
     private Focus focus;
     private Hints hint;
     private Map<PropertyKey, String> properties = new HashMap<>();
@@ -193,8 +196,34 @@ public class CloudbreakContext {
         this.platformToVariants = platformToVariants;
     }
 
+
     public Collection<String> getVariantsByPlatform(String platform) {
         return platformToVariants.get(platform);
+    }
+
+    public void setRegions(Map<String, Collection<String>> regions) {
+        this.regions = regions;
+    }
+
+    public Collection<String> getRegionsByPlatform(String platform) {
+        return regions.get(platform);
+    }
+
+    public void setAvailabilityZones(Map<String, Map<String, Collection<String>>> availabilityZones) {
+        this.availabilityZones = availabilityZones;
+    }
+
+    public Collection<String> getAvailabilityZonesByPlatform(String platform) {
+        Collection<String> result = Lists.newArrayList();
+        Map<String, Collection<String>> regionZones = availabilityZones.get(platform);
+        for (Collection<String> zones : regionZones.values()) {
+            result.addAll(zones);
+        }
+        return result;
+    }
+
+    public Collection<String> getAvailabilityZonesByRegion(String platform, String region) {
+        return availabilityZones.get(platform).get(region);
     }
 
     public Set<String> getActiveHostGroups() {

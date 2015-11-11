@@ -2,6 +2,7 @@ package com.sequenceiq.cloudbreak.shell.commands;
 
 import static com.sequenceiq.cloudbreak.shell.support.TableRenderer.renderSingleMap;
 
+import java.util.Collection;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,6 @@ import com.sequenceiq.cloudbreak.shell.model.AdjustmentType;
 import com.sequenceiq.cloudbreak.shell.model.CloudbreakContext;
 import com.sequenceiq.cloudbreak.shell.model.Hints;
 import com.sequenceiq.cloudbreak.shell.model.OnFailureAction;
-import com.sequenceiq.cloudbreak.shell.model.Region;
 import com.sequenceiq.cloudbreak.shell.model.StatusRequest;
 
 import groovyx.net.http.HttpResponseException;
@@ -119,10 +119,15 @@ public class StackCommands implements CommandMarker {
             if (securityGroupId == null) {
                 return "A security group must be selected";
             }
+            Collection<String> zonesByRegion = context.getAvailabilityZonesByRegion(context.getActiveCloudPlatform(), region.getName());
             if (availabilityZone != null) {
-                if (!Region.regionContainsAvZone(region.getName(), availabilityZone.getName())) {
+                if (zonesByRegion != null && !zonesByRegion.contains(availabilityZone.getName())) {
                     return "Availability zone is not in the selected region. The available zones in the regions are: "
-                            + Region.valueOf(region.getName()).avZones();
+                            + zonesByRegion;
+                }
+            } else if ("GCP".equals(context.getActiveCloudPlatform())) {
+                if (zonesByRegion != null && zonesByRegion.size() > 0) {
+                    availabilityZone = new StackAvailabilityZone(zonesByRegion.iterator().next());
                 }
             }
             String id =
