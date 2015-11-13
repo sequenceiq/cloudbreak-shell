@@ -22,6 +22,8 @@ import org.springframework.shell.converters.StringConverter;
 import org.springframework.shell.core.Converter;
 
 import com.sequenceiq.cloudbreak.client.CloudbreakClient;
+import com.sequenceiq.cloudbreak.shell.converter.AwsVolumeTypeConverter;
+import com.sequenceiq.cloudbreak.shell.converter.GcpVolumeTypeConverter;
 import com.sequenceiq.cloudbreak.shell.converter.HostGroupConverter;
 import com.sequenceiq.cloudbreak.shell.converter.InstanceGroupConverter;
 import com.sequenceiq.cloudbreak.shell.converter.InstanceGroupTemplateIdConverter;
@@ -182,5 +184,15 @@ public class ConverterConfiguration {
     @Bean
     Converter securityRulesConverter() {
         return new SecurityRulesConverter(client);
+    }
+
+    @Bean
+    Converter gcpVolumeTypeConverter() {
+        return new GcpVolumeTypeConverter(client);
+    }
+
+    @Bean
+    Converter awsVolumeTypeConverter() {
+        return new AwsVolumeTypeConverter(client);
     }
 }

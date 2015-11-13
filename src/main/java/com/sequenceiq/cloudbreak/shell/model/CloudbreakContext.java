@@ -24,6 +24,7 @@ public class CloudbreakContext {
     private Map<String, Collection<String>> platformToVariants;
     private Map<String, Collection<String>> regions;
     private Map<String, Map<String, Collection<String>>> availabilityZones;
+    private Map<String, Collection<String>> volumeTypes;
     private Focus focus;
     private Hints hint;
     private Map<PropertyKey, String> properties = new HashMap<>();
@@ -40,8 +41,8 @@ public class CloudbreakContext {
     private String activeSecurityGroupId;
     private String fileSystemType;
     private Map<String, Object> fileSystemParameters = new HashMap<>();
-    private Boolean defaultFileSystem;
 
+    private Boolean defaultFileSystem;
     @Autowired
     private CloudbreakClient client;
 
@@ -410,6 +411,14 @@ public class CloudbreakContext {
         } catch (Exception ex) {
             return "";
         }
+    }
+
+    public void setVolumeTypes(Map<String, Collection<String>> volumeTypes) {
+        this.volumeTypes = volumeTypes;
+    }
+
+    public Collection<String> getVolumeTypesByPlatform(String platform) {
+        return volumeTypes.get(platform);
     }
 
     private enum PropertyKey {
