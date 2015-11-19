@@ -15,13 +15,13 @@ import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.stereotype.Component;
 
 import com.sequenceiq.cloudbreak.client.CloudbreakClient;
+import com.sequenceiq.cloudbreak.shell.completion.AwsVolumeType;
+import com.sequenceiq.cloudbreak.shell.completion.GcpVolumeType;
 import com.sequenceiq.cloudbreak.shell.model.AwsInstanceType;
 import com.sequenceiq.cloudbreak.shell.model.AzureInstanceType;
 import com.sequenceiq.cloudbreak.shell.model.CloudbreakContext;
 import com.sequenceiq.cloudbreak.shell.model.GcpInstanceType;
-import com.sequenceiq.cloudbreak.shell.model.GcpVolumeType;
 import com.sequenceiq.cloudbreak.shell.model.Hints;
-import com.sequenceiq.cloudbreak.shell.model.VolumeType;
 
 import groovyx.net.http.HttpResponseException;
 
@@ -103,7 +103,7 @@ public class TemplateCommands implements CommandMarker {
             @CliOption(key = "instanceType", mandatory = true, help = "instanceType of the template") AwsInstanceType instanceType,
             @CliOption(key = "volumeCount", mandatory = true, help = "volumeCount of the template") Integer volumeCount,
             @CliOption(key = "volumeSize", mandatory = true, help = "volumeSize(GB) of the template") Integer volumeSize,
-            @CliOption(key = "volumeType", mandatory = false, help = "volumeType of the template", specifiedDefaultValue = "Gp2") VolumeType volumeType,
+            @CliOption(key = "volumeType", mandatory = false, help = "volumeType of the template") AwsVolumeType volumeType,
             @CliOption(key = "encrypted", mandatory = false, help = "use encrypted disks") Boolean encrypted,
             @CliOption(key = "spotPrice", mandatory = false, help = "spotPrice of the template") Double spotPrice,
             @CliOption(key = "sshLocation", mandatory = false, specifiedDefaultValue = "0.0.0.0/0", help = "sshLocation of the template") String sshLocation,
@@ -125,7 +125,7 @@ public class TemplateCommands implements CommandMarker {
                         instanceType.toString(),
                         volumeCount.toString(),
                         volumeSize.toString(),
-                        volumeType == null ? VolumeType.Gp2.name() : volumeType.name(),
+                        volumeType == null ? "gp2" : volumeType.getName(),
                         publicInAccount(publicInAccount),
                         encrypted == null ? false : encrypted
                 );
@@ -136,7 +136,7 @@ public class TemplateCommands implements CommandMarker {
                         instanceType.toString(),
                         volumeCount.toString(),
                         volumeSize.toString(),
-                        volumeType == null ? VolumeType.Gp2.name() : volumeType.name(),
+                        volumeType == null ? "gp2" : volumeType.getName(),
                         spotPrice.toString(),
                         publicInAccount(publicInAccount),
                         encrypted == null ? false : encrypted
@@ -194,7 +194,7 @@ public class TemplateCommands implements CommandMarker {
             @CliOption(key = "instanceType", mandatory = true, help = "type of the VM") GcpInstanceType instanceType,
             @CliOption(key = "volumeCount", mandatory = true, help = "volumeCount of the template") Integer volumeCount,
             @CliOption(key = "volumeSize", mandatory = true, help = "volumeSize(GB) of the template") Integer volumeSize,
-            @CliOption(key = "volumeType", mandatory = false, help = "volumeType of the template", unspecifiedDefaultValue = "HDD") GcpVolumeType volumeType,
+            @CliOption(key = "volumeType", mandatory = false, help = "volumeType of the template") GcpVolumeType volumeType,
             @CliOption(key = "publicInAccount", mandatory = false, help = "flags if the template is public in the account") Boolean publicInAccount,
             @CliOption(key = "description", mandatory = false, help = "Description of the template") String description
             ) {
@@ -208,7 +208,7 @@ public class TemplateCommands implements CommandMarker {
             String id = cloudbreak.postGcpTemplate(name,
                     getDescription(description, "Gcp"),
                     instanceType.name(),
-                    volumeType.name(),
+                    volumeType == null ? "pd-standard" : volumeType.getName(),
                     volumeCount.toString(),
                     volumeSize.toString(),
                     publicInAccount(publicInAccount)
