@@ -22,6 +22,7 @@ import com.sequenceiq.cloudbreak.shell.model.CloudbreakContext;
 import com.sequenceiq.cloudbreak.shell.model.Hints;
 import com.sequenceiq.cloudbreak.shell.model.OnFailureAction;
 import com.sequenceiq.cloudbreak.shell.model.StatusRequest;
+import com.sequenceiq.cloudbreak.shell.util.MessageUtil;
 
 import groovyx.net.http.HttpResponseException;
 
@@ -257,7 +258,7 @@ public class StackCommands implements CommandMarker {
             cloudbreak.putStackStatus(Integer.valueOf(context.getStackId()), StatusRequest.STOPPED.name());
             return "Stack is stopping";
         } catch (Exception ex) {
-            return ex.toString();
+            return MessageUtil.getMessage(ex);
         }
     }
 
@@ -267,7 +268,7 @@ public class StackCommands implements CommandMarker {
             cloudbreak.putStackStatus(Integer.valueOf(context.getStackId()), StatusRequest.STARTED.name());
             return "Stack is starting";
         } catch (Exception ex) {
-            return ex.toString();
+            return MessageUtil.getMessage(ex);
         }
     }
 
