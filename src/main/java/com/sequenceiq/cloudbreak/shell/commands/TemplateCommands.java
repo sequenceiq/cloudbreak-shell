@@ -15,12 +15,12 @@ import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.stereotype.Component;
 
 import com.sequenceiq.cloudbreak.client.CloudbreakClient;
+import com.sequenceiq.cloudbreak.shell.completion.AwsInstanceType;
 import com.sequenceiq.cloudbreak.shell.completion.AwsVolumeType;
+import com.sequenceiq.cloudbreak.shell.completion.AzureInstanceType;
+import com.sequenceiq.cloudbreak.shell.completion.GcpInstanceType;
 import com.sequenceiq.cloudbreak.shell.completion.GcpVolumeType;
-import com.sequenceiq.cloudbreak.shell.model.AwsInstanceType;
-import com.sequenceiq.cloudbreak.shell.model.AzureInstanceType;
 import com.sequenceiq.cloudbreak.shell.model.CloudbreakContext;
-import com.sequenceiq.cloudbreak.shell.model.GcpInstanceType;
 import com.sequenceiq.cloudbreak.shell.model.Hints;
 
 import groovyx.net.http.HttpResponseException;
@@ -122,7 +122,7 @@ public class TemplateCommands implements CommandMarker {
                 id = cloudbreak.postEc2Template(name,
                         getDescription(description, "Aws"),
                         sshLocation == null ? "0.0.0.0/0" : sshLocation,
-                        instanceType.toString(),
+                        instanceType.getName(),
                         volumeCount.toString(),
                         volumeSize.toString(),
                         volumeType == null ? "gp2" : volumeType.getName(),
@@ -133,7 +133,7 @@ public class TemplateCommands implements CommandMarker {
                 id = cloudbreak.postSpotEc2Template(name,
                         getDescription(description, "Aws"),
                         sshLocation == null ? "0.0.0.0/0" : sshLocation,
-                        instanceType.toString(),
+                        instanceType.getName(),
                         volumeCount.toString(),
                         volumeSize.toString(),
                         volumeType == null ? "gp2" : volumeType.getName(),
@@ -174,7 +174,7 @@ public class TemplateCommands implements CommandMarker {
         try {
             String id = cloudbreak.postAzureTemplate(name,
                     getDescription(description, "Azure"),
-                    vmType.name(),
+                    vmType.getName(),
                     volumeCount.toString(),
                     volumeSize.toString(),
                     publicInAccount(publicInAccount)
@@ -207,7 +207,7 @@ public class TemplateCommands implements CommandMarker {
         try {
             String id = cloudbreak.postGcpTemplate(name,
                     getDescription(description, "Gcp"),
-                    instanceType.name(),
+                    instanceType.getName(),
                     volumeType == null ? "pd-standard" : volumeType.getName(),
                     volumeCount.toString(),
                     volumeSize.toString(),
