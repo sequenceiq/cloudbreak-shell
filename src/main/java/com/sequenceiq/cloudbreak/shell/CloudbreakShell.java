@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.ComponentScan;
@@ -41,8 +42,22 @@ public class CloudbreakShell implements CommandLineRunner, ShellStatusListener {
     @Autowired
     private CloudbreakClient cloudbreak;
 
+    @Value("${sequenceiq.user:}")
+    private String user;
+
+    @Value("${sequenceiq.password:}")
+    private String password;
+
     @Override
     public void run(String... arg) throws Exception {
+        if ("".equals(user)) {
+            System.out.println("Missing 'sequenceiq.user' parameter!");
+            return;
+        }
+        if ("".equals(password)) {
+            System.out.println("Missing 'sequenceiq.password' parameter!");
+            return;
+        }
         String[] shellCommandsToExecute = commandLine.getShellCommandsToExecute();
         if (shellCommandsToExecute != null) {
             init();
