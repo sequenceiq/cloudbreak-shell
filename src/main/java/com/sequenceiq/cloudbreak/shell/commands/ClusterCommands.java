@@ -20,6 +20,7 @@ import com.sequenceiq.cloudbreak.shell.completion.HostGroup;
 import com.sequenceiq.cloudbreak.shell.model.CloudbreakContext;
 import com.sequenceiq.cloudbreak.shell.model.Hints;
 import com.sequenceiq.cloudbreak.shell.model.StatusRequest;
+import com.sequenceiq.cloudbreak.shell.util.MessageUtil;
 
 import groovyx.net.http.HttpResponseException;
 
@@ -222,7 +223,7 @@ public class ClusterCommands implements CommandMarker {
             cloudbreak.putClusterStatus(Integer.valueOf(context.getStackId()), StatusRequest.STOPPED.name());
             return "Cluster is stopping";
         } catch (Exception ex) {
-            return ex.toString();
+            return MessageUtil.getMessage(ex);
         }
     }
 
@@ -232,7 +233,7 @@ public class ClusterCommands implements CommandMarker {
             cloudbreak.putClusterStatus(Integer.valueOf(context.getStackId()), StatusRequest.STARTED.name());
             return "Cluster is starting";
         } catch (Exception ex) {
-            return ex.toString();
+            return MessageUtil.getMessage(ex);
         }
     }
 }
