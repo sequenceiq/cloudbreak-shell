@@ -53,10 +53,10 @@ public class ShellConfiguration {
     @Value("${identity.address:https://identity.sequenceiq.com}")
     private String identityServerAddress;
 
-    @Value("${sequenceiq.user:user@seq.com}")
+    @Value("${sequenceiq.user:}")
     private String user;
 
-    @Value("${sequenceiq.password:test123}")
+    @Value("${sequenceiq.password:}")
     private String password;
 
     @Value("${cmdfile:}")
@@ -64,8 +64,11 @@ public class ShellConfiguration {
 
     @Bean
     CloudbreakClient createCloudbreakClient() throws Exception {
-        String token = getToken(identityServerAddress, user, password);
-        return new CloudbreakClient(cloudbreakAddress, token);
+        if (!"".equals(user) && !"".equals(password)) {
+            String token = getToken(identityServerAddress, user, password);
+            return new CloudbreakClient(cloudbreakAddress, token);
+        }
+        return null;
     }
 
     @Bean
@@ -162,10 +165,11 @@ public class ShellConfiguration {
             throw new TokenUnavailableException("Error occurred while getting token from identity server", e);
         } catch (HttpClientErrorException e) {
             if (HttpStatus.UNAUTHORIZED == e.getStatusCode()) {
-                System.out.println("Error occurred while getting token from identity server: " + e.getMessage());
+                System.out.println("Error occurred while getting token from identity server: " + identityServerAddress);
                 System.out.println("Check your username and password.");
+            } else {
+                System.out.println("Something unexpected happened, couldn't get token from identity server. Please check your configurations.");
             }
-            System.out.println("Something unexpected happened, couldn't get token from identity server. Please check your configurations.");
             throw new TokenUnavailableException("Error occurred while getting token from identity server", e);
         } catch (Exception e) {
             System.out.println("Something unexpected happened, couldn't get token from identity server. Please check your configurations.");
