@@ -4,6 +4,7 @@ import static com.sequenceiq.cloudbreak.shell.VersionedApplication.versionedAppl
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -18,7 +19,6 @@ import org.springframework.shell.core.JLineShellComponent;
 import org.springframework.shell.event.ShellStatus;
 import org.springframework.shell.event.ShellStatusListener;
 
-import com.google.common.collect.Maps;
 import com.sequenceiq.cloudbreak.client.CloudbreakClient;
 import com.sequenceiq.cloudbreak.shell.model.CloudbreakContext;
 import com.sequenceiq.cloudbreak.shell.model.Hints;
@@ -168,10 +168,11 @@ public class CloudbreakShell implements CommandLineRunner, ShellStatusListener {
     }
 
     private void initPlatformVariants() {
-        Map<String, Collection<String>> platformToVariants = Maps.newHashMap();
-        Map<String, Collection<String>> regions = Maps.newHashMap();
-        Map<String, Collection<String>> volumeTypes = Maps.newHashMap();
-        Map<String, Map<String, Collection<String>>> availabilityZones = Maps.newHashMap();
+        Map<String, Collection<String>> platformToVariants = Collections.EMPTY_MAP;
+        Map<String, Collection<String>> regions = Collections.EMPTY_MAP;
+        Map<String, Collection<String>> volumeTypes = Collections.EMPTY_MAP;
+        Map<String, Map<String, Collection<String>>> availabilityZones = Collections.EMPTY_MAP;
+        Map<String, Collection<Map<String, String>>> instanceTypes = Collections.EMPTY_MAP;
         try {
             Map<String, Map<String, Map>> cloudConnectorParams = (Map<String, Map<String, Map>>) cloudbreak.getCloudConnectorParams();
             platformToVariants = (Map<String, Collection<String>>) cloudConnectorParams.get("variants").get("platformToVariants");
@@ -179,6 +180,7 @@ public class CloudbreakShell implements CommandLineRunner, ShellStatusListener {
             regions.put("AZURE", regions.get("AZURE_RM"));
             availabilityZones = (Map<String, Map<String, Collection<String>>>) cloudConnectorParams.get("regions").get("availabilityZones");
             volumeTypes = (Map<String, Collection<String>>) cloudConnectorParams.get("disks").get("diskTypes");
+            instanceTypes = cloudConnectorParams.get("virtualMachines").get("virtualMachines");
         } catch (Exception e) {
             System.out.println("Error during retrieving platform variants");
         } finally {
@@ -186,6 +188,7 @@ public class CloudbreakShell implements CommandLineRunner, ShellStatusListener {
             context.setRegions(regions);
             context.setAvailabilityZones(availabilityZones);
             context.setVolumeTypes(volumeTypes);
+            context.setInstanceTypes(instanceTypes);
         }
     }
 

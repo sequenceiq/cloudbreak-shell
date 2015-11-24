@@ -25,6 +25,7 @@ public class CloudbreakContext {
     private Map<String, Collection<String>> regions;
     private Map<String, Map<String, Collection<String>>> availabilityZones;
     private Map<String, Collection<String>> volumeTypes;
+    private Map<String, Collection<Map<String, String>>> instanceTypes;
     private Focus focus;
     private Hints hint;
     private Map<PropertyKey, String> properties = new HashMap<>();
@@ -40,8 +41,8 @@ public class CloudbreakContext {
     private String activeNetworkId;
     private String activeSecurityGroupId;
     private String fileSystemType;
-    private Map<String, Object> fileSystemParameters = new HashMap<>();
 
+    private Map<String, Object> fileSystemParameters = new HashMap<>();
     private Boolean defaultFileSystem;
     @Autowired
     private CloudbreakClient client;
@@ -225,6 +226,15 @@ public class CloudbreakContext {
 
     public Collection<String> getAvailabilityZonesByRegion(String platform, String region) {
         return availabilityZones.get(platform).get(region);
+    }
+
+    public Collection<String> getInstanceTypeNamesByPlatform(String platform) {
+        Collection<String> result = Lists.newArrayList();
+        Collection<Map<String, String>> platformInstances = instanceTypes.get(platform);
+        for (Map<String, String> instance : platformInstances) {
+            result.add(instance.get("value"));
+        }
+        return result;
     }
 
     public Set<String> getActiveHostGroups() {
@@ -419,6 +429,10 @@ public class CloudbreakContext {
 
     public Collection<String> getVolumeTypesByPlatform(String platform) {
         return volumeTypes.get(platform);
+    }
+
+    public void setInstanceTypes(Map<String, Collection<Map<String, String>>> instanceTypes) {
+        this.instanceTypes = instanceTypes;
     }
 
     private enum PropertyKey {
