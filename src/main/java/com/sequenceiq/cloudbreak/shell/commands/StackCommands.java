@@ -17,6 +17,7 @@ import com.sequenceiq.cloudbreak.shell.completion.InstanceGroup;
 import com.sequenceiq.cloudbreak.shell.completion.PlatformVariant;
 import com.sequenceiq.cloudbreak.shell.completion.StackAvailabilityZone;
 import com.sequenceiq.cloudbreak.shell.completion.StackRegion;
+import com.sequenceiq.cloudbreak.shell.exception.ValidationException;
 import com.sequenceiq.cloudbreak.shell.model.AdjustmentType;
 import com.sequenceiq.cloudbreak.shell.model.CloudbreakContext;
 import com.sequenceiq.cloudbreak.shell.model.Hints;
@@ -112,21 +113,12 @@ public class StackCommands implements CommandMarker {
             @CliOption(key = "platformVariant", mandatory = false, help = "select platform variant version") PlatformVariant platformVariant,
             @CliOption(key = "dedicatedInstances", mandatory = false, help = "request dedicated instances on AWS") Boolean dedicatedInstances) {
         try {
-            String networkId = context.getActiveNetworkId();
-            if (networkId == null || (networkId != null && context.getNetworksByProvider().get(networkId) == context.getActiveCloudPlatform())) {
-                return "A network must be selected with the same cloud platform as the credential!";
-            }
-            String securityGroupId = context.getActiveSecurityGroupId();
-            if (securityGroupId == null) {
-                return "A security group must be selected";
-            }
-            Collection<String> zonesByRegion = context.getAvailabilityZonesByRegion(context.getActiveCloudPlatform(), region.getName());
-            if (availabilityZone != null) {
-                if (zonesByRegion != null && !zonesByRegion.contains(availabilityZone.getName())) {
-                    return "Availability zone is not in the selected region. The available zones in the regions are: "
-                            + zonesByRegion;
-                }
-            } else if ("GCP".equals(context.getActiveCloudPlatform())) {
+            validateNetwork();
+            validateSecurityGroup();
+            validateRegion(region);
+            validateAvailabilityZone(region, availabilityZone);
+            if (availabilityZone == null && "GCP".equals(context.getActiveCloudPlatform())) {
+                Collection<String> zonesByRegion = context.getAvailabilityZonesByRegion(context.getActiveCloudPlatform(), region.getName());
                 if (zonesByRegion != null && zonesByRegion.size() > 0) {
                     availabilityZone = new StackAvailabilityZone(zonesByRegion.iterator().next());
                 }
@@ -142,8 +134,8 @@ public class StackCommands implements CommandMarker {
                             threshold == null ? 1L : threshold,
                             adjustmentType == null ? AdjustmentType.BEST_EFFORT.name() : adjustmentType.name(),
                             image,
-                            networkId,
-                            securityGroupId,
+                            context.getActiveNetworkId(),
+                            context.getActiveSecurityGroupId(),
                             diskPerStorage,
                             dedicatedInstances,
                             platformVariant == null ? "" : platformVariant.getName(),
@@ -151,10 +143,40 @@ public class StackCommands implements CommandMarker {
             context.addStack(id, name);
             context.setHint(Hints.CREATE_CLUSTER);
             return "Stack created, id: " + id;
+        } catch (ValidationException e) {
+            return e.getMessage();
         } catch (HttpResponseException ex) {
             return ex.getResponse().getData().toString();
         } catch (Exception ex) {
             return ex.toString();
+        }
+    }
+
+    private void validateAvailabilityZone(StackRegion region, StackAvailabilityZone availabilityZone) {
+        Collection<String> zonesByRegion = context.getAvailabilityZonesByRegion(context.getActiveCloudPlatform(), region.getName());
+        if (availabilityZone != null && zonesByRegion != null && !zonesByRegion.contains(availabilityZone.getName())) {
+            throw new ValidationException("Availability zone is not in the selected region. The available zones in the regions are: " + zonesByRegion);
+        }
+    }
+
+    private void validateNetwork() {
+        String networkId = context.getActiveNetworkId();
+        if (networkId == null || (networkId != null && context.getNetworksByProvider().get(networkId) == context.getActiveCloudPlatform())) {
+            throw new ValidationException("A network must be selected with the same cloud platform as the credential!");
+        }
+    }
+
+    private void validateSecurityGroup() {
+        String securityGroupId = context.getActiveSecurityGroupId();
+        if (securityGroupId == null) {
+            throw new ValidationException("A security group must be selected");
+        }
+    }
+
+    private void validateRegion(StackRegion region) {
+        Collection<String> regionsByPlatform = context.getRegionsByPlatform(context.getActiveCloudPlatform());
+        if (regionsByPlatform != null && !regionsByPlatform.isEmpty() && !regionsByPlatform.contains(region.getName())) {
+            throw new ValidationException("Region is not available for the selected platform.");
         }
     }
 
