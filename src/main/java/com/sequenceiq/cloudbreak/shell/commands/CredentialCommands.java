@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.CommandMarker;
 import org.springframework.shell.core.annotation.CliAvailabilityIndicator;
@@ -31,7 +30,6 @@ import groovyx.net.http.HttpResponseException;
 @Component
 public class CredentialCommands implements CommandMarker {
 
-    public static final String AZURE = "AZURE";
     private List<Map> maps = new ArrayList<>();
 
     @Autowired
@@ -337,47 +335,6 @@ public class CredentialCommands implements CommandMarker {
             context.setCredential(id);
             createOrSelectTemplateHint();
             return "Credential created, id: " + id;
-        } catch (HttpResponseException ex) {
-            return ex.getResponse().getData().toString();
-        } catch (Exception ex) {
-            return ex.toString();
-        }
-    }
-
-    @CliAvailabilityIndicator(value = "credential certificate")
-    public boolean isCredentialCertificateCommandAvailable() {
-        try {
-            List<Map> credentials = cloudbreak.getAccountCredentials();
-            int count = 0;
-            maps = new ArrayList<>();
-            for (Map map : credentials) {
-                if (map.get("cloudPlatform").toString().equals(AZURE)) {
-                    maps.add(map);
-                    count++;
-                }
-            }
-            return count == 0 ? false : true;
-        } catch (Exception ex) {
-            return false;
-        }
-    }
-
-    @CliCommand(value = "credential certificate", help = "get Azure certificate")
-    public String getAzureCertificate(
-            @CliOption(key = "id", mandatory = true, help = "id of the credential") String id,
-            @CliOption(key = "resultPath", mandatory = true, help = "path of the certificate") String path
-    ) {
-        try {
-            for (Map map : maps) {
-                if (map.get("id").toString().equals(id)) {
-                    String certicate = cloudbreak.getCertificate(id);
-                    FileUtils.writeStringToFile(new File(path, "certicate.cer"), certicate);
-                    return "Your certicate was saved into " + String.format("%s/%s", path, "certicate.cer")
-                            + "\nPlease upload to the Azure portal before you continue"
-                            + "\nThe file contains your certificate which is:\n" + certicate;
-                }
-            }
-            return "Azure certificate with this id does not exist";
         } catch (HttpResponseException ex) {
             return ex.getResponse().getData().toString();
         } catch (Exception ex) {

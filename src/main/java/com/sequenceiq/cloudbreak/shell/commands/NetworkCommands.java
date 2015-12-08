@@ -83,7 +83,7 @@ public class NetworkCommands implements CommandMarker {
     ) {
         try {
             String id = cloudbreakClient.postAzureNetwork(name, description, subnet, addressPrefix, publicInAccount == null ? false : publicInAccount);
-            createHintAndAddNetworkToContext(id, "AZURE");
+            createHintAndAddNetworkToContext(id, "AZURE_RM");
             return String.format(CREATE_SUCCESS_MSG, id);
         } catch (HttpResponseException ex) {
             return ex.getResponse().getData().toString();

@@ -177,7 +177,6 @@ public class CloudbreakShell implements CommandLineRunner, ShellStatusListener {
             Map<String, Map<String, Map>> cloudConnectorParams = (Map<String, Map<String, Map>>) cloudbreak.getCloudConnectorParams();
             platformToVariants = (Map<String, Collection<String>>) cloudConnectorParams.get("variants").get("platformToVariants");
             regions = (Map<String, Collection<String>>) cloudConnectorParams.get("regions").get("regions");
-            regions.put("AZURE", regions.get("AZURE_RM"));
             availabilityZones = (Map<String, Map<String, Collection<String>>>) cloudConnectorParams.get("regions").get("availabilityZones");
             volumeTypes = (Map<String, Collection<String>>) cloudConnectorParams.get("disks").get("diskTypes");
             instanceTypes = cloudConnectorParams.get("virtualMachines").get("virtualMachines");
