@@ -140,8 +140,14 @@ public class CredentialCommands implements CommandMarker {
             @CliOption(key = "name", mandatory = true, help = "Name of the credential") String name,
             @CliOption(key = "userName", mandatory = true, help = "Username of the credential") String userName,
             @CliOption(key = "password", mandatory = true, help = "password of the credential") String password,
-            @CliOption(key = "tenantName", mandatory = true, help = "tenantName of the credential") String tenantName,
             @CliOption(key = "endPoint", mandatory = true, help = "endPoint of the credential") String endPoint,
+            @CliOption(key = "tenantName", mandatory = false, help = "tenantName of the credential for cb-keystone-v2") String tenantName,
+            @CliOption(key = "userDomain", mandatory = false, help = "userDomain of the credential for cb-keystone-v3*") String userDomain,
+            @CliOption(key = "keystoneAuthScope", mandatory = false, help = "keystoneAuthScope of the credential for cb-keystone-v3*") String keystoneAuthScope,
+            @CliOption(key = "domainName", mandatory = false, help = "domainName of the credential for cb-keystone-v3-default-scope") String domainName,
+            @CliOption(key = "projectDomainName", mandatory = false, help = "projectDomainName of the credential for cb-keystone-v3-project-scope")
+            String projectDomainName,
+            @CliOption(key = "projectName", mandatory = false, help = "projectName of the credential for cb-keystone-v3-project-scope") String projectName,
             @CliOption(key = "sshKeyPath", mandatory = false, help = "path of a public SSH key file") File sshKeyPath,
             @CliOption(key = "sshKeyUrl", mandatory = false, help = "URL of a public SSH key file") String sshKeyUrl,
             @CliOption(key = "description", mandatory = false, help = "Description of the credential") String description,
@@ -149,6 +155,25 @@ public class CredentialCommands implements CommandMarker {
         ) {
         if ((sshKeyPath == null) && (sshKeyUrl == null || sshKeyUrl.isEmpty())) {
             return "An SSH public key must be specified either with --sshKeyPath or --sshKeyUrl";
+        }
+        String selector = null;
+        String keyStoneVersion = null;
+        if (tenantName != null) {
+            selector = "cb-keystone-v2";
+            keyStoneVersion = "cb-keystone-v2";
+        }
+        if (userDomain != null && keystoneAuthScope != null) {
+            if (domainName != null) {
+                selector = "cb-keystone-v3-domain-scope";
+            } else if (projectDomainName != null && projectName != null) {
+                selector = "cb-keystone-v3-project-scope";
+            } else {
+                selector = "cb-keystone-v3-default-scope";
+            }
+            keyStoneVersion = "cb-keystone-v3";
+        }
+        if (selector == null || keyStoneVersion == null) {
+            return "Selector not found for specified parameters.";
         }
         String sshKey;
         if (sshKeyPath != null) {
@@ -165,7 +190,8 @@ public class CredentialCommands implements CommandMarker {
             }
         }
         try {
-            String id = cloudbreak.postOpenStackCredential(name, description, userName, password, tenantName, endPoint, sshKey, publicInAccount);
+            String id = cloudbreak.postOpenStackCredential(name, description, userName, password, tenantName, endPoint, sshKey, selector, keyStoneVersion,
+                    userDomain, keystoneAuthScope, domainName, projectDomainName, projectName, publicInAccount);
             context.setCredential(id);
             createOrSelectTemplateHint();
             return "Credential created, id: " + id;
