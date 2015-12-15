@@ -4,6 +4,7 @@ import static com.sequenceiq.cloudbreak.shell.support.TableRenderer.renderSingle
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -14,6 +15,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.CommandMarker;
 import org.springframework.shell.core.annotation.CliAvailabilityIndicator;
@@ -152,7 +155,7 @@ public class CredentialCommands implements CommandMarker {
             @CliOption(key = "sshKeyUrl", mandatory = false, help = "URL of a public SSH key file") String sshKeyUrl,
             @CliOption(key = "description", mandatory = false, help = "Description of the credential") String description,
             @CliOption(key = "publicInAccount", mandatory = false, help = "flags if the credential is public in the account") Boolean publicInAccount
-        ) {
+    ) {
         if ((sshKeyPath == null) && (sshKeyUrl == null || sshKeyUrl.isEmpty())) {
             return "An SSH public key must be specified either with --sshKeyPath or --sshKeyUrl";
         }
@@ -210,7 +213,7 @@ public class CredentialCommands implements CommandMarker {
             @CliOption(key = "sshKeyUrl", mandatory = false, help = "URL of a public SSH key file") String sshKeyUrl,
             @CliOption(key = "publicInAccount", mandatory = false, help = "flags if the credential is public in the account") Boolean publicInAccount,
             @CliOption(key = "description", mandatory = false, help = "Description of the template") String description
-            ) {
+    ) {
         if ((sshKeyPath == null) && (sshKeyUrl == null || sshKeyUrl.isEmpty())) {
             return "An SSH public key must be specified either with --sshKeyPath or --sshKeyUrl";
         }
@@ -257,7 +260,7 @@ public class CredentialCommands implements CommandMarker {
             @CliOption(key = "sshKeyUrl", mandatory = false, help = "URL of a public SSH key url") String sshKeyUrl,
             @CliOption(key = "publicInAccount", mandatory = false, help = "flags if the credential is public in the account") Boolean publicInAccount,
             @CliOption(key = "description", mandatory = false, help = "Description of the credential") String description
-            ) {
+    ) {
         if ((sshKeyPath == null) && (sshKeyUrl == null || sshKeyUrl.isEmpty())) {
             return "An SSH public key must be specified either with --sshKeyPath or --sshKeyUrl";
         }
@@ -336,13 +339,13 @@ public class CredentialCommands implements CommandMarker {
         String sshKey;
         if (sshKeyPath != null) {
             try {
-                sshKey = Base64.encodeBase64String(Files.readAllBytes(Paths.get(sshKeyPath.getPath())));
+                sshKey = IOUtils.toString(new FileReader(new File(sshKeyPath.getPath())));
             } catch (IOException e) {
                 return "File not found with ssh key.";
             }
         } else {
             try {
-                sshKey = Base64.encodeBase64String(readUrl(sshKeyUrl).getBytes());
+                sshKey = readUrl(sshKeyUrl);
             } catch (IOException e) {
                 return "Url not found with ssh key.";
             }
@@ -355,7 +358,7 @@ public class CredentialCommands implements CommandMarker {
                     tenantId,
                     appId,
                     password,
-                    sshKey,
+                    StringEscapeUtils.escapeJava(sshKey),
                     publicInAccount == null ? false : publicInAccount
             );
             context.setCredential(id);
